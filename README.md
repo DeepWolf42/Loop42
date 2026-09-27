@@ -1,9 +1,10 @@
+**English** · [Deutsch](README.de.md)
+
 # Loop42
 
 <p align="center">
   <img src="docs/assets/loop42-mark.webp" alt="Loop42 retro emblem" width="300">
 </p>
-
 
 Loop42 is a reusable development and factory system for building complex projects with AI-assisted workflows while keeping execution bounded, evidence-driven and recoverable.
 
@@ -60,10 +61,17 @@ The sequence is not a ritual. Steps may collapse when the required evidence alre
 - `docs/RECOVERY_AND_TRUTH.md` — truth, stale-state and recovery rules
 - `docs/EVALUATION.md` — frozen-scenario and method evaluation
 - `docs/LICENSE_POLICY.md` — current licensing policy
+- `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [German](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — bilingual documentation convention
 - `THIRD_PARTY.md` — external source and provenance ledger
 - `tools/` — reusable harness, context and verification utilities
 - `tests/frozen_scenarios/` — reproducible evaluation scenarios
 - `adapters/` — consumer integration examples
+
+## Documentation languages
+
+Core human-facing documentation follows an **English + German** convention. Code, schemas, APIs, tests and other machine-facing artifacts stay English so bilingual presentation does not create a second technical truth or needless maintenance duplication.
+
+See the [Documentation Language Policy](docs/DOCUMENTATION_LANGUAGE_POLICY.md).
 
 ## Consumer projects
 
@@ -88,4 +96,3 @@ Because good systems need bounded loops, honest evidence, recoverable state —
 and occasionally the right question before the right answer.
 
 </details>
-
