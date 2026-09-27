@@ -56,6 +56,7 @@ The sequence is not a ritual. Steps may collapse when the required evidence alre
 
 - `docs/MATRIXLOOP.md` — Matrixloop lifecycle and stop rules
 - `docs/HARNESS_CONTRACT.md` — reusable harness capability boundary
+- `docs/CONSUMER_PROFILE.md` — exact-revision consumer binding contract
 - `docs/RECOVERY_AND_TRUTH.md` — truth, stale-state and recovery rules
 - `docs/EVALUATION.md` — frozen-scenario and method evaluation
 - `docs/LICENSE_POLICY.md` — current licensing policy
@@ -74,7 +75,7 @@ CORA is the first consumer project, but its product truth remains outside this r
 
 Private development repository.
 
-Current v0.1 focus: extraction of reusable harness/context mechanics, frozen CORA Factory equivalence, and exact-revision consumer binding. The compact milestone view is tracked in issue #4; repository contracts and tests remain authoritative.
+Current v0.1 focus: exact-revision consumer binding after reusable context/harness extraction and the first frozen CORA equivalence suite. The compact milestone view is tracked in issue #4; repository contracts and tests remain authoritative.
 
 No root project LICENSE is intentionally present. A publication or distribution license will be chosen only after a release-specific dependency, file and license audit.
 
