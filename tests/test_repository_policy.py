@@ -17,9 +17,13 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/LICENSE_POLICY.md",
             "docs/assets/loop42-mark.webp",
             "tools/harness/README.md",
+            "tools/harness/ollama_worker.py",
             "tools/context/README.md",
+            "tools/context/project_context.py",
             "tools/checks/README.md",
             "tests/frozen_scenarios/README.md",
+            "tests/test_context_tools.py",
+            "tests/test_ollama_worker.py",
             "adapters/examples/README.md",
         )
         missing = [path for path in required if not (ROOT / path).is_file()]
