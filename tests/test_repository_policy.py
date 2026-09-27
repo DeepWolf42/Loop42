@@ -9,6 +9,7 @@ class RepositoryPolicyTests(unittest.TestCase):
     def test_required_seed_files_exist(self):
         required = (
             "README.md",
+            "README.de.md",
             "THIRD_PARTY.md",
             "docs/MATRIXLOOP.md",
             "docs/HARNESS_CONTRACT.md",
@@ -16,6 +17,8 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/RECOVERY_AND_TRUTH.md",
             "docs/EVALUATION.md",
             "docs/LICENSE_POLICY.md",
+            "docs/DOCUMENTATION_LANGUAGE_POLICY.md",
+            "docs/DOCUMENTATION_LANGUAGE_POLICY.de.md",
             "docs/assets/loop42-mark.webp",
             "tools/harness/README.md",
             "tools/context/README.md",
@@ -38,6 +41,14 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("Matrixloop", readme)
         self.assertIn("project-agnostic", readme)
         self.assertIn("Consumer projects keep their own product state", readme)
+
+    def test_bilingual_landing_pages_are_explicit(self):
+        readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_de = (ROOT / "README.de.md").read_text(encoding="utf-8")
+        self.assertIn("[Deutsch](README.de.md)", readme_en)
+        self.assertIn("[README.md](README.md)", readme_de)
+        self.assertIn("DOCUMENTATION_LANGUAGE_POLICY.md", readme_en)
+        self.assertIn("DOCUMENTATION_LANGUAGE_POLICY.de.md", readme_de)
 
     def test_recovery_contract_rejects_parallel_product_truth(self):
         recovery = (ROOT / "docs/RECOVERY_AND_TRUTH.md").read_text(encoding="utf-8")
