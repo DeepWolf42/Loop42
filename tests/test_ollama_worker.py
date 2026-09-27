@@ -37,7 +37,7 @@ class OllamaWorkerTests(unittest.TestCase):
                 pass
 
             def do_GET(self):
-                self.assertEqual(self.path, "/api/tags")
+                assert self.path == "/api/tags"
                 body = json.dumps(
                     {"models": [{"name": "other:latest", "model": "other:latest"}]}
                 ).encode()
@@ -86,7 +86,7 @@ class OllamaWorkerTests(unittest.TestCase):
                 pass
 
             def do_GET(self):
-                self.assertEqual(self.path, "/api/tags")
+                assert self.path == "/api/tags"
                 body = json.dumps(
                     {
                         "models": [
@@ -104,7 +104,7 @@ class OllamaWorkerTests(unittest.TestCase):
                 self.wfile.write(body)
 
             def do_POST(self):
-                self.assertEqual(self.path, "/api/chat")
+                assert self.path == "/api/chat"
                 size = int(self.headers["Content-Length"])
                 type(self).payload = json.loads(self.rfile.read(size))
                 body = json.dumps(
