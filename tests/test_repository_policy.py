@@ -33,8 +33,8 @@ class RepositoryPolicyTests(unittest.TestCase):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("Loop42", readme)
         self.assertIn("Matrixloop", readme)
-        self.assertIn("CORA", readme)
-        self.assertIn("must never become a second CORA product truth", readme)
+        self.assertIn("project-agnostic", readme)
+        self.assertIn("Consumer projects keep their own product state", readme)
 
     def test_recovery_contract_rejects_parallel_product_truth(self):
         recovery = (ROOT / "docs/RECOVERY_AND_TRUTH.md").read_text(encoding="utf-8")
