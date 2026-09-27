@@ -74,6 +74,8 @@ CORA is the first consumer project, but its product truth remains outside this r
 
 Private development repository.
 
+Current v0.1 focus: extraction of reusable harness/context mechanics, frozen CORA Factory equivalence, and exact-revision consumer binding. The compact milestone view is tracked in issue #4; repository contracts and tests remain authoritative.
+
 No root project LICENSE is intentionally present. A publication or distribution license will be chosen only after a release-specific dependency, file and license audit.
 
 <details>

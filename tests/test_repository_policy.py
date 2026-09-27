@@ -15,6 +15,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/RECOVERY_AND_TRUTH.md",
             "docs/EVALUATION.md",
             "docs/LICENSE_POLICY.md",
+            "docs/assets/loop42-mark.webp",
             "tools/harness/README.md",
             "tools/context/README.md",
             "tools/checks/README.md",
@@ -40,6 +41,26 @@ class RepositoryPolicyTests(unittest.TestCase):
         recovery = (ROOT / "docs/RECOVERY_AND_TRUTH.md").read_text(encoding="utf-8")
         self.assertIn("must not become a second product-state store", recovery)
         self.assertIn("Recovery is not specification", recovery)
+
+    def test_consumer_product_truth_files_do_not_live_here(self):
+        forbidden = (
+            ROOT / "docs/CURRENT_PROJECT_STATE.md",
+            ROOT / "project-context.json",
+            ROOT / "src/cora",
+        )
+        present = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
+        self.assertEqual(present, [])
+
+    def test_no_legacy_github_owner_references(self):
+        legacy_owner = "michaelwolf" + "2289-lang"
+        text_suffixes = {".md", ".txt", ".py", ".json", ".toml", ".yml", ".yaml"}
+        offenders = []
+        for path in ROOT.rglob("*"):
+            if not path.is_file() or path.suffix.lower() not in text_suffixes:
+                continue
+            if legacy_owner in path.read_text(encoding="utf-8"):
+                offenders.append(str(path.relative_to(ROOT)))
+        self.assertEqual(offenders, [])
 
 
 if __name__ == "__main__":
