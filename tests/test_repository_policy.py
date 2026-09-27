@@ -12,6 +12,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "THIRD_PARTY.md",
             "docs/MATRIXLOOP.md",
             "docs/HARNESS_CONTRACT.md",
+            "docs/CONSUMER_PROFILE.md",
             "docs/RECOVERY_AND_TRUTH.md",
             "docs/EVALUATION.md",
             "docs/LICENSE_POLICY.md",
@@ -19,6 +20,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "tools/harness/README.md",
             "tools/context/README.md",
             "tools/checks/README.md",
+            "tools/checks/consumer_profile.py",
             "tests/frozen_scenarios/README.md",
             "adapters/examples/README.md",
         )
