@@ -1,0 +1,19 @@
+{
+  "schema": "loop42.frozen-scenarios.v1",
+  "suite": "cora-context-equivalence-v1",
+  "source_repository": "DeepWolf42/C.O.R.A.",
+  "source_revision": "665bdd49724f27258ca4633b0dc5fa8fbb9ae602",
+  "scenarios": [
+    "context-dedup-exact-hash",
+    "stale-document-rejects-checkpoint",
+    "stale-head-rejects-checkpoint",
+    "source-path-escape-rejected",
+    "duplicate-checkpoint-rejected",
+    "concurrent-writer-rejected",
+    "non-loopback-ollama-rejected",
+    "missing-model-refuses-chat-post",
+    "recovery-is-not-second-product-truth",
+    "matrixloop-stops-without-useful-delta",
+    "external-reviewer-remains-hypothesis"
+  ]
+}
