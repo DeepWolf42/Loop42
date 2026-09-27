@@ -75,7 +75,9 @@ CORA is the first consumer project, but its product truth remains outside this r
 
 Private development repository.
 
-Current v0.1 focus: exact-revision consumer binding after reusable context/harness extraction and the first frozen CORA equivalence suite. The compact milestone view is tracked in issue #4; repository contracts and tests remain authoritative.
+The **v0.1 extraction / consumer-binding foundation is verified**. Reusable context/harness mechanics, frozen CORA equivalence and the exact-revision consumer-profile contract are in place. Milestone issue #4 is closed; repository contracts and tests remain authoritative.
+
+CORA currently pins verified Loop42 revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. That pin is intentionally exact and does not float when Loop42 `main` advances.
 
 No root project LICENSE is intentionally present. A publication or distribution license will be chosen only after a release-specific dependency, file and license audit.
 
