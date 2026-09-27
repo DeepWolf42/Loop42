@@ -1,52 +1,72 @@
 # Loop42
 
-Loop42 is the reusable development/factory system extracted from the CORA project.
+Loop42 is a reusable development and factory system for building complex projects with AI-assisted workflows while keeping execution bounded, evidence-driven and recoverable.
 
-**Matrixloop** is Loop42's internal method: a bounded, evidence-driven development loop for working across AI/harnesses without creating parallel project truth.
+Its internal method is the **Matrixloop**: a compact loop for reconciling live state, choosing one useful target, implementing or inspecting it, verifying the result, challenging it with realistic counterexamples, and stopping when another pass would add no measurable value.
 
-## Purpose
+## What Loop42 does
 
-Loop42 owns generic development mechanics such as:
+Loop42 provides generic development mechanics for:
 
-- bounded loop lifecycle and stop rules
-- source-of-truth / stale-state / single-writer mechanics
+- bounded iteration and explicit stop rules
+- source-of-truth and stale-state handling
 - recovery and reconciliation
+- single-writer / live-head guards
 - harness capability contracts
-- prompt/skill evaluation
+- prompt and skill evaluation
 - run budgets and stop receipts
 - provenance and third-party license gates
-- GitHub visibility/freshness guards
-- reusable context/codemap mechanics
+- GitHub visibility and freshness checks
+- reusable context and navigation helpers
 - frozen-scenario evaluation
-- generic candidate-learning/evolution gates
+- candidate learning and controlled evolution
 
-Loop42 does **not** own product-specific state for CORA or any other consumer project.
+## Design principles
 
-## CORA boundary
+**Evidence over confidence.**  
+Claims should be tied to reproducible evidence, exact revisions, or clearly marked uncertainty.
 
-- **CORA** = manufacturing product, product code, Arthur/Decision Compression, UI/product contracts, printer/slicer/material/HIL integrations and CORA-specific Recovery/state.
-- **Loop42** = reusable Factory/development system.
-- **Matrixloop** = the internal loop/method implemented by Loop42.
+**One truth, many workers.**  
+Multiple models or tools may inspect and challenge a project, but they do not create competing authoritative states.
 
-CORA may consume an exact Loop42 revision/profile. Loop42 must never become a second CORA product truth.
+**Bounded autonomy.**  
+Automation may do useful work inside explicit authority limits. Missing capability or evidence must stay visible rather than being guessed away.
 
-## Migration rule
+**Useful delta over process.**  
+The loop exists to improve the project. A check or iteration that produces no distinct decision, evidence, defect discovery or implementation value should be merged, simplified or stopped.
 
-The split from CORA is an **extraction + verification**, not a cleanup pass.
+**Recovery by design.**  
+Work should be resumable from explicit current state, accepted decisions, verified results and open blockers.
 
-Nothing working is deleted from CORA merely because an equivalent Loop42 artifact exists. Generic material is copied/extracted first, Loop42 is independently verified, CORA is bound to an exact Loop42 revision, frozen CORA Factory scenarios are compared, and only then may old duplicated material be separately archived or deprecated.
+**Portable by default.**  
+Provider-specific behavior belongs behind thin adapters. Matrixloop rules should not depend on a single AI vendor, IDE, chat surface or local model.
 
-## Repository status
+## Matrixloop in one line
+
+`RECONCILE → TARGET → PRE-MORTEM → IMPLEMENT/INSPECT → VERIFY → FRICTION → VALUE CHECK → STOP/ITERATE`
+
+The sequence is not a ritual. Steps may collapse when the required evidence already exists.
+
+## Repository structure
+
+- `docs/MATRIXLOOP.md` — Matrixloop lifecycle and stop rules
+- `docs/HARNESS_CONTRACT.md` — reusable harness capability boundary
+- `docs/RECOVERY_AND_TRUTH.md` — truth, stale-state and recovery rules
+- `docs/EVALUATION.md` — frozen-scenario and method evaluation
+- `docs/LICENSE_POLICY.md` — current licensing policy
+- `THIRD_PARTY.md` — external source and provenance ledger
+- `tools/` — reusable harness, context and verification utilities
+- `tests/frozen_scenarios/` — reproducible evaluation scenarios
+- `adapters/` — consumer integration examples
+
+## Consumer projects
+
+Loop42 is project-agnostic. Consumer projects keep their own product state, domain rules and authority boundaries and may pin an exact Loop42 revision/profile.
+
+CORA is the first consumer project, but its product truth remains outside this repository.
+
+## Status
 
 Private development repository.
 
-No root project LICENSE is intentionally present. A publication/distribution license will be chosen only after a release-specific dependency/file/license audit.
-
-See:
-
-- `docs/MATRIXLOOP.md`
-- `docs/HARNESS_CONTRACT.md`
-- `docs/RECOVERY_AND_TRUTH.md`
-- `docs/EVALUATION.md`
-- `docs/LICENSE_POLICY.md`
-- `THIRD_PARTY.md`
+No root project LICENSE is intentionally present. A publication or distribution license will be chosen only after a release-specific dependency, file and license audit.
