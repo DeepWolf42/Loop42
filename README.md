@@ -70,3 +70,12 @@ CORA is the first consumer project, but its product truth remains outside this r
 Private development repository.
 
 No root project LICENSE is intentionally present. A publication or distribution license will be chosen only after a release-specific dependency, file and license audit.
+
+<details>
+<summary>Why 42?</summary>
+
+Because good systems need bounded loops, honest evidence, recoverable state —  
+and occasionally the right question before the right answer.
+
+</details>
+
