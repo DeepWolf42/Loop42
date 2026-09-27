@@ -1,5 +1,10 @@
 # Loop42
 
+<p align="center">
+  <img src="docs/assets/loop42-mark.webp" alt="Loop42 retro emblem" width="300">
+</p>
+
+
 Loop42 is a reusable development and factory system for building complex projects with AI-assisted workflows while keeping execution bounded, evidence-driven and recoverable.
 
 Its internal method is the **Matrixloop**: a compact loop for reconciling live state, choosing one useful target, implementing or inspecting it, verifying the result, challenging it with realistic counterexamples, and stopping when another pass would add no measurable value.
