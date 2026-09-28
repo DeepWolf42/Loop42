@@ -41,6 +41,9 @@ Automation may do useful work inside explicit authority limits. Missing capabili
 **Useful delta over process.**  
 The loop exists to improve the project. A check or iteration that produces no distinct decision, evidence, defect discovery or implementation value should be merged, simplified or stopped.
 
+**Execution fit before operator work.**  
+Verify capability, value and operator friction before handing over setup steps. Prefer the simplest viable path that meets the goal and safety/quality constraints.
+
 **Recovery by design.**  
 Work should be resumable from explicit current state, accepted decisions, verified results and open blockers.
 
@@ -56,6 +59,7 @@ The sequence is not a ritual. Steps may collapse when the required evidence alre
 ## Repository structure
 
 - `docs/MATRIXLOOP.md` — Matrixloop lifecycle and stop rules
+- `docs/EXECUTION_FIT.md` / [German](docs/EXECUTION_FIT.de.md) — capability/value/operator-fit gate before setup or execution
 - `docs/HARNESS_CONTRACT.md` — reusable harness capability boundary
 - `docs/CONSUMER_PROFILE.md` — exact-revision consumer binding contract
 - `docs/RECOVERY_AND_TRUTH.md` — truth, stale-state and recovery rules
