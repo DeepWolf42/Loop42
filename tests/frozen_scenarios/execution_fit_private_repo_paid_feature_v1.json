@@ -1,0 +1,52 @@
+{
+  "schema": "loop42-frozen-scenario-v1",
+  "id": "execution_fit_private_repo_paid_feature_v1",
+  "title": "Check entitlement before operator setup",
+  "basis": {
+    "kind": "simulated_fixture",
+    "version": 1,
+    "note": "Generic regression fixture derived from a private-repository branch-ruleset workflow. It is not live GitHub evidence."
+  },
+  "goal": "Protect the repository's integration branch with the least operator effort that materially improves safety.",
+  "input_state": {
+    "repository_visibility": "private",
+    "feature_ui_visible": true,
+    "feature_enforcement_requires_paid_entitlement": true,
+    "current_entitlement_supports_enforcement": false,
+    "simpler_viable_fallback_exists": true,
+    "operator_prefers_low_friction_execution": true
+  },
+  "bad_behavior": [
+    "give_detailed_setup_before_prerequisite_check",
+    "ask_for_multiple_ui_screenshots_before_entitlement_check",
+    "continue_configuration_after_feature_is_known_to_be_ineffective",
+    "recommend_paid_upgrade_without_value_comparison"
+  ],
+  "required_behavior": [
+    "verify_prerequisites_and_entitlement_first",
+    "stop_the_blocked_route_before_downstream_setup",
+    "evaluate_upgrade_value_against_cost_and_goal",
+    "choose_the_lowest_friction_viable_fallback",
+    "give_operator_steps_only_for_an_actionable_route"
+  ],
+  "expected_outcome": {
+    "capability_fit": "fail_for_paid_enforcement_route",
+    "value_fit": "upgrade_not_justified_by_this_goal_alone",
+    "operator_fit": "use_existing_branch_pr_ci_workflow_as_fallback",
+    "operator_setup_steps_before_fit_check": 0,
+    "paid_actions": 0,
+    "architectural_commitments": 0
+  },
+  "evidence_requirements": [
+    "current_repository_visibility",
+    "current_feature_entitlement_or_plan_requirement",
+    "actual_fallback_capability",
+    "current_goal_and_required_protection_level"
+  ],
+  "non_goals": [
+    "prove_all_repository_security properties",
+    "require a particular hosting provider",
+    "recommend a paid plan by default",
+    "replace consumer project authority"
+  ]
+}
