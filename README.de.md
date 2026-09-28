@@ -41,6 +41,9 @@ Automatisierung darf innerhalb expliziter Autoritätsgrenzen nützliche Arbeit e
 **Nützliches Delta statt Prozessvolumen.**  
 Der Loop existiert, um das Projekt zu verbessern. Eine Prüfung oder Iteration ohne eigene Entscheidung, Evidence, Fehlerfund oder Implementierungswert soll zusammengelegt, vereinfacht oder gestoppt werden.
 
+**Execution Fit vor Operator-Arbeit.**  
+Prüfe Machbarkeit, Nutzen und Operator-Reibung, bevor Setup-Schritte abgegeben werden. Bevorzuge den einfachsten brauchbaren Weg, der Ziel sowie Safety-/Quality-Grenzen erfüllt.
+
 **Recovery by Design.**  
 Arbeit soll aus explizitem aktuellem Zustand, akzeptierten Entscheidungen, verifizierten Ergebnissen und offenen Blockern fortsetzbar sein.
 
@@ -56,6 +59,7 @@ Die Sequenz ist kein Ritual. Schritte dürfen zusammenfallen, wenn die notwendig
 ## Repository-Struktur
 
 - `docs/MATRIXLOOP.md` — Matrixloop-Lifecycle und Stopregeln
+- `docs/EXECUTION_FIT.md` / [Deutsch](docs/EXECUTION_FIT.de.md) — Capability-/Value-/Operator-Fit vor Setup oder Ausführung
 - `docs/HARNESS_CONTRACT.md` — wiederverwendbare Harness-Capability-Grenze
 - `docs/CONSUMER_PROFILE.md` — Contract für Exact-Revision-Consumer-Binding
 - `docs/RECOVERY_AND_TRUTH.md` — Truth-, Stale-State- und Recovery-Regeln
