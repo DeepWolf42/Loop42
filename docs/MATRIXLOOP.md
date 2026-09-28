@@ -40,3 +40,7 @@ Concurrent workers may inspect in parallel, but persistent changes must reconcil
 ## External reviewers
 
 Independent models/reviewers may challenge the system, but their findings are hypotheses until reproduced against the current source of truth. They never become a second authority automatically.
+
+## Named evidence and gap checks
+
+[`/truth` and `/gaps`](TRUTH_AND_GAPS.md) expose the existing reconciliation, target-selection and verification checks as bounded agent workflows. Use them within the stages above, reusing current evidence rather than adding another loop. They are not native executable host commands. Consumer adoption remains subject to exact-revision binding.
