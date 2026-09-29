@@ -10,6 +10,9 @@ class RepositoryPolicyTests(unittest.TestCase):
         required = (
             "README.md",
             "README.de.md",
+            ".gitignore",
+            ".github/dependabot.yml",
+            ".github/workflows/gitleaks.yml",
             "THIRD_PARTY.md",
             "docs/MATRIXLOOP.md",
             "docs/HARNESS_CONTRACT.md",
@@ -17,6 +20,8 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/RECOVERY_AND_TRUTH.md",
             "docs/EVALUATION.md",
             "docs/LICENSE_POLICY.md",
+            "docs/PUBLICATION_GATE.md",
+            "docs/PUBLICATION_GATE.de.md",
             "docs/DOCUMENTATION_LANGUAGE_POLICY.md",
             "docs/DOCUMENTATION_LANGUAGE_POLICY.de.md",
             "docs/assets/loop42-mark.webp",
