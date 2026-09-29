@@ -61,6 +61,7 @@ The sequence is not a ritual. Steps may collapse when the required evidence alre
 - `docs/RECOVERY_AND_TRUTH.md` — truth, stale-state and recovery rules
 - `docs/EVALUATION.md` — frozen-scenario and method evaluation
 - `docs/LICENSE_POLICY.md` — current licensing policy
+- `docs/PUBLICATION_GATE.md` / [German](docs/PUBLICATION_GATE.de.md) — public-release safety and operator-decision gate
 - `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [German](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — bilingual documentation convention
 - `THIRD_PARTY.md` — external source and provenance ledger
 - `tools/` — reusable harness, context and verification utilities
