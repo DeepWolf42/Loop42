@@ -28,7 +28,7 @@ Loop42 currently uses normal GitHub/Python tooling rather than vendoring it:
 
 - `actions/checkout` — MIT; CI pin currently references commit `d23441a48e516b6c34aea4fa41551a30e30af803` (v6)
 - `actions/setup-python` — MIT; CI pin currently references commit `ece7cb06caefa5fff74198d8649806c4678c61a1` (v6)
-- `gitleaks/gitleaks-action` — consumed as an external GitHub Action at commit `e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e` (v3); no code is vendored. The action repository uses its own current license terms, so publication/release audits must re-check the applicable version and terms.
+- `gacts/gitleaks` — MIT; CI pin currently references commit `4fd785dcdaf557fda64e05b0ae033b8f7d82fb81` (v1.3). It installs and runs the MIT-licensed `gitleaks/gitleaks` scanner, currently pinned by workflow input to v8.29.1. No scanner or wrapper code is vendored.
 - GitHub Dependabot — hosted GitHub service used for grouped GitHub Actions version-update PRs; no Dependabot implementation is vendored in Loop42.
 - Python standard library / `unittest` for the v0.1 test surface
 
