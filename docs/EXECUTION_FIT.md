@@ -33,7 +33,8 @@ Compare:
 - setup and maintenance complexity;
 - safety and reliability impact;
 - future lock-in or migration cost;
-- whether a simpler path already meets the requirement.
+- whether a simpler path already meets the requirement;
+- whether a different or new tool creates enough net benefit to justify switching, learning, maintenance, lock-in and operator cost.
 
 A paid upgrade, new dependency or more elaborate architecture needs proportional value. Do not preserve a route just because work on it has already started.
 
@@ -44,7 +45,8 @@ Among viable routes, choose the lowest-friction path that still satisfies the go
 Prefer:
 
 - one actionable block over many fragmented commands;
-- existing installed tools over new dependencies;
+- existing tools when they remain the best overall fit;
+- a new tool when its demonstrated net benefit clearly outweighs migration, learning, maintenance, lock-in and operator cost;
 - reversible changes over invasive setup;
 - automatic verification over asking the operator to inspect values manually;
 - direct evidence over screenshot chains;
