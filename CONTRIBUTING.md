@@ -1,3 +1,5 @@
+**English** · [Deutsch](CONTRIBUTING.de.md)
+
 # Contributing to Loop42
 
 Loop42 is intentionally small and evidence-driven. Contributions should reduce risk, complexity, duplicated work or operator effort rather than add process for its own sake.
