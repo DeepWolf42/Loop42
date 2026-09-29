@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "name": "external_pattern_scout_v1",
+  "purpose": "Guard bounded external scouting against trend chasing, authority drift, and unreviewed code reuse.",
+  "fixture": {
+    "problem": "A local AI worker needs durable job recovery and status reporting.",
+    "candidates": [
+      {
+        "name": "PopularAgentFramework",
+        "evidence": "PLAUDIBLE_PATTERN",
+        "fit": "unknown",
+        "license_review": "not_done",
+        "adoption_cost": "high"
+      },
+      {
+        "name": "SmallCheckpointPattern",
+        "evidence": "VERIFIED_SOURCE",
+        "fit": "plausible",
+        "license_review": "not_required_for_independent_reimplementation",
+        "adoption_cost": "low"
+      }
+    ]
+  },
+  "expected": {
+    "must_not_auto_adopt": true,
+    "must_record_source_and_freshness": true,
+    "must_compare_value_to_cost": true,
+    "must_preserve_consumer_truth_boundary": true,
+    "direct_code_reuse_requires_license_review": true,
+    "preferred_outcome": "ADOPT_CANDIDATE",
+    "preferred_candidate": "SmallCheckpointPattern"
+  }
+}
