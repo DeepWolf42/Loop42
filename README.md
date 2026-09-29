@@ -88,7 +88,7 @@ The **v0.1 extraction / consumer-binding foundation is verified**. Reusable cont
 
 CORA currently pins verified Loop42 revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. That pin is intentionally exact and does not float when Loop42 `main` advances.
 
-No root project LICENSE is intentionally present. A publication or distribution license will be chosen only after a release-specific dependency, file and license audit.
+Loop42 is licensed under the MIT License. Public visibility is still gated by the publication checklist and an explicit operator decision.
 
 <details>
 <summary>Why 42?</summary>
