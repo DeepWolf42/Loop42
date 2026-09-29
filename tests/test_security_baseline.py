@@ -31,7 +31,7 @@ class SecurityBaselineTests(unittest.TestCase):
     def test_gitleaks_scans_full_history_read_only(self):
         text = (WORKFLOWS / "gitleaks.yml").read_text(encoding="utf-8")
         self.assertIn("fetch-depth: 0", text)
-        self.assertIn("permissions:\n  contents: read", text)
+        self.assertIn("permissions:\n  contents: read\n  pull-requests: read", text)
         self.assertIn('GITLEAKS_ENABLE_COMMENTS: "false"', text)
         self.assertIn('GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"', text)
 
