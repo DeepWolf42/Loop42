@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   gitleaks:
@@ -21,8 +20,6 @@ jobs:
           fetch-depth: 0
 
       - name: Scan repository history for secrets
-        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_ENABLE_COMMENTS: "false"
-          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
+        uses: gacts/gitleaks@4fd785dcdaf557fda64e05b0ae033b8f7d82fb81 # v1.3
+        with:
+          version: "8.29.1"
