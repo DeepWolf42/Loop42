@@ -31,9 +31,9 @@ class SecurityBaselineTests(unittest.TestCase):
     def test_gitleaks_scans_full_history_read_only(self):
         text = (WORKFLOWS / "gitleaks.yml").read_text(encoding="utf-8")
         self.assertIn("fetch-depth: 0", text)
-        self.assertIn("permissions:\n  contents: read\n  pull-requests: read", text)
-        self.assertIn('GITLEAKS_ENABLE_COMMENTS: "false"', text)
-        self.assertIn('GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"', text)
+        self.assertIn("permissions:\n  contents: read", text)
+        self.assertIn("gacts/gitleaks@4fd785dcdaf557fda64e05b0ae033b8f7d82fb81", text)
+        self.assertIn('version: "8.29.1"', text)
 
     def test_all_workflow_actions_are_pinned_to_commit_sha(self):
         unpinned = []
