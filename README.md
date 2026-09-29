@@ -90,13 +90,13 @@ CORA is the first consumer project, but its product truth remains outside this r
 
 ## Status
 
-Private development repository.
+Public development repository.
 
 The **v0.1 extraction / consumer-binding foundation is verified**. Reusable context/harness mechanics, frozen CORA equivalence and the exact-revision consumer-profile contract are in place. Milestone issue #4 is closed; repository contracts and tests remain authoritative.
 
 CORA currently pins verified Loop42 revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. That pin is intentionally exact and does not float when Loop42 `main` advances.
 
-Loop42 is licensed under the MIT License. Public visibility is still gated by the publication checklist and an explicit operator decision.
+Loop42 is licensed under the MIT License.
 
 <details>
 <summary>Why 42?</summary>

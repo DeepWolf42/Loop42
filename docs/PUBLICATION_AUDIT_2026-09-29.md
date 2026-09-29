@@ -1,6 +1,6 @@
 # Publication Audit — 2026-09-29
 
-Status: pre-publication evidence; not publication approval
+Status: public-release candidate; repository visibility explicitly approved by the operator on 2026-09-29
 
 ## Basis
 
@@ -86,13 +86,13 @@ The operator explicitly accepted public visibility of existing author-email meta
 
 `docs/assets/loop42-mark.webp` was explicitly confirmed as project-owned.
 
-### Repository visibility — OPERATOR DECISION REQUIRED
+### Repository visibility — APPROVED, SETTING CHANGE PENDING
 
-Changing the repository from private to public remains a protected action and has not been performed.
+The operator explicitly approved changing Loop42 from private to public on 2026-09-29. This document records that authorization; the repository setting must still be changed and then re-verified.
 
-### Final public-state wording — PENDING VISIBILITY APPROVAL
+### Final public-state wording — PREPARED
 
-The README correctly still says that the repository is private. Once visibility change is explicitly approved, that wording must be changed on a final candidate and that exact candidate must pass CI + secret scan before or immediately with publication.
+The public-release branch updates the English and German README status wording for a public repository. The exact candidate must pass CI + secret scan before the visibility setting is changed.
 
 ### Public branch protection — POST-PUBLIC ACTION
 
@@ -106,6 +106,6 @@ After public visibility, protect `main` with the lowest-friction rules available
 
 **Open-PR cleanup: PASS.**
 
-**Publication gate: READY EXCEPT FOR THE FINAL VISIBILITY DECISION, PUBLIC-STATE WORDING, AND POST-PUBLIC MAIN PROTECTION.**
+**Publication gate: READY FOR VISIBILITY CHANGE AFTER THE EXACT PUBLIC CANDIDATE PASSES CI + SECRET SCAN.**
 
 No paid service or additional user setup is required before the visibility decision.

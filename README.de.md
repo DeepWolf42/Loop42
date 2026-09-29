@@ -90,13 +90,13 @@ CORA ist das erste Consumer-Projekt; seine Produktwahrheit bleibt außerhalb die
 
 ## Status
 
-Privates Entwicklungs-Repository.
+Öffentliches Entwicklungs-Repository.
 
 Die **v0.1 Extraction-/Consumer-Binding-Foundation ist verifiziert**. Wiederverwendbare Context-/Harness-Mechanik, Frozen-CORA-Equivalence und der Exact-Revision-Consumer-Profile-Contract sind vorhanden. Milestone-Issue #4 ist geschlossen; Repository-Contracts und Tests bleiben autoritativ.
 
 CORA pinnt derzeit die verifizierte Loop42-Revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. Dieser Pin ist absichtlich exakt und floatet nicht mit, nur weil Loop42 `main` weiterläuft.
 
-Loop42 steht unter der MIT-Lizenz. Öffentliche Sichtbarkeit bleibt weiterhin durch das Publication Gate und eine ausdrückliche Operator-Entscheidung geschützt.
+Loop42 steht unter der MIT-Lizenz.
 
 <details>
 <summary>Warum 42?</summary>
