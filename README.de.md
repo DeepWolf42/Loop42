@@ -70,6 +70,8 @@ Die Sequenz ist kein Ritual. Schritte dürfen zusammenfallen, wenn die notwendig
 - `docs/PUBLICATION_GATE.md` / [Deutsch](docs/PUBLICATION_GATE.de.md) — Safety- und Operator-Entscheidungs-Gate für die Veröffentlichung
 - `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [Deutsch](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — Zweisprachigkeitsregel
 - `THIRD_PARTY.md` — externe Quellen und Provenance-Ledger
+- `SECURITY.md` / [Deutsch](SECURITY.de.md) — Security-Meldung und Grenze für sensible Informationen
+- `CONTRIBUTING.md` / [Deutsch](CONTRIBUTING.de.md) — Beitrags-, Verifikations-, Provenance- und Datenschutzregeln
 - `tools/` — wiederverwendbare Harness-, Context- und Verification-Utilities
 - `tests/frozen_scenarios/` — reproduzierbare Evaluationsszenarien
 - `adapters/` — Beispiele für Consumer-Integration
