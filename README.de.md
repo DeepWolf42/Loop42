@@ -61,6 +61,7 @@ Die Sequenz ist kein Ritual. Schritte dürfen zusammenfallen, wenn die notwendig
 - `docs/RECOVERY_AND_TRUTH.md` — Truth-, Stale-State- und Recovery-Regeln
 - `docs/EVALUATION.md` — Frozen-Scenario- und Methoden-Evaluation
 - `docs/LICENSE_POLICY.md` — aktuelle Lizenzregel
+- `docs/PUBLICATION_GATE.md` / [Deutsch](docs/PUBLICATION_GATE.de.md) — Safety- und Operator-Entscheidungs-Gate für die Veröffentlichung
 - `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [Deutsch](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — Zweisprachigkeitsregel
 - `THIRD_PARTY.md` — externe Quellen und Provenance-Ledger
 - `tools/` — wiederverwendbare Harness-, Context- und Verification-Utilities
