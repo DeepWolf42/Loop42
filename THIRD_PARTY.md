@@ -34,6 +34,10 @@ Loop42 currently uses normal GitHub/Python tooling rather than vendoring it:
 
 A future packaged/distributed Loop42 release must run a fresh dependency/file/license audit instead of treating this source-level list as an SBOM.
 
+## Project-owned assets
+
+- `docs/assets/loop42-mark.webp` — project-owned Loop42 visual asset. Origin/reuse rights were explicitly attested by the operator on 2026-09-29 as created by/for this project rather than sourced from a third party.
+
 ## Provenance rule
 
 Before importing or adapting third-party code:
