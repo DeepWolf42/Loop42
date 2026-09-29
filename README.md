@@ -90,7 +90,7 @@ CORA is the first consumer project, but its product truth remains outside this r
 
 ## Status
 
-Private development repository.
+Public development repository.
 
 The **v0.1 extraction / consumer-binding foundation is verified**. Reusable context/harness mechanics, frozen CORA equivalence and the exact-revision consumer-profile contract are in place. Milestone issue #4 is closed; repository contracts and tests remain authoritative.
 
