@@ -60,6 +60,34 @@ Avoid:
 - setup steps that cannot become effective;
 - asking the operator to perform checks that the available tools can verify directly.
 
+## Operator sovereignty
+
+Reducing operator effort must never silently reduce operator authority.
+
+Automation may proceed without interruption only inside already-authorized, bounded and reversible work. The operator keeps the final decision for protected actions such as:
+
+- spending money or enabling paid services;
+- publishing, releasing, merging into a protected product state, or changing repository visibility;
+- real machine motion, heating, actuation or other physical-world actions;
+- changing safety, quality or authority boundaries;
+- destructive or materially irreversible changes;
+- major product-direction decisions that exceed the currently authorized goal.
+
+Decision compression should reduce how often the operator is interrupted, not transfer these decisions away from them. When a protected decision is required, present the smallest decision that preserves meaningful choice.
+
+## Task and automation compression
+
+Task capacity and operator attention are finite resources.
+
+Before creating another agent, scheduled task, specialist role or monitoring loop:
+
+1. check whether the work can be completed in the current run;
+2. check whether it can be folded into an existing task without obscuring responsibility;
+3. check whether a local worker can do the bounded preparation instead of consuming another scarce orchestration slot;
+4. create a new persistent task only when separation has clear value.
+
+Prefer one coherent task with several related sources over several overlapping watchers. Preserve spare capacity for unexpected or high-value work.
+
 ## Failure behavior
 
 If Capability Fit fails:
