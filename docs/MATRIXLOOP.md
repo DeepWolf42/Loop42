@@ -40,3 +40,11 @@ Concurrent workers may inspect in parallel, but persistent changes must reconcil
 ## External reviewers
 
 Independent models/reviewers may challenge the system, but their findings are hypotheses until reproduced against the current source of truth. They never become a second authority automatically.
+
+## External pattern scouting
+
+Before inventing substantial new infrastructure or orchestration, Matrixloop may run a bounded external pattern scout. A scheduled maintenance scout may also look for newly useful patterns without blocking normal product work.
+
+Scouting is an input to TARGET / PRE-MORTEM, not another loop stage. Discovery does not authorize adoption: relevance, project fit, expected value, provenance/license status and reproduction against the current source of truth still apply.
+
+See `docs/EXTERNAL_PATTERN_SCOUT.md`.
