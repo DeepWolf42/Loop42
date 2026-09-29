@@ -22,3 +22,25 @@ CORA product state, Arthur, printer/slicer/material/HIL behavior and CORA Recove
 ## Deviation rule
 
 A frozen failure is treated as a regression unless the behavior change is explicit, the expected scenario is deliberately revised, and affected consumer evidence is re-run against the new exact revision. Passing a frozen suite never authorizes automatic deletion of predecessor material.
+
+
+## Execution Fit: private repository / paid feature v1
+
+`execution_fit_private_repo_paid_feature_v1.json` freezes a generic operator-friction regression:
+
+- a feature's configuration UI is visible;
+- effective enforcement requires an entitlement the current environment does not have;
+- a simpler fallback exists;
+- the method must verify prerequisites before asking the operator to perform downstream setup.
+
+The expected behavior is Capability Fit -> Value Fit -> Operator Fit: detect the blocked paid route, stop it before setup, evaluate whether an upgrade is justified, choose the lowest-friction viable fallback and only then give actionable operator instructions.
+
+The fixture is simulated. It preserves the decision failure mode, not a claim about any provider's current plan details.
+
+## Execution Fit: limited task capacity v1
+
+`execution_fit_limited_task_capacity_v1.json` freezes the rule that overlapping monitoring/work should be compressed before scarce persistent task capacity is consumed. It also preserves operator sovereignty for protected decisions.
+
+## External pattern scout v1
+
+`external_pattern_scout_v1.json` freezes bounded external scouting: candidates must be problem-linked, provenance-aware and value-checked rather than adopted because they are popular.
