@@ -1,3 +1,5 @@
+**[English](CONTRIBUTING.md)** · Deutsch
+
 # Zu Loop42 beitragen
 
 Loop42 bleibt bewusst klein und evidenzbasiert. Beiträge sollen Risiko, Komplexität, doppelte Arbeit oder Operator-Aufwand reduzieren, statt Prozess um des Prozesses willen zu erzeugen.
