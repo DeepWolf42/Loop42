@@ -59,6 +59,12 @@ class ArtifactKind(str, Enum):
     ARCHIVED = "archived"
 
 
+class NotificationKind(str, Enum):
+    RESULT = "result"
+    ACTIONABLE_FAILURE = "actionable_failure"
+    DECISION_REQUIRED = "decision_required"
+
+
 def _aware_utc(value: datetime) -> datetime:
     if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
         raise ValueError("timestamps must be timezone-aware")
@@ -464,3 +470,53 @@ def reconcile_worker(
         late_results=tuple(late_results),
         result_receipt=receipt,
     )
+
+
+def notification_for(
+    previous: ReconciledState | None,
+    current: ReconciledState,
+) -> NotificationKind | None:
+    """Return only meaningful state-transition notifications.
+
+    Ordinary offline/stale observations are intentionally silent. Adapters can
+    persist the previous reconciled state and use this helper to avoid repeated
+    alerts while a host is powered off or temporarily unreachable.
+    """
+    if not isinstance(current, ReconciledState):
+        raise TypeError("current must be ReconciledState")
+    if previous is not None and not isinstance(previous, ReconciledState):
+        raise TypeError("previous must be ReconciledState or None")
+
+    if current.lifecycle is TaskLifecycle.SUCCEEDED:
+        if (
+            previous is None
+            or previous.lifecycle is not TaskLifecycle.SUCCEEDED
+            or previous.result_receipt != current.result_receipt
+        ):
+            return NotificationKind.RESULT
+        return None
+
+    if current.lifecycle is TaskLifecycle.FAILED:
+        if previous is None or previous.lifecycle is not TaskLifecycle.FAILED:
+            return NotificationKind.ACTIONABLE_FAILURE
+        return None
+
+    needs_decision = (
+        current.lifecycle in {TaskLifecycle.CONFLICT, TaskLifecycle.BLOCKED}
+        or bool(current.late_results)
+    )
+    previous_needs_decision = bool(
+        previous
+        and (
+            previous.lifecycle in {TaskLifecycle.CONFLICT, TaskLifecycle.BLOCKED}
+            or previous.late_results
+        )
+    )
+    if needs_decision and (
+        not previous_needs_decision
+        or previous is None
+        or previous.reasons != current.reasons
+        or previous.late_results != current.late_results
+    ):
+        return NotificationKind.DECISION_REQUIRED
+    return None
