@@ -1,3 +1,5 @@
+**[English](SECURITY.md)** · Deutsch
+
 # Sicherheitsrichtlinie
 
 Loop42 soll Automatisierung begrenzt, reproduzierbar und sicher prüfbar halten.
