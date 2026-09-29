@@ -61,6 +61,34 @@ Vermeide:
 - Setup-Schritte, die später gar nicht wirksam werden können;
 - Prüfungen durch den Operator, die vorhandene Tools selbst durchführen können.
 
+## Entscheidungshoheit des Operators
+
+Weniger Operator-Aufwand darf niemals stillschweigend weniger Entscheidungshoheit bedeuten.
+
+Automatisierung darf ohne Unterbrechung nur innerhalb bereits freigegebener, begrenzter und reversibler Arbeit weiterlaufen. Die letzte Entscheidung bleibt beim Operator für geschützte Aktionen wie:
+
+- Geld ausgeben oder kostenpflichtige Dienste aktivieren;
+- Veröffentlichen, Releasen, Mergen in einen geschützten Produktzustand oder Ändern der Repository-Sichtbarkeit;
+- reale Maschinenbewegung, Heizung, Aktorik oder andere physische Aktionen;
+- Änderungen an Safety-, Quality- oder Authority-Grenzen;
+- destruktive oder wesentlich irreversible Änderungen;
+- grundlegende Produkt-Richtungsentscheidungen außerhalb des aktuell freigegebenen Ziels.
+
+Decision Compression soll die Zahl der Unterbrechungen reduzieren, nicht diese Entscheidungen wegautomatisieren. Wenn eine geschützte Entscheidung nötig ist, wird die kleinstmögliche Entscheidung vorgelegt, die echte Wahlfreiheit erhält.
+
+## Aufgaben- und Automationskompression
+
+Task-Kapazität und Operator-Aufmerksamkeit sind begrenzte Ressourcen.
+
+Bevor ein weiterer Agent, geplanter Task, Spezialisten-Job oder Monitoring-Loop erzeugt wird:
+
+1. prüfen, ob die Arbeit im aktuellen Lauf erledigt werden kann;
+2. prüfen, ob sie ohne Verantwortungsunklarheit in einen bestehenden Task integriert werden kann;
+3. prüfen, ob ein lokaler Worker die begrenzte Vorarbeit übernehmen kann, statt einen knappen Orchestrierungs-Slot zu belegen;
+4. einen neuen dauerhaften Task nur erzeugen, wenn die Trennung einen klaren Mehrwert hat.
+
+Ein kohärenter Task mit mehreren verwandten Quellen ist mehreren überlappenden Watchern vorzuziehen. Freie Kapazität für unerwartete oder besonders wertvolle Arbeit soll bewusst erhalten bleiben.
+
 ## Verhalten bei fehlendem Fit
 
 Wenn Capability Fit fehlschlägt:
