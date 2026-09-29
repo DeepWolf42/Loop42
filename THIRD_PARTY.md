@@ -26,11 +26,17 @@ No implementation code from these projects is intentionally imported by the curr
 
 Loop42 currently uses normal GitHub/Python tooling rather than vendoring it:
 
-- `actions/checkout` — MIT
-- `actions/setup-python` — MIT
+- `actions/checkout` — MIT; CI pin currently references commit `d23441a48e516b6c34aea4fa41551a30e30af803` (v6)
+- `actions/setup-python` — MIT; CI pin currently references commit `ece7cb06caefa5fff74198d8649806c4678c61a1` (v6)
+- `gacts/gitleaks` — MIT; CI pin currently references commit `4fd785dcdaf557fda64e05b0ae033b8f7d82fb81` (v1.3). It installs and runs the MIT-licensed `gitleaks/gitleaks` scanner, currently pinned by workflow input to v8.29.1. No scanner or wrapper code is vendored.
+- GitHub Dependabot — hosted GitHub service used for grouped GitHub Actions version-update PRs; no Dependabot implementation is vendored in Loop42.
 - Python standard library / `unittest` for the v0.1 test surface
 
 A future packaged/distributed Loop42 release must run a fresh dependency/file/license audit instead of treating this source-level list as an SBOM.
+
+## Project-owned assets
+
+- `docs/assets/loop42-mark.webp` — project-owned Loop42 visual asset. Origin/reuse rights were explicitly attested by the operator on 2026-09-29 as created by/for this project rather than sourced from a third party.
 
 ## Provenance rule
 

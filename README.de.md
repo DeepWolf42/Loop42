@@ -61,6 +61,7 @@ Die Sequenz ist kein Ritual. Schritte dürfen zusammenfallen, wenn die notwendig
 - `docs/RECOVERY_AND_TRUTH.md` — Truth-, Stale-State- und Recovery-Regeln
 - `docs/EVALUATION.md` — Frozen-Scenario- und Methoden-Evaluation
 - `docs/LICENSE_POLICY.md` — aktuelle Lizenzregel
+- `docs/PUBLICATION_GATE.md` / [Deutsch](docs/PUBLICATION_GATE.de.md) — Safety- und Operator-Entscheidungs-Gate für die Veröffentlichung
 - `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [Deutsch](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — Zweisprachigkeitsregel
 - `THIRD_PARTY.md` — externe Quellen und Provenance-Ledger
 - `tools/` — wiederverwendbare Harness-, Context- und Verification-Utilities
@@ -87,7 +88,7 @@ Die **v0.1 Extraction-/Consumer-Binding-Foundation ist verifiziert**. Wiederverw
 
 CORA pinnt derzeit die verifizierte Loop42-Revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. Dieser Pin ist absichtlich exakt und floatet nicht mit, nur weil Loop42 `main` weiterläuft.
 
-Absichtlich existiert kein Root-Projekt-`LICENSE`. Eine Veröffentlichungs- oder Distributionslizenz wird erst nach einem releasespezifischen Dependency-, Datei- und Lizenz-Audit gewählt.
+Loop42 steht unter der MIT-Lizenz. Öffentliche Sichtbarkeit bleibt weiterhin durch das Publication Gate und eine ausdrückliche Operator-Entscheidung geschützt.
 
 <details>
 <summary>Warum 42?</summary>

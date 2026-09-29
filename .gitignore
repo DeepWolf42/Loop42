@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Local/editor state
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+client_secret*.json
+credentials*.json
+token*.json
+
+# Local Loop42 / worker state
+*.local.json
+*.local.toml
+*.local.yaml
+*.local.yml
