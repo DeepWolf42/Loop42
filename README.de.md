@@ -47,6 +47,9 @@ Arbeit soll aus explizitem aktuellem Zustand, akzeptierten Entscheidungen, verif
 **Standardmäßig portabel.**  
 Provider-spezifisches Verhalten gehört hinter dünne Adapter. Matrixloop-Regeln sollen nicht von einem einzelnen KI-Anbieter, einer IDE, Chat-Oberfläche oder einem lokalen Modell abhängen.
 
+**Execution Fit vor Operator-Arbeit.**  
+Prüfe Machbarkeit, Nutzen und Operator-Reibung, bevor Setup-Schritte abgegeben werden. Bevorzuge den einfachsten brauchbaren Weg, der Ziel sowie Safety-/Quality-Grenzen erfüllt.
+
 ## Matrixloop in einer Zeile
 
 `RECONCILE → TARGET → PRE-MORTEM → IMPLEMENT/INSPECT → VERIFY → FRICTION → VALUE CHECK → STOP/ITERATE`
@@ -56,6 +59,9 @@ Die Sequenz ist kein Ritual. Schritte dürfen zusammenfallen, wenn die notwendig
 ## Repository-Struktur
 
 - `docs/MATRIXLOOP.md` — Matrixloop-Lifecycle und Stopregeln
+- `docs/EXECUTION_FIT.md` / [Deutsch](docs/EXECUTION_FIT.de.md) — Capability-/Value-/Operator-Fit vor Setup oder Ausführung
+- `docs/TRUTH_AND_GAPS.md` / [Deutsch](docs/TRUTH_AND_GAPS.de.md) — begrenzte Evidence- und Gap-Workflows
+- `docs/EXTERNAL_PATTERN_SCOUT.md` / [Deutsch](docs/EXTERNAL_PATTERN_SCOUT.de.md) — begrenztes externes Pattern-Scouting
 - `docs/HARNESS_CONTRACT.md` — wiederverwendbare Harness-Capability-Grenze
 - `docs/CONSUMER_PROFILE.md` — Contract für Exact-Revision-Consumer-Binding
 - `docs/RECOVERY_AND_TRUTH.md` — Truth-, Stale-State- und Recovery-Regeln
@@ -64,6 +70,8 @@ Die Sequenz ist kein Ritual. Schritte dürfen zusammenfallen, wenn die notwendig
 - `docs/PUBLICATION_GATE.md` / [Deutsch](docs/PUBLICATION_GATE.de.md) — Safety- und Operator-Entscheidungs-Gate für die Veröffentlichung
 - `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [Deutsch](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — Zweisprachigkeitsregel
 - `THIRD_PARTY.md` — externe Quellen und Provenance-Ledger
+- `SECURITY.md` / [Deutsch](SECURITY.de.md) — Security-Meldung und Grenze für sensible Informationen
+- `CONTRIBUTING.md` / [Deutsch](CONTRIBUTING.de.md) — Beitrags-, Verifikations-, Provenance- und Datenschutzregeln
 - `tools/` — wiederverwendbare Harness-, Context- und Verification-Utilities
 - `tests/frozen_scenarios/` — reproduzierbare Evaluationsszenarien
 - `adapters/` — Beispiele für Consumer-Integration
