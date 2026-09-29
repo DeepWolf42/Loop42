@@ -26,8 +26,10 @@ No implementation code from these projects is intentionally imported by the curr
 
 Loop42 currently uses normal GitHub/Python tooling rather than vendoring it:
 
-- `actions/checkout` — MIT
-- `actions/setup-python` — MIT
+- `actions/checkout` — MIT; CI pin currently references commit `d23441a48e516b6c34aea4fa41551a30e30af803` (v6)
+- `actions/setup-python` — MIT; CI pin currently references commit `ece7cb06caefa5fff74198d8649806c4678c61a1` (v6)
+- `gitleaks/gitleaks-action` — consumed as an external GitHub Action at commit `e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e` (v3); no code is vendored. The action repository uses its own current license terms, so publication/release audits must re-check the applicable version and terms.
+- GitHub Dependabot — hosted GitHub service used for grouped GitHub Actions version-update PRs; no Dependabot implementation is vendored in Loop42.
 - Python standard library / `unittest` for the v0.1 test surface
 
 A future packaged/distributed Loop42 release must run a fresh dependency/file/license audit instead of treating this source-level list as an SBOM.
