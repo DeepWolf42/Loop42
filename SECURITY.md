@@ -1,3 +1,5 @@
+**English** · [Deutsch](SECURITY.de.md)
+
 # Security Policy
 
 Loop42 aims to keep automation bounded, reproducible and safe to inspect.
