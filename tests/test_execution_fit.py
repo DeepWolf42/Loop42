@@ -5,6 +5,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO = ROOT / "tests" / "frozen_scenarios" / "execution_fit_private_repo_paid_feature_v1.json"
+CAPACITY_SCENARIO = ROOT / "tests" / "frozen_scenarios" / "execution_fit_limited_task_capacity_v1.json"
 
 
 class ExecutionFitContractTests(unittest.TestCase):
@@ -63,6 +64,34 @@ class ExecutionFitContractTests(unittest.TestCase):
         expected = data["expected_outcome"]
         self.assertEqual(expected["operator_setup_steps_before_fit_check"], 0)
         self.assertEqual(expected["paid_actions"], 0)
+
+
+    def test_operator_sovereignty_and_task_compression_are_explicit(self):
+        english = (ROOT / "docs" / "EXECUTION_FIT.md").read_text(encoding="utf-8")
+        german = (ROOT / "docs" / "EXECUTION_FIT.de.md").read_text(encoding="utf-8")
+
+        self.assertIn("## Operator sovereignty", english)
+        self.assertIn("## Task and automation compression", english)
+        self.assertIn("Decision compression should reduce how often the operator is interrupted", english)
+        self.assertIn("## Entscheidungshoheit des Operators", german)
+        self.assertIn("## Aufgaben- und Automationskompression", german)
+        self.assertIn("Decision Compression soll die Zahl der Unterbrechungen reduzieren", german)
+
+    def test_limited_capacity_scenario_compresses_overlapping_watchers(self):
+        data = json.loads(CAPACITY_SCENARIO.read_text(encoding="utf-8"))
+        self.assertEqual(data["schema"], "loop42-frozen-scenario-v1")
+        self.assertEqual(data["input_state"]["task_slots_available"], 5)
+        self.assertTrue(data["input_state"]["one_combined_scout_can_cover_sources"])
+
+        required = set(data["required_behavior"])
+        self.assertIn("compress_related_sources_into_one_coherent_task", required)
+        self.assertIn("preserve_spare_task_capacity", required)
+        self.assertIn("keep_protected_decisions_with_operator", required)
+
+        expected = data["expected_outcome"]
+        self.assertEqual(expected["new_persistent_tasks"], 1)
+        self.assertEqual(expected["operator_manual_report_merge_steps"], 0)
+        self.assertEqual(expected["protected_decisions_transferred_to_automation"], 0)
 
 
 if __name__ == "__main__":
