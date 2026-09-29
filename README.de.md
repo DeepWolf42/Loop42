@@ -96,7 +96,7 @@ Die **v0.1 Extraction-/Consumer-Binding-Foundation ist verifiziert**. Wiederverw
 
 CORA pinnt derzeit die verifizierte Loop42-Revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. Dieser Pin ist absichtlich exakt und floatet nicht mit, nur weil Loop42 `main` weiterläuft.
 
-Loop42 steht unter der MIT-Lizenz. Öffentliche Sichtbarkeit bleibt weiterhin durch das Publication Gate und eine ausdrückliche Operator-Entscheidung geschützt.
+Loop42 steht unter der MIT-Lizenz.
 
 <details>
 <summary>Warum 42?</summary>
