@@ -90,7 +90,7 @@ CORA ist das erste Consumer-Projekt; seine Produktwahrheit bleibt außerhalb die
 
 ## Status
 
-Privates Entwicklungs-Repository.
+Öffentliches Entwicklungs-Repository.
 
 Die **v0.1 Extraction-/Consumer-Binding-Foundation ist verifiziert**. Wiederverwendbare Context-/Harness-Mechanik, Frozen-CORA-Equivalence und der Exact-Revision-Consumer-Profile-Contract sind vorhanden. Milestone-Issue #4 ist geschlossen; Repository-Contracts und Tests bleiben autoritativ.
 
