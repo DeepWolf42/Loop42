@@ -10,6 +10,7 @@ class RepositoryPolicyTests(unittest.TestCase):
         required = (
             "README.md",
             "README.de.md",
+            "LICENSE",
             ".gitignore",
             ".github/dependabot.yml",
             ".github/workflows/gitleaks.yml",
@@ -35,10 +36,10 @@ class RepositoryPolicyTests(unittest.TestCase):
         missing = [path for path in required if not (ROOT / path).is_file()]
         self.assertEqual(missing, [])
 
-    def test_private_seed_has_no_root_project_license(self):
-        forbidden = ("LICENSE", "LICENSE.txt", "LICENSE.md", "COPYING")
-        present = [name for name in forbidden if (ROOT / name).exists()]
-        self.assertEqual(present, [])
+    def test_root_project_license_is_mit(self):
+        license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        self.assertTrue(license_text.startswith("MIT License"))
+        self.assertIn("Copyright (c) 2026 Loop42 contributors", license_text)
 
     def test_naming_boundary_is_explicit(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
