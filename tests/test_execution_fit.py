@@ -29,6 +29,13 @@ class ExecutionFitContractTests(unittest.TestCase):
         self.assertLess(german.index("Capability Fit"), german.index("Value Fit"))
         self.assertLess(german.index("Value Fit"), german.index("Operator Fit"))
 
+        self.assertIn("demonstrated net benefit", english)
+        self.assertIn("migration, learning, maintenance, lock-in and operator cost", english)
+        self.assertIn("belegbarer Netto-Vorteil", german)
+        self.assertIn("Wechsel-, Lern-, Wartungs-, Lock-in- und Operator-Kosten", german)
+        self.assertNotIn("existing installed tools over new dependencies", english)
+        self.assertNotIn("bereits installierte Werkzeuge statt neuer Abhängigkeiten", german)
+
     def test_private_repo_paid_feature_scenario_guards_operator_friction(self):
         data = json.loads(SCENARIO.read_text(encoding="utf-8"))
 
