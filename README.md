@@ -47,6 +47,9 @@ Work should be resumable from explicit current state, accepted decisions, verifi
 **Portable by default.**  
 Provider-specific behavior belongs behind thin adapters. Matrixloop rules should not depend on a single AI vendor, IDE, chat surface or local model.
 
+**Execution fit before operator work.**  
+Verify capability, value and operator friction before handing over setup steps. Prefer the simplest viable path that meets the goal and safety/quality constraints.
+
 ## Matrixloop in one line
 
 `RECONCILE → TARGET → PRE-MORTEM → IMPLEMENT/INSPECT → VERIFY → FRICTION → VALUE CHECK → STOP/ITERATE`
@@ -56,6 +59,9 @@ The sequence is not a ritual. Steps may collapse when the required evidence alre
 ## Repository structure
 
 - `docs/MATRIXLOOP.md` — Matrixloop lifecycle and stop rules
+- `docs/EXECUTION_FIT.md` / [German](docs/EXECUTION_FIT.de.md) — capability/value/operator-fit gate before setup or execution
+- `docs/TRUTH_AND_GAPS.md` / [German](docs/TRUTH_AND_GAPS.de.md) — bounded evidence and gap workflows
+- `docs/EXTERNAL_PATTERN_SCOUT.md` / [German](docs/EXTERNAL_PATTERN_SCOUT.de.md) — bounded external pattern scouting
 - `docs/HARNESS_CONTRACT.md` — reusable harness capability boundary
 - `docs/CONSUMER_PROFILE.md` — exact-revision consumer binding contract
 - `docs/RECOVERY_AND_TRUTH.md` — truth, stale-state and recovery rules
