@@ -34,7 +34,8 @@ Berücksichtige:
 - Setup- und Wartungsaufwand;
 - Auswirkungen auf Sicherheit und Zuverlässigkeit;
 - spätere Bindung oder Migrationskosten;
-- ob ein einfacherer Weg das Ziel bereits ausreichend erfüllt.
+- ob ein einfacherer Weg das Ziel bereits ausreichend erfüllt;
+- ob ein anderes oder neues Tool genug Netto-Vorteil bringt, um Wechsel-, Lern-, Wartungs-, Lock-in- und Operator-Kosten zu rechtfertigen.
 
 Ein kostenpflichtiges Upgrade, eine neue Abhängigkeit oder eine komplexere Architektur braucht einen proportionalen Mehrwert. Ein Weg wird nicht nur deshalb weiterverfolgt, weil bereits Arbeit hineingeflossen ist.
 
@@ -45,7 +46,8 @@ Wähle unter den brauchbaren Wegen die Variante mit dem geringsten Reibungsverlu
 Bevorzuge:
 
 - einen ausführbaren Block statt vieler zerstückelter Einzelbefehle;
-- bereits installierte Werkzeuge statt neuer Abhängigkeiten;
+- vorhandene Werkzeuge, solange sie insgesamt der beste Fit bleiben;
+- ein neues Tool, wenn sein belegbarer Netto-Vorteil die Wechsel-, Lern-, Wartungs-, Lock-in- und Operator-Kosten klar überwiegt;
 - reversible Änderungen statt invasivem Setup;
 - automatische Verifikation statt manueller Werteprüfung;
 - direkte Evidenz statt Screenshot-Ketten;
