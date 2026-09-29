@@ -45,7 +45,11 @@ Do not manufacture additional work merely to keep the loop active.
 
 Process exists to improve the product or development system. If a loop/check produces no distinct decision, defect discovery, evidence, or implementation value, merge it into another step or remove it.
 
-Operator effort is also a real cost. Do not make the operator perform setup or navigation steps whose prerequisites, availability or expected value have not been established.
+Operator effort is also a real cost. Do not make the operator perform setup or navigation steps whose prerequisites, availability or expected value have not been established. Before creating another persistent task or agent role, try to complete the work in the current run, fold it into an existing coherent task, or delegate bounded preparation to a suitable local worker. Preserve spare capacity when possible.
+
+## Operator sovereignty
+
+Bounded autonomy reduces interruptions, not authority. Protected decisions remain with the operator: cost-bearing actions, publication/release, repository visibility, real machine actions, safety/quality boundary changes, destructive or materially irreversible actions, and major product-direction changes outside the authorized goal.
 
 ## Single-writer principle
 
