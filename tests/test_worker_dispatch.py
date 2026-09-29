@@ -8,9 +8,11 @@ from tools.harness.worker_dispatch import (
     EvidenceFreshness,
     HostAvailability,
     HostObservation,
+    NotificationKind,
     TaskLifecycle,
     WorkerHealth,
     WorkerSession,
+    notification_for,
     reconcile_worker,
 )
 
@@ -291,6 +293,60 @@ class WorkerDispatchTests(unittest.TestCase):
         )
         self.assertEqual(state.lifecycle, TaskLifecycle.CONFLICT)
         self.assertFalse(state.can_dispatch)
+
+    def test_offline_period_does_not_create_notification_noise(self):
+        first = reconcile_worker(
+            now=NOW,
+            observation=host(reachable=False),
+            artifacts=[],
+            expected=task(),
+        )
+        second = reconcile_worker(
+            now=NOW + timedelta(minutes=1),
+            observation=host(reachable=False),
+            artifacts=[],
+            expected=task(),
+        )
+        self.assertIsNone(notification_for(None, first))
+        self.assertIsNone(notification_for(first, second))
+
+    def test_new_result_notifies_once(self):
+        before = reconcile_worker(
+            now=NOW,
+            observation=host(),
+            artifacts=[artifact(ArtifactKind.QUEUED)],
+            expected=task(),
+        )
+        after = reconcile_worker(
+            now=NOW,
+            observation=host(),
+            artifacts=[artifact(ArtifactKind.RESULT, receipt=RECEIPT)],
+            expected=task(),
+        )
+        self.assertEqual(notification_for(before, after), NotificationKind.RESULT)
+        self.assertIsNone(notification_for(after, after))
+
+    def test_new_conflict_requests_decision_once(self):
+        before = reconcile_worker(
+            now=NOW,
+            observation=host(),
+            artifacts=[],
+            expected=task(),
+        )
+        conflict = reconcile_worker(
+            now=NOW,
+            observation=host(
+                WorkerSession("worker-1", "review-cora", "a1"),
+                WorkerSession("worker-2", "review-cora", "a1"),
+            ),
+            artifacts=[],
+            expected=task(),
+        )
+        self.assertEqual(
+            notification_for(before, conflict),
+            NotificationKind.DECISION_REQUIRED,
+        )
+        self.assertIsNone(notification_for(conflict, conflict))
 
 
 if __name__ == "__main__":
