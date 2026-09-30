@@ -346,6 +346,11 @@ def repository_map(
             "candidate_count": len(entries),
             "entries": [*selected, compact],
             "truncated": False,
+            "source_scope": (
+                "tracked working-tree files; HEAD is provenance, "
+                "not proof bytes are committed"
+            ),
+            "fingerprint": "0" * 64,
         }
         if len(_encoded(projected)) > budget_bytes:
             if item["path"] in target_set:
@@ -375,9 +380,15 @@ def repository_map(
         "candidate_count": len(entries),
         "entries": selected,
         "truncated": len(selected) < len(entries),
-        "source_scope": "tracked working-tree files; HEAD is provenance, not proof bytes are committed",
+        "source_scope": (
+            "tracked working-tree files; HEAD is provenance, "
+            "not proof bytes are committed"
+        ),
     }
-    result["fingerprint"] = _digest(_encoded(result))
+    fingerprint_basis = dict(result)
+    result["fingerprint"] = _digest(_encoded(fingerprint_basis))
+    if len(_encoded(result)) > budget_bytes:
+        raise ValueError("internal map budget accounting failed")
     return result
 
 
