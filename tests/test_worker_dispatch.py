@@ -4,6 +4,7 @@ import unittest
 from tools.harness.worker_dispatch import (
     ArtifactKind,
     AttemptArtifact,
+    DispatchPermit,
     DispatchTask,
     EvidenceFreshness,
     HostAvailability,
@@ -12,8 +13,10 @@ from tools.harness.worker_dispatch import (
     TaskLifecycle,
     WorkerHealth,
     WorkerSession,
+    issue_dispatch_permit,
     notification_for,
     reconcile_worker,
+    validate_dispatch_permit,
 )
 
 NOW = datetime(2026, 9, 29, 20, 0, tzinfo=timezone.utc)
@@ -347,6 +350,173 @@ class WorkerDispatchTests(unittest.TestCase):
             NotificationKind.DECISION_REQUIRED,
         )
         self.assertIsNone(notification_for(conflict, conflict))
+
+    def test_dispatch_permit_requires_fresh_available_host(self):
+        self.assertIsNone(
+            issue_dispatch_permit(
+                task=task(),
+                now=NOW,
+                observation=None,
+                artifacts=[],
+            )
+        )
+        self.assertIsNone(
+            issue_dispatch_permit(
+                task=task(),
+                now=NOW,
+                observation=host(minutes=20),
+                artifacts=[],
+                freshness_seconds=300,
+            )
+        )
+        permit = issue_dispatch_permit(
+            task=task(),
+            now=NOW,
+            observation=host(),
+            artifacts=[],
+        )
+        self.assertIsInstance(permit, DispatchPermit)
+
+    def test_dispatch_permit_revalidates_same_basis_immediately_before_write(self):
+        observation = host()
+        permit = issue_dispatch_permit(
+            task=task(),
+            now=NOW,
+            observation=observation,
+            artifacts=[],
+        )
+        self.assertIsNotNone(permit)
+        self.assertTrue(
+            validate_dispatch_permit(
+                permit,
+                task=task(),
+                now=NOW + timedelta(seconds=30),
+                observation=observation,
+                artifacts=[],
+            )
+        )
+
+    def test_dispatch_permit_fails_when_queue_changes_during_pause(self):
+        observation = host()
+        permit = issue_dispatch_permit(
+            task=task(),
+            now=NOW,
+            observation=observation,
+            artifacts=[],
+        )
+        self.assertIsNotNone(permit)
+        other = AttemptArtifact(
+            kind=ArtifactKind.QUEUED,
+            task_id="another-task",
+            attempt_id="a9",
+            source_revision=REV,
+            context_fingerprint=CTX,
+            observed_at=NOW + timedelta(seconds=1),
+        )
+        self.assertFalse(
+            validate_dispatch_permit(
+                permit,
+                task=task(),
+                now=NOW + timedelta(seconds=2),
+                observation=observation,
+                artifacts=[other],
+            )
+        )
+
+    def test_dispatch_permit_fails_when_safety_or_host_session_changes(self):
+        observation = host()
+        permit = issue_dispatch_permit(
+            task=task(),
+            now=NOW,
+            observation=observation,
+            artifacts=[],
+        )
+        self.assertIsNotNone(permit)
+        safety = HostObservation(
+            observed_at=NOW + timedelta(seconds=1),
+            session_id=observation.session_id,
+            reachable=True,
+            safety_stop=True,
+        )
+        self.assertFalse(
+            validate_dispatch_permit(
+                permit,
+                task=task(),
+                now=NOW + timedelta(seconds=2),
+                observation=safety,
+                artifacts=[],
+            )
+        )
+        restarted = HostObservation(
+            observed_at=NOW + timedelta(seconds=1),
+            session_id="host-restarted",
+            reachable=True,
+        )
+        self.assertFalse(
+            validate_dispatch_permit(
+                permit,
+                task=task(),
+                now=NOW + timedelta(seconds=2),
+                observation=restarted,
+                artifacts=[],
+            )
+        )
+
+    def test_dispatch_permit_expires_when_observation_becomes_stale(self):
+        observation = host()
+        permit = issue_dispatch_permit(
+            task=task(),
+            now=NOW,
+            observation=observation,
+            artifacts=[],
+            freshness_seconds=300,
+        )
+        self.assertIsNotNone(permit)
+        self.assertFalse(
+            validate_dispatch_permit(
+                permit,
+                task=task(),
+                now=NOW + timedelta(seconds=301),
+                observation=observation,
+                artifacts=[],
+                freshness_seconds=300,
+            )
+        )
+
+    def test_dispatch_permit_rejects_attempt_reuse_and_changed_task_basis(self):
+        observation = host()
+        original = task()
+        permit = issue_dispatch_permit(
+            task=original,
+            now=NOW,
+            observation=observation,
+            artifacts=[],
+        )
+        self.assertIsNotNone(permit)
+        self.assertIsNone(
+            issue_dispatch_permit(
+                task=original,
+                now=NOW,
+                observation=observation,
+                artifacts=[artifact(ArtifactKind.RESULT, receipt=RECEIPT)],
+            )
+        )
+        changed = DispatchTask(
+            original.task_id,
+            original.attempt_id,
+            original.source_revision,
+            original.context_fingerprint,
+            ("different acceptance criterion",),
+        )
+        self.assertFalse(
+            validate_dispatch_permit(
+                permit,
+                task=changed,
+                now=NOW,
+                observation=observation,
+                artifacts=[],
+            )
+        )
 
 
 if __name__ == "__main__":

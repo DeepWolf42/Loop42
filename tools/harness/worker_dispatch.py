@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
+import hashlib
+import json
 import re
 from typing import Iterable, Tuple
 
@@ -196,6 +198,34 @@ class ReconciledState:
     outstanding: Tuple[Tuple[str, str], ...]
     late_results: Tuple[Tuple[str, str], ...]
     result_receipt: str | None = None
+
+
+@dataclass(frozen=True)
+class DispatchPermit:
+    """Short-lived proof that one exact dispatch basis was reconciled.
+
+    Adapters must validate this permit again immediately before their queue write.
+    A permit is not execution authority and carries no model or shell capability.
+    """
+
+    task_id: str
+    attempt_id: str
+    source_revision: str
+    context_fingerprint: str
+    basis_fingerprint: str
+
+    def __post_init__(self) -> None:
+        for name, value in (("task_id", self.task_id), ("attempt_id", self.attempt_id)):
+            if not isinstance(value, str) or not _ID_RE.fullmatch(value):
+                raise ValueError(f"invalid {name}")
+        if not isinstance(self.source_revision, str) or not _SHA_RE.fullmatch(self.source_revision):
+            raise ValueError("source_revision must be a lowercase Git revision")
+        if not isinstance(self.context_fingerprint, str) or not _FP_RE.fullmatch(self.context_fingerprint):
+            raise ValueError("context_fingerprint must be a SHA-256 hex digest")
+        if not isinstance(self.basis_fingerprint, str) or not _FP_RE.fullmatch(
+            self.basis_fingerprint
+        ):
+            raise ValueError("basis_fingerprint must be a SHA-256 hex digest")
 
 
 def _age_seconds(now: datetime, then: datetime) -> float:
@@ -470,6 +500,221 @@ def reconcile_worker(
         late_results=tuple(late_results),
         result_receipt=receipt,
     )
+
+
+def _iso(value: datetime) -> str:
+    return _aware_utc(value).isoformat(timespec="microseconds")
+
+
+def _dispatch_basis_fingerprint(
+    *,
+    task: DispatchTask,
+    observation: HostObservation,
+    artifacts: tuple[AttemptArtifact, ...],
+    state: ReconciledState,
+) -> str:
+    sessions = sorted(
+        (
+            {
+                "session_id": item.session_id,
+                "task_id": item.task_id,
+                "attempt_id": item.attempt_id,
+                "progress_seq": item.progress_seq,
+                "progress_at": _iso(item.progress_at) if item.progress_at else None,
+            }
+            for item in observation.worker_sessions
+        ),
+        key=lambda item: (
+            item["session_id"],
+            item["task_id"] or "",
+            item["attempt_id"] or "",
+            item["progress_seq"] if item["progress_seq"] is not None else -1,
+            item["progress_at"] or "",
+        ),
+    )
+    evidence = sorted(
+        (
+            {
+                "kind": item.kind.value,
+                "task_id": item.task_id,
+                "attempt_id": item.attempt_id,
+                "source_revision": item.source_revision,
+                "context_fingerprint": item.context_fingerprint,
+                "observed_at": _iso(item.observed_at),
+                "complete": item.complete,
+                "valid": item.valid,
+                "success": item.success,
+                "receipt_fingerprint": item.receipt_fingerprint,
+            }
+            for item in artifacts
+        ),
+        key=lambda item: (
+            item["task_id"],
+            item["attempt_id"],
+            item["kind"],
+            item["observed_at"],
+            item["source_revision"],
+            item["context_fingerprint"],
+            item["receipt_fingerprint"] or "",
+        ),
+    )
+    payload = {
+        "schema": "loop42.dispatch-basis.v1",
+        "task": {
+            "task_id": task.task_id,
+            "attempt_id": task.attempt_id,
+            "source_revision": task.source_revision,
+            "context_fingerprint": task.context_fingerprint,
+            "acceptance_criteria": list(task.acceptance_criteria),
+        },
+        "host_observation": {
+            "observed_at": _iso(observation.observed_at),
+            "session_id": observation.session_id,
+            "reachable": observation.reachable,
+            "safety_stop": observation.safety_stop,
+            "worker_sessions": sessions,
+        },
+        "artifacts": evidence,
+        "reconciled": {
+            "host": state.host.value,
+            "worker": state.worker.value,
+            "lifecycle": state.lifecycle.value,
+            "freshness": state.freshness.value,
+            "can_dispatch": state.can_dispatch,
+            "reasons": list(state.reasons),
+            "outstanding": [list(item) for item in state.outstanding],
+            "late_results": [list(item) for item in state.late_results],
+            "result_receipt": state.result_receipt,
+        },
+    }
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def issue_dispatch_permit(
+    *,
+    task: DispatchTask,
+    now: datetime,
+    observation: HostObservation | None,
+    artifacts: Iterable[AttemptArtifact],
+    freshness_seconds: int = 300,
+    stall_seconds: int | None = None,
+) -> DispatchPermit | None:
+    """Issue a permit only from fresh, currently dispatchable evidence.
+
+    This is the pre-side-effect planning check.  The adapter must still call
+    validate_dispatch_permit() after any pause/approval and immediately before
+    writing the consumer queue.
+    """
+    if not isinstance(task, DispatchTask):
+        raise TypeError("task must be DispatchTask")
+    items = tuple(artifacts)
+    if any(not isinstance(item, AttemptArtifact) for item in items):
+        raise TypeError("artifacts must contain AttemptArtifact values")
+    if any(
+        item.task_id == task.task_id and item.attempt_id == task.attempt_id
+        for item in items
+    ):
+        return None
+
+    state = reconcile_worker(
+        now=now,
+        observation=observation,
+        artifacts=items,
+        expected=None,
+        freshness_seconds=freshness_seconds,
+        stall_seconds=stall_seconds,
+    )
+    if (
+        observation is None
+        or state.freshness is not EvidenceFreshness.FRESH
+        or state.host is not HostAvailability.AVAILABLE
+        or not state.can_dispatch
+    ):
+        return None
+
+    basis = _dispatch_basis_fingerprint(
+        task=task,
+        observation=observation,
+        artifacts=items,
+        state=state,
+    )
+    return DispatchPermit(
+        task_id=task.task_id,
+        attempt_id=task.attempt_id,
+        source_revision=task.source_revision,
+        context_fingerprint=task.context_fingerprint,
+        basis_fingerprint=basis,
+    )
+
+
+def validate_dispatch_permit(
+    permit: DispatchPermit,
+    *,
+    task: DispatchTask,
+    now: datetime,
+    observation: HostObservation | None,
+    artifacts: Iterable[AttemptArtifact],
+    freshness_seconds: int = 300,
+    stall_seconds: int | None = None,
+) -> bool:
+    """Reconcile again immediately before a queue side effect.
+
+    Any changed queue/result evidence, worker/host session, safety marker, task
+    identity, or freshness failure invalidates the previous permit.  The caller
+    must stop and reconcile; it must not refresh the permit and write in one
+    unobserved step.
+    """
+    if not isinstance(permit, DispatchPermit):
+        raise TypeError("permit must be DispatchPermit")
+    if not isinstance(task, DispatchTask):
+        raise TypeError("task must be DispatchTask")
+    if (
+        permit.task_id != task.task_id
+        or permit.attempt_id != task.attempt_id
+        or permit.source_revision != task.source_revision
+        or permit.context_fingerprint != task.context_fingerprint
+    ):
+        return False
+
+    items = tuple(artifacts)
+    if any(not isinstance(item, AttemptArtifact) for item in items):
+        raise TypeError("artifacts must contain AttemptArtifact values")
+    if any(
+        item.task_id == task.task_id and item.attempt_id == task.attempt_id
+        for item in items
+    ):
+        return False
+
+    state = reconcile_worker(
+        now=now,
+        observation=observation,
+        artifacts=items,
+        expected=None,
+        freshness_seconds=freshness_seconds,
+        stall_seconds=stall_seconds,
+    )
+    if (
+        observation is None
+        or state.freshness is not EvidenceFreshness.FRESH
+        or state.host is not HostAvailability.AVAILABLE
+        or not state.can_dispatch
+    ):
+        return False
+
+    current = _dispatch_basis_fingerprint(
+        task=task,
+        observation=observation,
+        artifacts=items,
+        state=state,
+    )
+    return current == permit.basis_fingerprint
 
 
 def notification_for(

@@ -68,3 +68,30 @@ state requiring operator review such as a conflict, late result or safety stop.
 Provider-, Drive-, filesystem- and OS-specific observation/write behavior stays
 in thin adapters. The generic reconciler never starts processes, writes queue
 files, commits code, clears safety markers, or grants model output authority.
+
+
+## Pre-side-effect dispatch revalidation
+
+A successful reconciliation is not a durable permission to write the queue. State may
+change between planning, an approval/pause, and the actual side effect. Adapters that
+can enqueue work therefore use a short-lived `DispatchPermit`:
+
+1. reconcile fresh host/queue/result/safety evidence and issue a permit bound to the
+   exact task identity plus a canonical fingerprint of that evidence;
+2. after any pause and **immediately before** the queue write, re-read the same
+   authoritative surfaces and validate the permit;
+3. if the host/session, safety stop, queue/result evidence, task basis or freshness
+   changed, abort the write and reconcile again. Do not silently refresh the permit
+   and continue inside the same unobserved write step.
+
+The permit is not model, shell, merge or execution authority. It only closes the
+time-of-check/time-of-use gap around the existing bounded dispatch decision.
+
+Pattern provenance: OpenAI Agents SDK Python, MIT, revision
+`6862bdfa70a788626a0df5b9c69c8c0e1a2cc441`,
+`.agents/references/tool-execution-lifecycle.md` (blob
+`ad8f793a0e6e979e2d18d59bf68e92d78764fee3`) documents the same general rule:
+a pre-approval guard is only an optimization and time-sensitive guardrails must run
+again immediately before a tool side effect because state/policy/arguments may have
+changed. Loop42 reimplements the general race-prevention pattern in its own dispatch
+contract; no Agents SDK runtime or implementation code is imported.

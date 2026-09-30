@@ -58,3 +58,14 @@ may notify once when the adapter persists the previous reconciled state.
 This layer deliberately does not encode Drive paths, PowerShell process control,
 Ollama service management or a second scheduler. Those remain adapter/consumer
 concerns.
+
+
+### Dispatch permits: recheck before the queue write
+
+`issue_dispatch_permit(...)` creates a short-lived fingerprint only from fresh,
+available host evidence and a currently empty/reconciled dispatch basis.
+`validate_dispatch_permit(...)` must be called after any pause/approval and directly
+before the adapter writes a new queue item. Queue/result changes, attempt reuse,
+host-session changes, safety stops, stale telemetry or changed acceptance criteria
+invalidate the old permit. A failed validation means stop and reconcile; it never
+means "refresh and write anyway."
