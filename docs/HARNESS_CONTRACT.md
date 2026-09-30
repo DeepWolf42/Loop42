@@ -121,3 +121,18 @@ documents `POST /api/chat`, `format` as either JSON or a JSON schema, default
 streaming, completion metadata, and structured-output guidance including local
 validation and lower temperature. Loop42 independently implements its validation;
 no Ollama implementation code is imported.
+
+
+## Machine-readable action policy
+
+Harness consumers may classify a proposed action through the pure action-policy
+boundary before any side effect. The decision vocabulary is deliberately small:
+`ALLOW`, `ASK_USER`, or `DENY`.
+
+Read-only inspection defaults to ALLOW. Reversible writes default to ASK_USER.
+Protected actions remain operator-owned and cannot be auto-allowed by a normal
+rule. A headless run cannot satisfy ASK_USER, so it resolves to DENY.
+
+Policy rules are decision inputs only. They do not execute tools, create durable
+consent, supersede consumer authority, or bypass the pre-side-effect dispatch
+revalidation rule. See `docs/ACTION_POLICY.md`.
