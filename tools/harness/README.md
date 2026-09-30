@@ -25,7 +25,10 @@ Boundary:
 - local model inventory checked before chat;
 - missing models are refused rather than implicitly downloaded;
 - non-streaming response only;
-- result is bound to exact snapshot fingerprint and Git HEAD;
+- Ollama structured outputs are requested with an explicit JSON schema and temperature 0;
+- malformed, ambiguous or duplicate-key JSON is rejected instead of being treated as a proposal;
+- the validated proposal uses bounded `summary / known / proven / open / discarded / next / evidence_paths` fields;
+- the result records a SHA-256 of the exact proposal schema as well as the snapshot fingerprint and Git HEAD;
 - model output cannot checkpoint, commit, push, publish or operate physical systems.
 
 Consumer projects keep their own action/approval policy.
@@ -69,3 +72,21 @@ before the adapter writes a new queue item. Queue/result changes, attempt reuse,
 host-session changes, safety stops, stale telemetry or changed acceptance criteria
 invalidate the old permit. A failed validation means stop and reconcile; it never
 means "refresh and write anyway."
+
+
+### Structured proposal boundary
+
+The local model does not choose its own result shape. `ollama_payload(...)` sends
+Loop42's proposal JSON schema through Ollama's documented `format` field and also
+includes the schema in the prompt. `run_ollama(...)` parses and validates the returned
+JSON again locally before producing `loop42.ollama-worker-result.v2`.
+
+Schema enforcement is useful structure, not trust. A valid proposal is still
+unverified model output. It does not prove its claims, satisfy worker-dispatch
+task/attempt identity by itself, authorize checkpoint writeback, or grant any shell,
+Git, network, printer or physical authority.
+
+Streaming remains deliberately out of this generic adapter for now. The later local
+Deep Thought/Drive adapter can use streaming as a fresh progress signal only when its
+actual Windows worker lifecycle and heartbeat write are tested together; historic or
+partial chunks must never be mistaken for successful completion.
