@@ -90,3 +90,19 @@ Streaming remains deliberately out of this generic adapter for now. The later lo
 Deep Thought/Drive adapter can use streaming as a fresh progress signal only when its
 actual Windows worker lifecycle and heartbeat write are tested together; historic or
 partial chunks must never be mistaken for successful completion.
+
+
+## Action policy decision
+
+`action_policy.py` is a pure pre-action decision boundary. A consumer describes
+an action as read-only, reversible write, or protected and receives only
+`ALLOW / ASK_USER / DENY`.
+
+Read-only work defaults to ALLOW. Reversible writes default to confirmation.
+Protected actions are never auto-allowed by ordinary policy rules. In headless
+execution, any `ASK_USER` result becomes `DENY`.
+
+Rules may narrow by exact action, target prefix, effect and execution mode with
+explicit priorities; equal-priority conflicts fail closed. The module never
+executes the requested action, never creates durable approval, and does not
+replace dispatch-permit revalidation immediately before a write.
