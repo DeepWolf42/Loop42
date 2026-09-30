@@ -474,8 +474,15 @@ def reconcile_worker(
     if late_results:
         reasons.append("late_result_requires_reconciliation")
 
+    # Queue sync can lag behind fresh worker observations. A terminal artifact
+    # also does not prove that a worker has released its current task yet.
+    busy_worker = any(session.task_id is not None for session in sessions)
+    if busy_worker:
+        reasons.append("worker_has_active_attempt")
+
     can_dispatch = (
         not safety_stop
+        and not busy_worker
         and worker is not WorkerHealth.CONFLICT
         and not conflicting_terminal
         and not outstanding

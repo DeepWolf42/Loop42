@@ -54,6 +54,12 @@ fingerprint and bounded acceptance criteria. A validated terminal result must
 match all of them. Unresolved attempts, late results, conflicting terminal
 evidence, duplicate workers and latched safety stops block a new submission.
 
+A fresh worker session that still names a task/attempt also blocks submission,
+even when queue artifacts have not synced yet or a terminal result is already
+visible. A result does not prove that the worker has released its task. Reconcile
+a fresh idle observation before issuing another permit; do not clear task identity
+merely to obtain a permit.
+
 The notification helper is transition-only: ordinary offline/stale observations
 stay silent; new validated results, actionable failures and operator decisions
 may notify once when the adapter persists the previous reconciled state.
