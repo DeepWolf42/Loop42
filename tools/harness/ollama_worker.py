@@ -118,7 +118,19 @@ def strict_json(data):
     def invalid_constant(value):
         raise ValueError(f"invalid JSON constant: {value}")
 
-    return json.loads(data.decode("utf-8"), parse_constant=invalid_constant)
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    return json.loads(
+        data.decode("utf-8"),
+        parse_constant=invalid_constant,
+        object_pairs_hook=unique_object,
+    )
 
 
 def ollama_http(base, path, *, method="GET", payload=None, timeout=180):
@@ -232,10 +244,11 @@ def ollama_payload(snapshot_value, model, prompt):
     if not isinstance(prompt, str) or not prompt.strip():
         raise ValueError("prompt must be non-empty")
     schema_text = encoded(PROPOSAL_SCHEMA).decode("utf-8")
+    schema_value = json.loads(schema_text)
     return {
         "model": model,
         "stream": False,
-        "format": PROPOSAL_SCHEMA,
+        "format": schema_value,
         "options": {"temperature": 0},
         "messages": [
             {
