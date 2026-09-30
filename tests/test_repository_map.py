@@ -88,7 +88,7 @@ class RepositoryMapTests(unittest.TestCase):
         paths = [entry["path"] for entry in result["entries"]]
         self.assertIn("config.json", paths)
         self.assertNotIn("scratch.py", paths)
-        self.assertEqual(result["candidate_count"], 5)
+        self.assertEqual(result["candidate_count"], 6)
         config = next(entry for entry in result["entries"] if entry["path"] == "config.json")
         self.assertEqual(
             [symbol["name"] for symbol in config["symbols"]],
