@@ -62,6 +62,23 @@ This layer deliberately does not encode Drive paths, PowerShell process control,
 Ollama service management or a second scheduler. Those remain adapter/consumer
 concerns.
 
+### JSON adapter boundary
+
+`worker_dispatch_cli.py` exposes the same pure reconciliation/permit contract as
+strict JSON for thin OS/provider adapters that should not reimplement Loop42 state
+semantics. Run it from the repository root:
+
+```text
+python -m tools.harness.worker_dispatch_cli --input request.json
+```
+
+The schema `loop42.worker-dispatch-cli.v1` supports `reconcile`,
+`issue-permit`, and `validate-permit`. Input is bounded to 1 MiB, duplicate
+JSON keys and non-standard constants fail closed, timestamps require timezone
+offsets, and unexpected fields are rejected. The CLI only parses evidence and
+returns decisions; it does not write queues, start workers, call models, clear
+safety state, or perform consumer actions.
+
 
 ### Dispatch permits: recheck before the queue write
 
