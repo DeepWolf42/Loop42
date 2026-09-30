@@ -9,6 +9,7 @@ from tools.harness.ollama_worker import (
     ollama_payload,
     proposal_schema_fingerprint,
     run_ollama,
+    strict_json,
     validate_structured_proposal,
 )
 
@@ -69,6 +70,10 @@ class OllamaWorkerTests(unittest.TestCase):
         no_next = {**valid, "next": []}
         with self.assertRaisesRegex(ValueError, "next"):
             validate_structured_proposal(no_next)
+
+    def test_strict_json_rejects_duplicate_keys(self):
+        with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
+            strict_json(b'{"summary":"first","summary":"second"}')
 
     def test_missing_model_refuses_chat_post(self):
         class Handler(BaseHTTPRequestHandler):
