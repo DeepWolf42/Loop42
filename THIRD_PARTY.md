@@ -16,6 +16,7 @@ The entries below were carried forward from CORA's verified 2026-09-26 Factory p
 | OpenAI Codex | https://github.com/openai/codex | Apache-2.0 | harness/tooling and instruction-scope reference |
 | Aider | https://github.com/Aider-AI/aider | Apache-2.0 | bounded repository-map/context-selection pattern; research revision `5dc9490bb35f9729ef2c95d00a19ccd30c26339c`; Loop42 implementation is independent standard-library code, no Aider code/runtime imported |
 | OpenAI Agents SDK Python | https://github.com/openai/openai-agents-python | MIT | pre-side-effect guardrail revalidation / approval-resume race pattern; pinned research revision `6862bdfa70a788626a0df5b9c69c8c0e1a2cc441`, no runtime/code imported |
+| Ollama | https://github.com/ollama/ollama | MIT | local `/api/chat` structured-output interoperability: documented JSON-schema `format`, non-streaming completion metadata and temperature guidance; docs checked 2026-09-30, upstream revision `1abe35e6e6e777e858bbfbba283667ee8d516801`; Loop42 validation is independently implemented, no Ollama code imported |
 | mini-SWE-agent | https://github.com/SWE-agent/mini-swe-agent | MIT | small bounded agent-loop/run-budget research |
 | Microsoft Agent Framework | https://github.com/microsoft/agent-framework | MIT | workflow/checkpoint/resume research |
 | LangGraph | https://github.com/langchain-ai/langgraph | MIT | durable execution/checkpoint/human-interrupt research |

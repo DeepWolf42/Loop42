@@ -95,3 +95,29 @@ a pre-approval guard is only an optimization and time-sensitive guardrails must 
 again immediately before a tool side effect because state/policy/arguments may have
 changed. Loop42 reimplements the general race-prevention pattern in its own dispatch
 contract; no Agents SDK runtime or implementation code is imported.
+
+
+## Structured model-result contract
+
+When a provider supports structured outputs, a harness should prefer an explicit,
+bounded result schema over free-form text when that reduces parsing ambiguity without
+granting extra authority. Provider-side schema enforcement is not sufficient by
+itself: the adapter must parse and validate the returned value again before treating
+it as a completed proposal.
+
+The current Ollama adapter uses the documented `/api/chat` JSON-schema `format`
+field and requests temperature 0. Its proposal contains bounded
+`summary / known / proven / open / discarded / next / evidence_paths` fields and
+records the exact schema fingerprint in the result. Duplicate JSON keys, non-standard
+JSON constants, unexpected fields, invalid types, overlong entries and an empty
+`next` list fail closed.
+
+A structurally valid proposal is still model output, not evidence or execution
+authority. It must be reconciled against task/attempt/revision/context identity and
+independently verified before any consumer write or action.
+
+Primary-source interoperability check: Ollama API documentation checked 2026-09-30
+documents `POST /api/chat`, `format` as either JSON or a JSON schema, default
+streaming, completion metadata, and structured-output guidance including local
+validation and lower temperature. Loop42 independently implements its validation;
+no Ollama implementation code is imported.
