@@ -14,6 +14,9 @@ class ExternalPatternScoutTests(unittest.TestCase):
         self.assertIn("time/run budget", text)
         self.assertIn("Discovery is not adoption", text)
         self.assertIn("Direct code reuse requires", text)
+        self.assertIn("Search for the **problem**", text)
+        self.assertIn("adjacent disciplines", text)
+        self.assertIn("A similar product is neither required nor sufficient", text)
 
     def test_consumer_truth_boundary_is_explicit(self):
         text = (ROOT / "docs/EXTERNAL_PATTERN_SCOUT.md").read_text(encoding="utf-8")
@@ -29,6 +32,8 @@ class ExternalPatternScoutTests(unittest.TestCase):
         self.assertTrue(expected["must_compare_value_to_cost"])
         self.assertTrue(expected["must_preserve_consumer_truth_boundary"])
         self.assertTrue(expected["direct_code_reuse_requires_license_review"])
+        self.assertTrue(expected["must_search_adjacent_domains"])
+        self.assertTrue(expected["must_not_require_similar_product"])
         self.assertEqual(expected["preferred_candidate"], "SmallCheckpointPattern")
 
 
