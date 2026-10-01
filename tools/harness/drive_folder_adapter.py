@@ -311,8 +311,11 @@ class FolderSnapshot:
             blockers.append("provider_surface_missing")
         if self.errors:
             blockers.append("provider_evidence_invalid")
-        if self.legacy_files:
-            blockers.append("legacy_evidence_requires_reconciliation")
+        # Historical legacy result/error/archive files are retained evidence and
+        # must not permanently poison an otherwise clean provider. Only an
+        # unresolved legacy queue item in Inbox blocks replacement dispatch.
+        if any(surface == INBOX for surface, _name in self.legacy_files):
+            blockers.append("legacy_inbox_requires_reconciliation")
         return tuple(blockers)
 
 
