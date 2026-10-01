@@ -115,6 +115,23 @@ actual Windows worker lifecycle and heartbeat write are tested together; histori
 partial chunks must never be mistaken for successful completion.
 
 
+## Windows / Drive folder adapter
+
+`drive_folder_adapter.py` maps a local Drive-synchronized folder into the
+generic worker-dispatch contract. It is model-independent and can be exercised
+without Ollama.
+
+The provider contract is documented in `docs/WINDOWS_DRIVE_ADAPTER.md`.
+It requires complete Inbox/Results/Logs/Error/Archive surfaces, strict JSON
+identity for modern work, and fresh host/session evidence before dispatch.
+Legacy Markdown/text jobs remain explicit UNKNOWN evidence and block replacement
+dispatch until consciously reconciled.
+
+The adapter can atomically write a modern local queue manifest only after a
+previously issued `DispatchPermit` is revalidated against a fresh provider
+rescan. That local write does not prove Google Drive sync completion and does
+not start a worker.
+
 ## Action policy decision
 
 `action_policy.py` is a pure pre-action decision boundary. A consumer describes
