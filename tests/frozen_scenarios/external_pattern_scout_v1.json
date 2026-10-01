@@ -28,6 +28,8 @@
     "must_preserve_consumer_truth_boundary": true,
     "direct_code_reuse_requires_license_review": true,
     "preferred_outcome": "ADOPT_CANDIDATE",
-    "preferred_candidate": "SmallCheckpointPattern"
+    "preferred_candidate": "SmallCheckpointPattern",
+    "must_search_adjacent_domains": true,
+    "must_not_require_similar_product": true
   }
 }
