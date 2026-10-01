@@ -77,8 +77,8 @@ class DriveFolderAdapterTests(unittest.TestCase):
             },
         )
 
-    def test_legacy_025_is_unknown_and_blocks_new_dispatch(self):
-        name = "025_CORA_G92_CodeReview_b7f08ec_20260929.md"
+    def test_legacy_job_is_unknown_and_blocks_new_dispatch(self):
+        name = "025_legacy_code_review.md"
         (self.root / INBOX / name).write_text("legacy job\n", encoding="utf-8")
 
         snapshot = scan_root(self.root)
