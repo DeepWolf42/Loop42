@@ -178,6 +178,27 @@ or DeepThought worker has completed an end-to-end roundtrip. That live E2E remai
 separate consumer gate.
 
 
+## Minimal worker integration hook
+
+`tools/harness/windows_worker_contract.psm1` is the intended shim for the existing
+PowerShell worker. It deliberately has no model transport, process-start, queue-write,
+RESULT or receipt authority.
+
+The later local worker patch is reduced to four identity calls around its existing
+logic:
+
+1. after accepting a modern task manifest, call `Start-Loop42WorkerSession`;
+2. while work is genuinely progressing, call `Update-Loop42WorkerProgress`;
+3. after writing the raw response content into `10_Results`, call
+   `Write-Loop42ProposalManifest` with the exact prompt-contract fingerprint and
+   model identifier;
+4. in a `finally` boundary, call `Clear-Loop42WorkerSession`.
+
+The proposal helper hashes the already-written response file and emits only
+`loop42.drive-proposal.v1`. It cannot create terminal RESULT evidence and cannot
+invent a receipt. This keeps the worker's authority at "produced an unverified
+proposal" even when the model call itself succeeds.
+
 ## No-model identity roundtrip
 
 `tests/frozen_scenarios/drive_identity_roundtrip_without_model_v1.json` exercises
