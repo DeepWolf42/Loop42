@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "drive_identity_roundtrip_without_model_v1",
+  "purpose": "Freeze the complete Windows/Drive identity and reconciliation lifecycle without invoking a model.",
+  "sequence": [
+    {"step": "fresh_idle_host", "expected": {"permit": true}},
+    {"step": "atomic_queue_write", "expected": {"queued": true, "cloud_sync_confirmed": false}},
+    {"step": "identified_worker_session", "expected": {"lifecycle": "running", "can_dispatch": false}},
+    {"step": "receipt_bound_result_worker_still_busy", "expected": {"lifecycle": "succeeded", "can_dispatch": false}},
+    {"step": "worker_releases_attempt", "expected": {"lifecycle": "succeeded", "can_dispatch": true}},
+    {"step": "next_attempt", "expected": {"permit": true}}
+  ],
+  "non_goals": [
+    "no Ollama/model call",
+    "no proof of real Google Drive sync latency",
+    "no proof of real Windows worker integration",
+    "no CORA pin advance"
+  ]
+}
