@@ -15,6 +15,7 @@ class RetryPolicyTests(unittest.TestCase):
             attempt=1,
             max_attempts=4,
             fresh_evidence=True,
+            side_effect_possible=False,
         )
         values.update(kwargs)
         return assess_retry(**values)
@@ -34,8 +35,14 @@ class RetryPolicyTests(unittest.TestCase):
             dict(failure=FailureClass.UNKNOWN),
             dict(failure=FailureClass.CONFLICT),
             dict(fresh_evidence=False),
-            dict(side_effect_state=SideEffectState.UNKNOWN),
-            dict(side_effect_state=SideEffectState.CONFLICT),
+            dict(
+                side_effect_possible=True,
+                side_effect_state=SideEffectState.UNKNOWN,
+            ),
+            dict(
+                side_effect_possible=True,
+                side_effect_state=SideEffectState.CONFLICT,
+            ),
         )
         for case in cases:
             with self.subTest(case=case):
@@ -44,12 +51,19 @@ class RetryPolicyTests(unittest.TestCase):
                 self.assertIsNone(result.delay_seconds)
 
     def test_applied_side_effect_is_never_retried(self):
-        result = self.assess(side_effect_state=SideEffectState.APPLIED)
+        result = self.assess(
+            side_effect_possible=True,
+            side_effect_state=SideEffectState.APPLIED,
+        )
         self.assertEqual(result.decision, RetryDecision.DO_NOT_RETRY)
         self.assertIn("side_effect_already_applied", result.reasons)
 
     def test_not_applied_side_effect_still_needs_other_retry_gates(self):
-        retry = self.assess(side_effect_state=SideEffectState.NOT_APPLIED)
+        retry = self.assess(
+            side_effect_possible=True,
+            side_effect_possible=True,
+            side_effect_state=SideEffectState.NOT_APPLIED,
+        )
         self.assertEqual(retry.decision, RetryDecision.RETRY_AFTER_BACKOFF)
         self.assertIn("side_effect_confirmed_not_applied", retry.reasons)
 
@@ -58,6 +72,12 @@ class RetryPolicyTests(unittest.TestCase):
             side_effect_state=SideEffectState.NOT_APPLIED,
         )
         self.assertEqual(unknown.decision, RetryDecision.RECONCILE)
+
+    def test_possible_side_effect_requires_explicit_reconciled_state(self):
+        missing = self.assess(side_effect_possible=True)
+        self.assertEqual(missing.decision, RetryDecision.RECONCILE)
+        self.assertIsNone(missing.delay_seconds)
+        self.assertIn("side_effect_state_missing", missing.reasons)
 
     def test_safety_stop_requires_operator_and_permanent_failure_stops(self):
         safety = self.assess(failure=FailureClass.SAFETY_STOP)
@@ -84,7 +104,14 @@ class RetryPolicyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.assess(max_attempts=0)
         with self.assertRaises(TypeError):
-            self.assess(side_effect_state="not_applied")
+            self.assess(side_effect_possible=1)
+        with self.assertRaises(TypeError):
+            self.assess(
+                side_effect_possible=True,
+                side_effect_state="not_applied",
+            )
+        with self.assertRaises(ValueError):
+            self.assess(side_effect_state=SideEffectState.NOT_APPLIED)
 
 
 if __name__ == "__main__":
