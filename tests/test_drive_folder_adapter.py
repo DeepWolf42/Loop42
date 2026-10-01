@@ -390,6 +390,31 @@ class DriveFolderAdapterTests(unittest.TestCase):
             expected["identified_worker_session"]["can_dispatch"],
         )
 
+        proposal_content_name = "review-cora__a1.proposal.md"
+        proposal_content = b"bounded unverified proposal\n"
+        (self.root / RESULTS / proposal_content_name).write_bytes(proposal_content)
+        self.write_json(
+            self.root / RESULTS / "review-cora__a1.proposal.json",
+            {
+                "schema": PROPOSAL_SCHEMA,
+                "task_id": task.task_id,
+                "attempt_id": task.attempt_id,
+                "source_revision": task.source_revision,
+                "context_fingerprint": task.context_fingerprint,
+                "observed_at": NOW.isoformat(),
+                "worker_session_id": "worker-1",
+                "prompt_contract_sha256": "d" * 64,
+                "model_id": "local-test",
+                "content_file": proposal_content_name,
+                "content_sha256": hashlib.sha256(proposal_content).hexdigest(),
+            },
+        )
+        proposal_snapshot = scan_root(self.root)
+        self.assertIn(
+            expected["identity_bound_unverified_proposal"]["dispatch_blocker"],
+            proposal_snapshot.dispatch_blockers,
+        )
+
         self.write_json(
             self.root / RESULTS / "review-cora__a1.result.json",
             {
