@@ -46,6 +46,16 @@ Optional fields:
 A missing host file becomes UNKNOWN through the canonical reconciler. A stale file,
 changed host session, safety stop, or busy worker invalidates a previous permit.
 
+The Windows evidence writer `tools/harness/windows_drive_host_state.ps1` can
+produce this file without starting a worker or model. It derives a stable host
+session from the Windows boot time, carries the existing safety flags, and reports
+`unidentified_worker_count` when a DeepThought worker process exists without
+modern task/attempt identity. Any such unidentified worker blocks dispatch.
+
+The existing DeepThought watchdog already has a 15-second supervision loop, so the
+intended deployment is to invoke this one-shot evidence writer from that existing
+loop rather than creating another scheduler or supervisor.
+
 ## Modern task manifest
 
 A new queue item uses `loop42.drive-task.v1` and contains:
@@ -150,3 +160,21 @@ reconciliation.
 A passing repository test is **not** proof that the actual Windows Google Drive client
 or DeepThought worker has completed an end-to-end roundtrip. That live E2E remains a
 separate consumer gate.
+
+
+## No-model identity roundtrip
+
+`tests/frozen_scenarios/drive_identity_roundtrip_without_model_v1.json` exercises
+the complete provider identity/reconciliation lifecycle without an AI model:
+
+1. fresh idle host -> permit;
+2. permit-revalidated atomic local queue write;
+3. identified worker session -> RUNNING;
+4. receipt-bound result while worker still owns the attempt -> SUCCEEDED but not
+   dispatchable;
+5. fresh idle worker evidence -> SUCCEEDED and dispatchable;
+6. a new attempt can receive a new permit.
+
+This proves the Loop42 provider/control-plane path only. It intentionally does not
+claim real Google Drive synchronization, real Windows worker integration, or a model
+response.
