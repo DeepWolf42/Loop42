@@ -26,6 +26,7 @@ Loop42 stellt generische Entwicklungsmechanik bereit für:
 - wiederverwendbare Context- und Navigationshelfer
 - Frozen-Scenario-Evaluation
 - Candidate Learning und kontrollierte Evolution
+- evidenzbasierte Hygiene-/Entropy-Klassifikation ohne automatisches Löschen
 
 ## Designprinzipien
 

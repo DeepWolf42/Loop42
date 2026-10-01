@@ -26,6 +26,7 @@ Loop42 provides generic development mechanics for:
 - reusable context and navigation helpers
 - frozen-scenario evaluation
 - candidate learning and controlled evolution
+- evidence-driven hygiene / entropy classification without automatic deletion
 
 ## Design principles
 
