@@ -16,26 +16,26 @@ Statt dass Chats, Werkzeuge, Branches und verschiedene Worker mit der Zeit ihre 
 
 Loop42 ist **kein** KI-Modell, keine Projektmanagement-App und keine zweite Datenbank für dein Projekt.
 
-Es ist eine wiederverwendbare **Arbeitsmethode mit kleinen Werkzeugen**, die dafür sorgt, dass Menschen, KI-Modelle und Automatisierung an derselben aktuellen Projektwahrheit arbeiten.
+Es ist eine wiederverwendbare **Arbeitsmethode mit kleinen Werkzeugen**, die dafür sorgt, dass Menschen, KI-Modelle und Automatisierung am selben aktuellen Projektstand arbeiten.
 
 | Typisches Problem | Antwort von Loop42 |
 | --- | --- |
 | Alte Chats oder Annahmen werden für aktuell gehalten | Zuerst mit den Live-Quellen abgleichen |
-| Mehrere Worker bauen unterschiedliche Projektstände | Eine autoritative Projektwahrheit behalten |
-| Automatisierung läuft weiter, nur weil sie kann | Klare Grenzen für Autorität, Fähigkeiten und Stopps |
-| „Sieht gut aus“ ersetzt einen Nachweis | Evidence, Verifikation oder sichtbare Unsicherheit verlangen |
-| Nach Abbrüchen wird Arbeit doppelt gemacht | Aus explizitem Zustand, Entscheidungen und Checkpoints fortsetzen |
+| Mehrere Worker laufen in unterschiedliche Richtungen | Einen verbindlichen Projektstand behalten |
+| Automatisierung läuft weiter, nur weil sie kann | Klare Grenzen für Rechte, Fähigkeiten und Stopps |
+| „Sieht gut aus“ ersetzt einen Nachweis | Belege liefern oder Unsicherheit sichtbar lassen |
+| Nach Abbrüchen wird Arbeit doppelt gemacht | Aus Zustand, Entscheidungen und Checkpoints fortsetzen |
 | Mehr Prozess wird mit mehr Fortschritt verwechselt | Stoppen, wenn eine weitere Runde keinen echten Nutzen bringt |
 
 ## Der Matrixloop
 
-Die interne Methode heißt **Matrixloop**. Ohne Computer-Blabla bedeutet das:
+Die interne Methode heißt **Matrixloop**. In normalen Worten:
 
 1. **Abgleichen** — den Live-Zustand prüfen, statt altem Kontext blind zu vertrauen.
 2. **Ein Ziel wählen** — den nächsten sinnvollen und begrenzten Arbeitsschritt festlegen.
 3. **Vorher nach Fehlern suchen** — offensichtliche Sackgassen erkennen, bevor Aufwand entsteht.
 4. **Umsetzen oder prüfen** — genau die Arbeit erledigen, die wirklich nötig ist.
-5. **Verifizieren** — das Ergebnis gegen belastbare Evidence prüfen.
+5. **Verifizieren** — das Ergebnis mit nachvollziehbaren Belegen prüfen.
 6. **Reibung prüfen** — unnötiges Setup, Bedienaufwand und Komplexität erkennen.
 7. **Nutzen prüfen** — bringt eine weitere Runde eine echte Verbesserung?
 8. **Stoppen oder weiterdrehen** — nur mit einem konkreten Grund weitermachen.
@@ -44,21 +44,21 @@ Technische Kurzform:
 
 `RECONCILE → TARGET → PRE-MORTEM → IMPLEMENT/INSPECT → VERIFY → FRICTION → VALUE CHECK → STOP/ITERATE`
 
-Das ist ein Ablauf, kein Ritual. Wenn die nötige Evidence schon vorhanden ist, dürfen Schritte zusammenfallen.
+Das ist ein Ablauf, kein Ritual. Wenn die nötigen Belege bereits vorhanden sind, dürfen Schritte zusammenfallen.
 
 ## Die wichtigsten Regeln
 
 **Eine Wahrheit, viele Worker.**  
-Das Projekt behält seinen eigenen autoritativen Zustand. Modelle und Werkzeuge dürfen prüfen, widersprechen und verbessern, aber nicht stillschweigend konkurrierende Wahrheiten erzeugen.
+Das Projekt behält einen verbindlichen aktuellen Stand. Modelle und Werkzeuge dürfen prüfen, widersprechen und verbessern, aber nicht stillschweigend konkurrierende Projektstände erzeugen.
 
-**Evidence vor Selbstvertrauen.**  
-Wichtige Aussagen brauchen reproduzierbare Evidence, eine exakte Revision oder klar sichtbare Unsicherheit.
+**Belege vor Selbstvertrauen.**  
+Wichtige Aussagen brauchen nachvollziehbare Belege (im technischen Teil: Evidence), eine exakte Revision oder klar sichtbare Unsicherheit.
 
 **Begrenzte Autonomie.**  
-Automatisierung darf innerhalb klarer Autoritäts- und Fähigkeitsgrenzen handeln. Fehlender Zugriff, fehlende Evidence oder fehlende Fähigkeiten werden nicht weggeraten.
+Automatisierung darf innerhalb klarer Rechte- und Fähigkeitsgrenzen handeln. Fehlender Zugriff, fehlende Belege oder fehlende Fähigkeiten werden nicht weggeraten.
 
 **Nützliche Änderung statt Prozessvolumen.**  
-Wenn eine Runde keine neue Entscheidung, Evidence, Fehlerentdeckung oder reale Verbesserung bringt, wird sie vereinfacht oder beendet.
+Wenn eine Runde keine neue Entscheidung, keinen neuen Beleg, keinen Fehlerfund oder keine reale Verbesserung bringt, wird sie vereinfacht oder beendet.
 
 **Recovery by Design.**  
 Abgebrochene Arbeit soll aus aktuellem Zustand, akzeptierten Entscheidungen, verifizierten Ergebnissen und offenen Blockern sauber fortsetzbar sein.
@@ -71,9 +71,9 @@ Bevor ein Mensch Setup-Schritte bekommt, wird geprüft, ob der Weg überhaupt ma
 
 ## Wo Loop42 hingehört
 
-Loop42 ist projektagnostisch. Das **Consumer-Projekt besitzt seine Produktwahrheit**; Loop42 liefert die wiederverwendbare Arbeitsmethode und die unterstützende Mechanik.
+Loop42 ist nicht an ein bestimmtes Projekt gebunden. Das **angebundenen Projekt behält seinen eigenen verbindlichen Produktstand**; Loop42 liefert die wiederverwendbare Arbeitsmethode und die unterstützende Mechanik.
 
-CORA ist das erste Consumer-Projekt. CORA behält seinen eigenen Produktzustand und pinnt eine exakt verifizierte Loop42-Revision, statt automatisch jedem neuen Commit auf `main` zu folgen.
+CORA ist das erste angebundene Projekt. CORA behält seinen eigenen Produktzustand und pinnt eine exakt verifizierte Loop42-Revision, statt automatisch jedem neuen Commit auf `main` zu folgen.
 
 ## Hier anfangen
 
@@ -81,7 +81,7 @@ Wenn du das System verstehen willst, ohne dich zuerst durch jedes Dokument zu gr
 
 - [Matrixloop](docs/MATRIXLOOP.md) — Ablauf und Stopregeln
 - [Execution Fit](docs/EXECUTION_FIT.de.md) — kann und soll diese Arbeit überhaupt ausgeführt werden?
-- [Recovery and Truth](docs/RECOVERY_AND_TRUTH.md) — Source-of-Truth-, Stale-State- und Recovery-Regeln
+- [Recovery and Truth](docs/RECOVERY_AND_TRUTH.md) — Regeln für aktuellen Stand, veraltete Informationen und Recovery
 - [Harness Contract](docs/HARNESS_CONTRACT.md) — was eine Ausführungsumgebung können muss
 - [Consumer Profile](docs/CONSUMER_PROFILE.md) — wie ein Projekt an eine exakte Loop42-Revision gebunden wird
 
