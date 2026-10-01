@@ -44,3 +44,13 @@ The fixture is simulated. It preserves the decision failure mode, not a claim ab
 ## External pattern scout v1
 
 `external_pattern_scout_v1.json` freezes bounded external scouting: candidates must be problem-linked, provenance-aware and value-checked rather than adopted because they are popular.
+
+
+## Drive legacy attempt unknown v1
+
+`drive_legacy_attempt_unknown_v1.json` freezes the fail-closed migration case for
+a pre-contract synced-folder job that has no task/attempt/source/context identity.
+A legacy file in Inbox with no structured terminal evidence remains UNKNOWN: it is
+not inferred RUNNING from historic logs, not inferred FAILED from silence, and does
+not authorize retry or replacement dispatch. The legacy file remains operator-owned
+evidence until consciously reconciled.
