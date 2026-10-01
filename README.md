@@ -25,7 +25,7 @@ Loop42 provides generic development mechanics for:
 - GitHub visibility and freshness checks
 - reusable context and navigation helpers
 - frozen-scenario evaluation
-- candidate learning and controlled evolution
+- candidate learning and controlled evolution\n- evidence-driven hygiene / entropy classification without automatic deletion
 
 ## Design principles
 
