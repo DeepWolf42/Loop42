@@ -28,7 +28,7 @@ Boundary:
 - Ollama structured outputs are requested with an explicit JSON schema and temperature 0;
 - malformed, ambiguous or duplicate-key JSON is rejected instead of being treated as a proposal;
 - the validated proposal uses bounded `summary / known / proven / open / discarded / next / evidence_paths` fields;
-- the result records a SHA-256 of the exact proposal schema as well as the snapshot fingerprint and Git HEAD;
+- the result records SHA-256 fingerprints of the exact proposal schema and prompt contract as well as the snapshot fingerprint and Git HEAD;
 - model output cannot checkpoint, commit, push, publish or operate physical systems.
 
 Consumer projects keep their own action/approval policy.
@@ -114,6 +114,21 @@ Deep Thought/Drive adapter can use streaming as a fresh progress signal only whe
 actual Windows worker lifecycle and heartbeat write are tested together; historic or
 partial chunks must never be mistaken for successful completion.
 
+
+## Verification receipts
+
+`verification_receipt.py` provides the content-addressed success-evidence layer
+between a worker proposal and a reconciled successful result. It binds one exact
+task/attempt/revision/context basis, the verified subject digest, verifier revision,
+the full ordered acceptance-criteria set and evidence fingerprints.
+
+Every PASS criterion requires evidence. FAIL or UNKNOWN never validates as a
+successful receipt. `worker_dispatch.py` therefore rejects a RESULT that lacks
+a receipt fingerprint.
+
+A receipt fingerprint is not a signature or identity proof. It gives deterministic
+content identity so adapters can verify the full receipt before surfacing its hash
+to the generic reconciler.
 
 ## Action policy decision
 
