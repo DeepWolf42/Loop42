@@ -71,7 +71,7 @@ Bevor ein Mensch Setup-Schritte bekommt, wird geprüft, ob der Weg überhaupt ma
 
 ## Wo Loop42 hingehört
 
-Loop42 ist nicht an ein bestimmtes Projekt gebunden. Das **angebundenen Projekt behält seinen eigenen verbindlichen Produktstand**; Loop42 liefert die wiederverwendbare Arbeitsmethode und die unterstützende Mechanik.
+Loop42 ist nicht an ein bestimmtes Projekt gebunden. Das **angebundene Projekt behält seinen eigenen verbindlichen Produktstand**; Loop42 liefert die wiederverwendbare Arbeitsmethode und die unterstützende Mechanik.
 
 CORA ist das erste angebundene Projekt. CORA behält seinen eigenen Produktzustand und pinnt eine exakt verifizierte Loop42-Revision, statt automatisch jedem neuen Commit auf `main` zu folgen.
 
