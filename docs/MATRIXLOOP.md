@@ -71,3 +71,21 @@ Before inventing substantial new infrastructure or orchestration, Matrixloop may
 Scouting is an input to TARGET / PRE-MORTEM, not another loop stage. Discovery does not authorize adoption: relevance, project fit, expected value, provenance/license status and reproduction against the current source of truth still apply.
 
 See `docs/EXTERNAL_PATTERN_SCOUT.md`.
+
+
+## Hygiene / entropy control
+
+Matrixloop maintenance may run a bounded hygiene pass when repositories,
+workspaces or recovery surfaces accumulate stale references, completed branches,
+superseded material or ambiguous duplicates.
+
+Hygiene is **reconciliation, not deletion**. Fresh evidence may classify items
+as active, historical, superseded, merged branch, duplicate candidate, orphaned,
+stale reference or unknown. Classification is not authority to delete or move an
+item. Destructive cleanup remains a separate protected action under the
+consumer's retention and action-policy rules.
+
+Do not infer a duplicate from a matching filename, infer an orphan from a
+partial scan, or infer disposable state from age alone. Historical and frozen
+compatibility material may be intentionally retained. Missing, stale or
+incomplete evidence stays unknown.
