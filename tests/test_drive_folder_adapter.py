@@ -1,3 +1,4 @@
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -13,6 +14,7 @@ from tools.harness.drive_folder_adapter import (
     INBOX,
     LEGACY_SCHEMA,
     LOGS,
+    PROPOSAL_SCHEMA,
     RESULTS,
     SNAPSHOT_SCHEMA,
     TASK_SCHEMA,
@@ -197,6 +199,87 @@ class DriveFolderAdapterTests(unittest.TestCase):
                 permit,
                 now=NOW,
             )
+
+    def test_unverified_proposal_blocks_dispatch_until_terminal_verification(self):
+        task, _, _ = load_task_manifest(self.task_path)
+        content_name = "review-cora__a1.proposal.md"
+        content = b"unverified model proposal\n"
+        (self.root / RESULTS / content_name).write_bytes(content)
+        self.write_json(
+            self.root / RESULTS / "review-cora__a1.proposal.json",
+            {
+                "schema": PROPOSAL_SCHEMA,
+                "task_id": task.task_id,
+                "attempt_id": task.attempt_id,
+                "source_revision": task.source_revision,
+                "context_fingerprint": task.context_fingerprint,
+                "observed_at": NOW.isoformat(),
+                "worker_session_id": "worker-1",
+                "prompt_contract_sha256": "d" * 64,
+                "model_id": "local-test",
+                "content_file": content_name,
+                "content_sha256": hashlib.sha256(content).hexdigest(),
+            },
+        )
+
+        snapshot = scan_root(self.root)
+        self.assertEqual(len(snapshot.proposals), 1)
+        self.assertIn(
+            "unverified_proposal_requires_verification",
+            snapshot.dispatch_blockers,
+        )
+        self.assertNotIn((RESULTS, content_name), snapshot.legacy_files)
+
+        self.write_json(
+            self.root / RESULTS / "review-cora__a1.result.json",
+            {
+                "schema": ARTIFACT_SCHEMA,
+                "kind": "result",
+                "task_id": task.task_id,
+                "attempt_id": task.attempt_id,
+                "source_revision": task.source_revision,
+                "context_fingerprint": task.context_fingerprint,
+                "observed_at": NOW.isoformat(),
+                "complete": True,
+                "valid": True,
+                "success": True,
+                "receipt_fingerprint": RECEIPT,
+            },
+        )
+        verified = scan_root(self.root)
+        self.assertNotIn(
+            "unverified_proposal_requires_verification",
+            verified.dispatch_blockers,
+        )
+
+    def test_proposal_content_hash_mismatch_fails_closed(self):
+        task, _, _ = load_task_manifest(self.task_path)
+        content_name = "review-cora__a1.proposal.md"
+        (self.root / RESULTS / content_name).write_text(
+            "actual content\n",
+            encoding="utf-8",
+        )
+        self.write_json(
+            self.root / RESULTS / "review-cora__a1.proposal.json",
+            {
+                "schema": PROPOSAL_SCHEMA,
+                "task_id": task.task_id,
+                "attempt_id": task.attempt_id,
+                "source_revision": task.source_revision,
+                "context_fingerprint": task.context_fingerprint,
+                "observed_at": NOW.isoformat(),
+                "worker_session_id": "worker-1",
+                "prompt_contract_sha256": "d" * 64,
+                "model_id": "local-test",
+                "content_file": content_name,
+                "content_sha256": "e" * 64,
+            },
+        )
+        snapshot = scan_root(self.root)
+        self.assertIn("provider_evidence_invalid", snapshot.dispatch_blockers)
+        self.assertTrue(
+            any("proposal content fingerprint mismatch" in item for item in snapshot.errors)
+        )
 
     def test_structured_result_with_receipt_reconciles_success(self):
         task, _, _ = load_task_manifest(self.task_path)
