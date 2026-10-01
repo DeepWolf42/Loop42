@@ -217,6 +217,23 @@ class DriveFolderAdapterTests(unittest.TestCase):
         self.assertIsNone(permit)
         self.assertIn("provider_surface_missing", reasons)
 
+    def test_frozen_legacy_scenario_matches_contract(self):
+        path = (
+            Path(__file__).resolve().parents[1]
+            / "tests"
+            / "frozen_scenarios"
+            / "drive_legacy_attempt_unknown_v1.json"
+        )
+        data = json.loads(path.read_text(encoding="utf-8"))
+        expected = data["expected"]
+        self.assertEqual(expected["state"], "unknown")
+        self.assertFalse(expected["can_retry"])
+        self.assertFalse(expected["can_dispatch_replacement"])
+        self.assertTrue(expected["requires_operator_reconciliation"])
+        self.assertTrue(expected["must_not_infer_running_from_historic_start"])
+        self.assertTrue(expected["must_not_infer_failure_from_missing_terminal"])
+        self.assertTrue(expected["must_preserve_legacy_file"])
+
     def test_duplicate_json_keys_fail_closed(self):
         path = self.root / LOGS / HOST_STATE_FILE
         path.write_text(
