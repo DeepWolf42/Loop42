@@ -6,76 +6,110 @@
   <img src="docs/assets/loop42-mark.webp" alt="Loop42 retro emblem" width="300">
 </p>
 
-Loop42 is a reusable development and factory system for building complex projects with AI-assisted workflows while keeping execution bounded, evidence-driven and recoverable.
+Loop42 helps long-running, AI-assisted development stay **understandable, verifiable and resumable**.
 
-Its internal method is the **Matrixloop**: a compact loop for reconciling live state, choosing one useful target, implementing or inspecting it, verifying the result, challenging it with realistic counterexamples, and stopping when another pass would add no measurable value.
+Instead of letting chats, tools, branches and workers slowly drift into different versions of reality, Loop42 keeps returning to a few simple questions:
 
-## What Loop42 does
+**What is actually true now? What is the next useful thing to do? Are we allowed and able to do it? Did it really work? Is another round still worth it?**
 
-Loop42 provides generic development mechanics for:
+## In plain language
 
-- bounded iteration and explicit stop rules
-- source-of-truth and stale-state handling
-- recovery and reconciliation
-- single-writer / live-head guards
-- harness capability contracts
-- prompt and skill evaluation
-- run budgets and stop receipts
-- provenance and third-party license gates
-- GitHub visibility and freshness checks
-- reusable context and navigation helpers
-- frozen-scenario evaluation
-- candidate learning and controlled evolution
-- evidence-driven hygiene / entropy classification without automatic deletion
+Loop42 is **not** an AI model, a project-management app or a second database for your project.
 
-## Design principles
+It is a reusable **working method plus small tools** that help a project stay on one current truth while humans, AI models and automation work on it.
 
-**Evidence over confidence.**  
-Claims should be tied to reproducible evidence, exact revisions, or clearly marked uncertainty.
+| Common failure mode | Loop42's response |
+| --- | --- |
+| Old chats or assumptions are treated as current | Reconcile against live sources first |
+| Several workers create competing versions of the project | Keep one authoritative project state |
+| Automation keeps going because it can | Use explicit authority, capability and stop limits |
+| "Looks good" replaces proof | Require evidence, verification or visible uncertainty |
+| Work is repeated after interruptions | Recover from explicit state, decisions and checkpoints |
+| More process is mistaken for more progress | Stop when another pass adds no useful value |
 
-**One truth, many workers.**  
-Multiple models or tools may inspect and challenge a project, but they do not create competing authoritative states.
+## The Matrixloop
 
-**Bounded autonomy.**  
-Automation may do useful work inside explicit authority limits. Missing capability or evidence must stay visible rather than being guessed away.
+The internal method is called the **Matrixloop**. In human terms:
 
-**Useful delta over process.**  
-The loop exists to improve the project. A check or iteration that produces no distinct decision, evidence, defect discovery or implementation value should be merged, simplified or stopped.
+1. **Reconcile** — check the live state instead of trusting stale context.
+2. **Choose one target** — pick the next useful, bounded piece of work.
+3. **Pre-mortem** — look for obvious ways the plan could fail before spending effort.
+4. **Implement or inspect** — do the work that is actually needed.
+5. **Verify** — test the result against evidence.
+6. **Check friction** — notice unnecessary setup, operator work or complexity.
+7. **Check value** — ask whether another pass would create a real improvement.
+8. **Stop or iterate** — continue only when there is a distinct reason.
 
-**Recovery by design.**  
-Work should be resumable from explicit current state, accepted decisions, verified results and open blockers.
-
-**Portable by default.**  
-Provider-specific behavior belongs behind thin adapters. Matrixloop rules should not depend on a single AI vendor, IDE, chat surface or local model.
-
-**Execution fit before operator work.**  
-Verify capability, value and operator friction before handing over setup steps. Prefer the simplest viable path that meets the goal and safety/quality constraints.
-
-## Matrixloop in one line
+Technical shorthand:
 
 `RECONCILE → TARGET → PRE-MORTEM → IMPLEMENT/INSPECT → VERIFY → FRICTION → VALUE CHECK → STOP/ITERATE`
 
-The sequence is not a ritual. Steps may collapse when the required evidence already exists.
+The sequence is a guide, not a ritual. Steps can collapse when the required evidence already exists.
 
-## Repository structure
+## Core rules
 
-- `docs/MATRIXLOOP.md` — Matrixloop lifecycle and stop rules
-- `docs/EXECUTION_FIT.md` / [German](docs/EXECUTION_FIT.de.md) — capability/value/operator-fit gate before setup or execution
-- `docs/TRUTH_AND_GAPS.md` / [German](docs/TRUTH_AND_GAPS.de.md) — bounded evidence and gap workflows
-- `docs/EXTERNAL_PATTERN_SCOUT.md` / [German](docs/EXTERNAL_PATTERN_SCOUT.de.md) — bounded external pattern scouting
-- `docs/HARNESS_CONTRACT.md` — reusable harness capability boundary
-- `docs/CONSUMER_PROFILE.md` — exact-revision consumer binding contract
-- `docs/RECOVERY_AND_TRUTH.md` — truth, stale-state and recovery rules
+**One truth, many workers.**  
+A project keeps its own authoritative state. Models and tools may inspect, challenge and improve it, but they should not silently create competing truths.
+
+**Evidence before confidence.**  
+Important claims should point to reproducible evidence, an exact revision or clearly marked uncertainty.
+
+**Bounded autonomy.**  
+Automation may act inside explicit authority and capability limits. Missing access, evidence or capability stays visible instead of being guessed away.
+
+**Useful change over process volume.**  
+A loop that produces no new decision, evidence, defect discovery or implementation value should be simplified or stopped.
+
+**Recovery by design.**  
+Interrupted work should be resumable from explicit current state, accepted decisions, verified results and open blockers.
+
+**Portable by default.**  
+Provider-specific behavior belongs behind adapters. The method should not depend on one AI vendor, IDE, chat surface or local model.
+
+**Execution fit before operator work.**  
+Before handing setup steps to a human, check whether the path is actually possible, useful and worth the friction.
+
+## Where Loop42 fits
+
+Loop42 is project-agnostic. **Consumer projects keep their own product state.** Loop42 supplies the reusable working method and supporting mechanics around that state.
+
+CORA is the first consumer project. CORA keeps its own product state and pins an exact verified Loop42 revision rather than automatically following every new commit on `main`.
+
+## Start here
+
+If you want to understand the system rather than read every file:
+
+- [Matrixloop](docs/MATRIXLOOP.md) — the lifecycle and stop rules
+- [Execution Fit](docs/EXECUTION_FIT.md) / [Deutsch](docs/EXECUTION_FIT.de.md) — can and should this work actually run?
+- [Recovery and Truth](docs/RECOVERY_AND_TRUTH.md) — source-of-truth, stale-state and recovery rules
+- [Harness Contract](docs/HARNESS_CONTRACT.md) — what an execution environment must be able to do
+- [Consumer Profile](docs/CONSUMER_PROFILE.md) — how a project binds to an exact Loop42 revision
+
+<details>
+<summary>Technical reference and repository map</summary>
+
+### Evidence, evaluation and external inputs
+
+- `docs/TRUTH_AND_GAPS.md` / [Deutsch](docs/TRUTH_AND_GAPS.de.md) — bounded evidence and gap workflows
+- `docs/EXTERNAL_PATTERN_SCOUT.md` / [Deutsch](docs/EXTERNAL_PATTERN_SCOUT.de.md) — bounded external pattern scouting
 - `docs/EVALUATION.md` — frozen-scenario and method evaluation
-- `docs/LICENSE_POLICY.md` — current licensing policy
-- `docs/PUBLICATION_GATE.md` / [German](docs/PUBLICATION_GATE.de.md) — public-release safety and operator-decision gate
-- `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [German](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — bilingual documentation convention
-- `THIRD_PARTY.md` — external source and provenance ledger
-- `SECURITY.md` / [German](SECURITY.de.md) — security reporting and sensitive-information boundary
-- `CONTRIBUTING.md` / [German](CONTRIBUTING.de.md) — contribution, verification, provenance and privacy rules
-- `tools/` — reusable harness, context and verification utilities
 - `tests/frozen_scenarios/` — reproducible evaluation scenarios
+
+### Safety, publication and provenance
+
+- `docs/LICENSE_POLICY.md` — licensing policy
+- `docs/PUBLICATION_GATE.md` / [Deutsch](docs/PUBLICATION_GATE.de.md) — public-release safety and operator-decision gate
+- `THIRD_PARTY.md` — external source and provenance ledger
+- `SECURITY.md` / [Deutsch](SECURITY.de.md) — security reporting and sensitive-information boundary
+- `CONTRIBUTING.md` / [Deutsch](CONTRIBUTING.de.md) — contribution, verification, provenance and privacy rules
+
+### Language and implementation
+
+- `docs/DOCUMENTATION_LANGUAGE_POLICY.md` / [Deutsch](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md) — bilingual documentation convention
+- `tools/` — reusable harness, context and verification utilities
 - `adapters/` — consumer integration examples
+
+</details>
 
 ## Documentation languages
 
@@ -83,19 +117,13 @@ Core human-facing documentation follows an **English + German** convention. Code
 
 See the [Documentation Language Policy](docs/DOCUMENTATION_LANGUAGE_POLICY.md).
 
-## Consumer projects
-
-Loop42 is project-agnostic. Consumer projects keep their own product state, domain rules and authority boundaries and may pin an exact Loop42 revision/profile.
-
-CORA is the first consumer project, but its product truth remains outside this repository.
-
 ## Status
 
-Public development repository.
+Loop42 is a public development repository.
 
-The **v0.1 extraction / consumer-binding foundation is verified**. Reusable context/harness mechanics, frozen CORA equivalence and the exact-revision consumer-profile contract are in place. Milestone issue #4 is closed; repository contracts and tests remain authoritative.
+The **v0.1 extraction / consumer-binding foundation is verified**. Reusable context and harness mechanics, frozen CORA equivalence and the exact-revision consumer-profile contract are in place.
 
-CORA currently pins verified Loop42 revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. That pin is intentionally exact and does not float when Loop42 `main` advances.
+CORA currently pins verified Loop42 revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. That pin is intentionally exact; Loop42 `main` may continue to advance independently.
 
 Loop42 is licensed under the MIT License.
 
