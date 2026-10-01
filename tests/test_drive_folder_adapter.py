@@ -335,6 +335,22 @@ class DriveFolderAdapterTests(unittest.TestCase):
         self.assertIsNone(permit)
         self.assertIn("provider_surface_missing", reasons)
 
+    def test_windows_worker_contract_has_no_execution_or_result_authority(self):
+        module = (
+            Path(__file__).resolve().parents[1]
+            / "tools"
+            / "harness"
+            / "windows_worker_contract.psm1"
+        ).read_text(encoding="utf-8")
+        self.assertIn("loop42.windows-worker-session.v1", module)
+        self.assertIn("loop42.drive-proposal.v1", module)
+        self.assertIn("Write-Loop42ProposalManifest", module)
+        self.assertNotIn("loop42.drive-artifact.v1", module)
+        self.assertNotIn("receipt_fingerprint", module)
+        self.assertNotIn("Start-Process", module)
+        self.assertNotIn("Invoke-RestMethod", module)
+        self.assertNotIn("ollama", module.lower())
+
     def test_windows_host_writer_is_evidence_only(self):
         script = (
             Path(__file__).resolve().parents[1]
