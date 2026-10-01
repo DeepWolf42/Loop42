@@ -7,6 +7,7 @@ from tools.harness.ollama_worker import (
     PROPOSAL_SCHEMA,
     loopback_base,
     ollama_payload,
+    prompt_contract_fingerprint,
     proposal_schema_fingerprint,
     run_ollama,
     strict_json,
@@ -48,6 +49,14 @@ class OllamaWorkerTests(unittest.TestCase):
         self.assertIn("Required proposal JSON schema", payload["messages"][2]["content"])
         self.assertIn("not execution authority", payload["messages"][0]["content"])
         self.assertIn("Return only JSON", payload["messages"][0]["content"])
+
+    def test_prompt_contract_fingerprint_is_deterministic_and_prompt_bound(self):
+        first = prompt_contract_fingerprint("What is open?")
+        second = prompt_contract_fingerprint("What is open?")
+        changed = prompt_contract_fingerprint("What changed?")
+        self.assertEqual(first, second)
+        self.assertNotEqual(first, changed)
+        self.assertEqual(len(first), 64)
 
     def test_schema_fingerprint_is_deterministic(self):
         first = proposal_schema_fingerprint()
@@ -195,6 +204,10 @@ class OllamaWorkerTests(unittest.TestCase):
         self.assertEqual(
             output["proposal_schema_sha256"],
             proposal_schema_fingerprint(),
+        )
+        self.assertEqual(
+            output["prompt_contract_sha256"],
+            prompt_contract_fingerprint("What is open?"),
         )
         self.assertTrue(output["authority"].startswith("proposal-only"))
         self.assertEqual(output["metrics"]["prompt_eval_count"], 123)
