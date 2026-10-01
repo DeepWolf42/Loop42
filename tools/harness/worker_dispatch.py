@@ -185,6 +185,8 @@ class AttemptArtifact:
             self.receipt_fingerprint
         ):
             raise ValueError("receipt_fingerprint must be a SHA-256 hex digest")
+        if self.kind is ArtifactKind.RESULT and self.receipt_fingerprint is None:
+            raise ValueError("RESULT requires receipt_fingerprint")
 
 
 @dataclass(frozen=True)
