@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet('begin','progress','error','result','clear')]
+    [ValidateSet('begin','progress','proposal','error','clear')]
     [string]$Operation,
 
     [Parameter(Mandatory=$false)]
@@ -16,7 +16,7 @@ param(
     [int]$ProgressSeq = -1,
 
     [Parameter(Mandatory=$false)]
-    [string]$ReceiptFingerprint,
+    [string]$ProposalFile,
 
     [Parameter(Mandatory=$false)]
     [string]$ErrorCode = 'worker_error',
@@ -195,23 +195,32 @@ switch ($Operation) {
         $target
     }
 
-    'result' {
+    'proposal' {
         $task = Read-StrictTask
         $session = Current-Session
         Assert-SessionMatchesTask -Session $session -Task $task
 
-        if (
-            [string]::IsNullOrWhiteSpace($ReceiptFingerprint) -or
-            $ReceiptFingerprint -notmatch '^[0-9a-f]{64}$'
-        ) {
-            throw 'ReceiptFingerprint must be a lowercase SHA-256 digest'
+        if ([string]::IsNullOrWhiteSpace($ProposalFile)) {
+            throw 'ProposalFile is required'
+        }
+        if (-not (Test-Path -LiteralPath $ProposalFile -PathType Leaf)) {
+            throw "Proposal file unavailable: $ProposalFile"
         }
 
-        $artifact = Artifact-Base -Task $task -Kind 'result'
-        $artifact.success = $true
-        $artifact.receipt_fingerprint = $ReceiptFingerprint
-        $target = Join-Path $Results ('{0}__{1}.result.json' -f $task.task_id, $task.attempt_id)
-        Write-AtomicJson -Path $target -Value $artifact
+        $proposalHash = (Get-FileHash -LiteralPath $ProposalFile -Algorithm SHA256).Hash.ToLowerInvariant()
+        $proposal = [ordered]@{
+            schema = 'loop42.drive-worker-proposal.v1'
+            task_id = [string]$task.task_id
+            attempt_id = [string]$task.attempt_id
+            source_revision = [string]$task.source_revision
+            context_fingerprint = [string]$task.context_fingerprint
+            observed_at = ([datetimeoffset]::Now.ToUniversalTime().ToString('o'))
+            proposal_sha256 = $proposalHash
+            proposal_file = [System.IO.Path]::GetFileName($ProposalFile)
+            verified = $false
+        }
+        $target = Join-Path $Results ('{0}__{1}.proposal.json' -f $task.task_id, $task.attempt_id)
+        Write-AtomicJson -Path $target -Value $proposal
         $target
     }
 
