@@ -61,7 +61,6 @@ class RetryPolicyTests(unittest.TestCase):
     def test_not_applied_side_effect_still_needs_other_retry_gates(self):
         retry = self.assess(
             side_effect_possible=True,
-            side_effect_possible=True,
             side_effect_state=SideEffectState.NOT_APPLIED,
         )
         self.assertEqual(retry.decision, RetryDecision.RETRY_AFTER_BACKOFF)
@@ -69,6 +68,7 @@ class RetryPolicyTests(unittest.TestCase):
 
         unknown = self.assess(
             failure=FailureClass.UNKNOWN,
+            side_effect_possible=True,
             side_effect_state=SideEffectState.NOT_APPLIED,
         )
         self.assertEqual(unknown.decision, RetryDecision.RECONCILE)
