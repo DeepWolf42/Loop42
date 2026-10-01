@@ -2,6 +2,8 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -334,6 +336,38 @@ class DriveFolderAdapterTests(unittest.TestCase):
         permit, reasons = issue_provider_permit(snapshot, task, now=NOW)
         self.assertIsNone(permit)
         self.assertIn("provider_surface_missing", reasons)
+
+    def test_windows_powershell_contracts_parse_when_pwsh_is_available(self):
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("pwsh is not available in this environment")
+
+        root = Path(__file__).resolve().parents[1]
+        for relative in (
+            "tools/harness/windows_worker_contract.psm1",
+            "tools/harness/windows_drive_host_state.ps1",
+        ):
+            with self.subTest(path=relative):
+                path = root / relative
+                escaped = str(path).replace("'", "''")
+                script = (
+                    "$tokens=$null; $errors=$null; "
+                    f"[System.Management.Automation.Language.Parser]::ParseFile('{escaped}',"
+                    "[ref]$tokens,[ref]$errors) | Out-Null; "
+                    "if ($errors.Count -gt 0) { "
+                    "$errors | ForEach-Object { Write-Error $_.Message }; exit 1 }"
+                )
+                completed = subprocess.run(
+                    [pwsh, "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                self.assertEqual(
+                    completed.returncode,
+                    0,
+                    msg=completed.stdout + completed.stderr,
+                )
 
     def test_windows_worker_contract_has_no_execution_or_result_authority(self):
         module = (
