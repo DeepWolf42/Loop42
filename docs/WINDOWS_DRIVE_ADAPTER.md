@@ -199,6 +199,12 @@ The proposal helper hashes the already-written response file and emits only
 invent a receipt. This keeps the worker's authority at "produced an unverified
 proposal" even when the model call itself succeeds.
 
+The shim also owns session identity fail-closed: a second `begin` refuses to
+overwrite an existing session file, progress/clear refuse another process's
+session, and proposal emission derives its worker-session ID from the current
+same-process session rather than accepting one from the caller. A task/session
+mismatch therefore blocks proposal publication instead of being papered over.
+
 ## No-model identity roundtrip
 
 `tests/frozen_scenarios/drive_identity_roundtrip_without_model_v1.json` exercises
