@@ -42,3 +42,34 @@ non-interactive mode.
 Gemini CLI is Apache-2.0. Loop42 independently implements only this narrow
 general policy pattern in Python standard-library code; no Gemini CLI
 implementation code or runtime is imported.
+
+
+## Post-interruption side-effect reconciliation
+
+A runtime ending after an action request is not evidence that the action failed.
+For bounded side effects whose provider adapter can project the relevant target
+state into a stable canonical fingerprint, consumers may record a
+`SideEffectIntent` before execution and use
+`tools/harness/side_effect_reconcile.py` after an interruption.
+
+The intent binds one action ID, action, target and state-projection scope to
+different pre-action and desired SHA-256 fingerprints. A fresh provider re-read
+using the same target and projection scope is classified as:
+
+- `APPLIED`: the desired fingerprint is present. Do not replay.
+- `NOT_APPLIED`: the exact pre-action fingerprint is still present. The action
+  may be reconsidered, but the old policy result, approval and provider
+  preconditions are not durable authority; evaluate them again before any write.
+- `CONFLICT`: the target/scope differs or the target state has diverged. Do not
+  replay; reconcile the new state.
+- `UNKNOWN`: evidence is absent, stale, future-dated, incomplete or invalid.
+  Do not replay.
+
+The state projection is provider/consumer-owned evidence, not a second product
+truth. It must be deterministic and narrow enough that equality proves the
+relevant before/desired condition. If a deterministic postcondition cannot be
+specified, leave the interrupted side effect unresolved instead of manufacturing
+an `APPLIED` or `NOT_APPLIED` result.
+
+This contract is pure classification. It never executes the action, never
+persists approval and never turns `NOT_APPLIED` into automatic permission.

@@ -129,3 +129,22 @@ Rules may narrow by exact action, target prefix, effect and execution mode with
 explicit priorities; equal-priority conflicts fail closed. The module never
 executes the requested action, never creates durable approval, and does not
 replace dispatch-permit revalidation immediately before a write.
+
+
+## Post-interruption side-effect reconciliation
+
+`side_effect_reconcile.py` covers the gap between pre-action policy and a
+runtime that disappears before it can report whether a side effect completed.
+Adapters define a narrow deterministic target-state projection, record its
+pre-action and desired SHA-256 fingerprints, then freshly re-read the provider
+after interruption.
+
+The pure reconciler returns `APPLIED`, `NOT_APPLIED`, `CONFLICT` or
+`UNKNOWN`. Only `NOT_APPLIED` sets `may_reconsider=True`, and that flag is
+not execution authority: action policy, operator approval when required, current
+provider preconditions and any time-sensitive permit must all be evaluated
+again. `APPLIED`, `CONFLICT` and `UNKNOWN` never justify blind replay.
+
+This is runtime-neutral. ChatGPT Work, another cloud agent, a local worker or a
+future adapter may all use the same contract; no runtime session becomes product
+truth.
