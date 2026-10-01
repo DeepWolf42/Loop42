@@ -83,7 +83,10 @@ provider-evidence errors and block dispatch.
 ## Legacy evidence
 
 Existing `.md` and `.txt` files remain visible as legacy provider evidence but
-are **not** converted into modern identity.
+are **not** converted into modern identity. Historical legacy files already in
+Results/Error/Archive are retained diagnostics and do not permanently block new
+work. An unresolved legacy job still present in Inbox does block replacement
+dispatch until consciously reconciled.
 
 `legacy-reconcile` therefore returns UNKNOWN and:
 
