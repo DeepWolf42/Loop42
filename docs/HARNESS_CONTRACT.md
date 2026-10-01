@@ -150,12 +150,15 @@ conditions hold:
 
 - the failure is explicitly classified as transient;
 - the evidence used for that classification is fresh;
-- the bounded attempt budget still has capacity; and
-- either no side effect is in scope, or post-interruption reconciliation
-  confirmed the side effect as NOT_APPLIED.
+- the bounded attempt budget still has capacity;
+- the caller explicitly declares whether the previous attempt could have
+  produced a side effect; and
+- when a side effect was possible, post-interruption reconciliation explicitly
+  confirms it as NOT_APPLIED.
 
-UNKNOWN or conflicting failure evidence, and UNKNOWN or CONFLICT side-effect
-state, return RECONCILE rather than retry. An already APPLIED side effect, a
+A possible side effect with no reconciled state, UNKNOWN state or CONFLICT state
+returns RECONCILE rather than retry. Declaring no side effect is an explicit
+input, not the default meaning of a missing state. An already APPLIED side effect, a
 permanent failure or an exhausted attempt budget returns DO_NOT_RETRY. A latched
 safety stop returns OPERATOR_REQUIRED.
 
