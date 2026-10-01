@@ -64,7 +64,14 @@ class DriveFolderAdapterTests(unittest.TestCase):
             },
         )
 
-    def write_host(self, *, session_id="host-1", safety=False, workers=None):
+    def write_host(
+        self,
+        *,
+        session_id="host-1",
+        safety=False,
+        workers=None,
+        unidentified_worker_count=0,
+    ):
         self.write_json(
             self.root / LOGS / HOST_STATE_FILE,
             {
@@ -73,6 +80,7 @@ class DriveFolderAdapterTests(unittest.TestCase):
                 "session_id": session_id,
                 "reachable": True,
                 "safety_stop": safety,
+                "unidentified_worker_count": unidentified_worker_count,
                 "worker_sessions": workers or [],
             },
         )
@@ -137,6 +145,17 @@ class DriveFolderAdapterTests(unittest.TestCase):
         second, second_reasons = issue_provider_permit(queued, task, now=NOW)
         self.assertIsNone(second)
         self.assertIn("canonical_dispatch_not_permitted", second_reasons)
+
+    def test_unidentified_worker_process_blocks_dispatch(self):
+        self.write_host(unidentified_worker_count=1)
+        snapshot = scan_root(self.root)
+        self.assertEqual(snapshot.unidentified_worker_count, 1)
+        self.assertIn("unidentified_worker_session", snapshot.dispatch_blockers)
+
+        task, _, _ = load_task_manifest(self.task_path)
+        permit, reasons = issue_provider_permit(snapshot, task, now=NOW)
+        self.assertIsNone(permit)
+        self.assertIn("unidentified_worker_session", reasons)
 
     def test_host_session_change_invalidates_permit_before_write(self):
         snapshot = scan_root(self.root)
@@ -232,6 +251,20 @@ class DriveFolderAdapterTests(unittest.TestCase):
         permit, reasons = issue_provider_permit(snapshot, task, now=NOW)
         self.assertIsNone(permit)
         self.assertIn("provider_surface_missing", reasons)
+
+    def test_windows_host_writer_is_evidence_only(self):
+        script = (
+            Path(__file__).resolve().parents[1]
+            / "tools"
+            / "harness"
+            / "windows_drive_host_state.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn("loop42.drive-host-state.v1", script)
+        self.assertIn("unidentified_worker_count", script)
+        self.assertIn("[System.IO.File]::Replace", script)
+        self.assertNotIn("Start-Process", script)
+        self.assertNotIn("Invoke-RestMethod", script)
+        self.assertNotIn("ollama", script.lower())
 
     def test_frozen_legacy_scenario_matches_contract(self):
         path = (
