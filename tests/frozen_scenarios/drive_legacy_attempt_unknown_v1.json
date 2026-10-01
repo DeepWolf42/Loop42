@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "name": "drive_legacy_attempt_unknown_v1",
+  "purpose": "Freeze fail-closed handling for a pre-contract Drive worker job with no structured task/attempt/source/context identity.",
+  "fixture": {
+    "legacy_job": "025_legacy_code_review.md",
+    "surfaces": {
+      "00_Inbox": ["025_legacy_code_review.md"],
+      "10_Results": [],
+      "95_Error": [],
+      "99_Archive": []
+    },
+    "fresh_host_state": false
+  },
+  "expected": {
+    "state": "unknown",
+    "can_retry": false,
+    "can_dispatch_replacement": false,
+    "requires_operator_reconciliation": true,
+    "must_not_infer_running_from_historic_start": true,
+    "must_not_infer_failure_from_missing_terminal": true,
+    "must_preserve_legacy_file": true
+  }
+}
