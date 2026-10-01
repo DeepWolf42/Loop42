@@ -13,7 +13,11 @@ import hashlib
 import json
 import re
 
-from tools.harness.worker_dispatch import DispatchTask
+from tools.harness.worker_dispatch import (
+    ArtifactKind,
+    AttemptArtifact,
+    DispatchTask,
+)
 
 SCHEMA = "loop42.verification-receipt.v1"
 _ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}")
@@ -91,12 +95,14 @@ class VerificationReceipt:
         ):
             if not isinstance(value, str) or not _ID_RE.fullmatch(value):
                 raise ValueError(f"invalid {name}")
-        for name, value in (
-            ("source_revision", self.source_revision),
-            ("verifier_revision", self.verifier_revision),
+        if not isinstance(self.source_revision, str) or not _SHA_RE.fullmatch(
+            self.source_revision
         ):
-            if not isinstance(value, str) or not _SHA_RE.fullmatch(value):
-                raise ValueError(f"{name} must be a lowercase Git revision")
+            raise ValueError("source_revision must be a lowercase Git revision")
+        if not isinstance(self.verifier_revision, str) or not _ID_RE.fullmatch(
+            self.verifier_revision
+        ):
+            raise ValueError("invalid verifier_revision")
         for name, value in (
             ("context_fingerprint", self.context_fingerprint),
             ("subject_fingerprint", self.subject_fingerprint),
@@ -120,7 +126,7 @@ class ReceiptValidation:
     fingerprint: str
 
 
-def _payload(receipt: VerificationReceipt) -> dict:
+def receipt_payload(receipt: VerificationReceipt) -> dict:
     if not isinstance(receipt, VerificationReceipt):
         raise TypeError("receipt must be VerificationReceipt")
     return {
@@ -149,7 +155,7 @@ def _payload(receipt: VerificationReceipt) -> dict:
 
 def receipt_fingerprint(receipt: VerificationReceipt) -> str:
     encoded = json.dumps(
-        _payload(receipt),
+        receipt_payload(receipt),
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -206,4 +212,34 @@ def validate_receipt(
         valid=not reasons,
         reasons=tuple(reasons),
         fingerprint=receipt_fingerprint(receipt),
+    )
+
+
+def result_artifact_from_receipt(
+    receipt: VerificationReceipt,
+    task: DispatchTask,
+    *,
+    observed_at: datetime,
+    subject_fingerprint: str | None = None,
+) -> AttemptArtifact:
+    """Create a successful terminal artifact only from a receipt valid for task."""
+    validation = validate_receipt(
+        receipt,
+        task,
+        subject_fingerprint=subject_fingerprint,
+    )
+    if not validation.valid:
+        joined = ",".join(validation.reasons)
+        raise ValueError(f"verification receipt is not valid for task: {joined}")
+    return AttemptArtifact(
+        kind=ArtifactKind.RESULT,
+        task_id=task.task_id,
+        attempt_id=task.attempt_id,
+        source_revision=task.source_revision,
+        context_fingerprint=task.context_fingerprint,
+        observed_at=observed_at,
+        complete=True,
+        valid=True,
+        success=True,
+        receipt_fingerprint=validation.fingerprint,
     )
