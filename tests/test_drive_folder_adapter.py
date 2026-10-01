@@ -266,6 +266,96 @@ class DriveFolderAdapterTests(unittest.TestCase):
         self.assertNotIn("Invoke-RestMethod", script)
         self.assertNotIn("ollama", script.lower())
 
+    def test_no_model_identity_roundtrip(self):
+        scenario_path = (
+            Path(__file__).resolve().parents[1]
+            / "tests"
+            / "frozen_scenarios"
+            / "drive_identity_roundtrip_without_model_v1.json"
+        )
+        scenario = json.loads(scenario_path.read_text(encoding="utf-8"))
+        expected = {item["step"]: item["expected"] for item in scenario["sequence"]}
+
+        task, _, _ = load_task_manifest(self.task_path)
+        initial = scan_root(self.root)
+        permit, reasons = issue_provider_permit(initial, task, now=NOW)
+        self.assertIsNotNone(permit)
+        self.assertEqual(reasons, ())
+        self.assertTrue(expected["fresh_idle_host"]["permit"])
+
+        queued_path = enqueue_with_permit(self.root, self.task_path, permit, now=NOW)
+        self.assertTrue(queued_path.exists())
+        self.assertTrue(expected["atomic_queue_write"]["queued"])
+        self.assertFalse(expected["atomic_queue_write"]["cloud_sync_confirmed"])
+
+        self.write_host(
+            workers=[{
+                "session_id": "worker-1",
+                "task_id": task.task_id,
+                "attempt_id": task.attempt_id,
+                "progress_seq": 1,
+                "progress_at": NOW.isoformat(),
+            }]
+        )
+        running = reconcile_modern(scan_root(self.root), task, now=NOW)
+        self.assertEqual(
+            running["state"]["lifecycle"],
+            expected["identified_worker_session"]["lifecycle"],
+        )
+        self.assertEqual(
+            running["state"]["can_dispatch"],
+            expected["identified_worker_session"]["can_dispatch"],
+        )
+
+        self.write_json(
+            self.root / RESULTS / "review-cora__a1.result.json",
+            {
+                "schema": ARTIFACT_SCHEMA,
+                "kind": "result",
+                "task_id": task.task_id,
+                "attempt_id": task.attempt_id,
+                "source_revision": task.source_revision,
+                "context_fingerprint": task.context_fingerprint,
+                "observed_at": NOW.isoformat(),
+                "complete": True,
+                "valid": True,
+                "success": True,
+                "receipt_fingerprint": RECEIPT,
+            },
+        )
+        busy_success = reconcile_modern(scan_root(self.root), task, now=NOW)
+        self.assertEqual(
+            busy_success["state"]["lifecycle"],
+            expected["receipt_bound_result_worker_still_busy"]["lifecycle"],
+        )
+        self.assertEqual(
+            busy_success["state"]["can_dispatch"],
+            expected["receipt_bound_result_worker_still_busy"]["can_dispatch"],
+        )
+
+        self.write_host()
+        released = reconcile_modern(scan_root(self.root), task, now=NOW)
+        self.assertEqual(
+            released["state"]["lifecycle"],
+            expected["worker_releases_attempt"]["lifecycle"],
+        )
+        self.assertEqual(
+            released["state"]["can_dispatch"],
+            expected["worker_releases_attempt"]["can_dispatch"],
+        )
+
+        next_path = Path(self.temp.name) / "next-a2.task.json"
+        self.write_task(next_path, attempt="a2")
+        next_task, _, _ = load_task_manifest(next_path)
+        next_permit, next_reasons = issue_provider_permit(
+            scan_root(self.root),
+            next_task,
+            now=NOW,
+        )
+        self.assertIsNotNone(next_permit)
+        self.assertEqual(next_reasons, ())
+        self.assertTrue(expected["next_attempt"]["permit"])
+
     def test_frozen_legacy_scenario_matches_contract(self):
         path = (
             Path(__file__).resolve().parents[1]
