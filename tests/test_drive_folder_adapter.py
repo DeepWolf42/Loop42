@@ -96,7 +96,23 @@ class DriveFolderAdapterTests(unittest.TestCase):
         task, _, _ = load_task_manifest(self.task_path)
         permit, reasons = issue_provider_permit(snapshot, task, now=NOW)
         self.assertIsNone(permit)
-        self.assertIn("legacy_evidence_requires_reconciliation", reasons)
+        self.assertIn("legacy_inbox_requires_reconciliation", reasons)
+
+    def test_historic_legacy_results_do_not_poison_new_dispatch(self):
+        (self.root / RESULTS / "2026-09-28_old_review.md").write_text(
+            "historic result\n",
+            encoding="utf-8",
+        )
+        (self.root / ARCHIVE / "old_job.md").write_text(
+            "historic archive\n",
+            encoding="utf-8",
+        )
+        snapshot = scan_root(self.root)
+        self.assertEqual(snapshot.dispatch_blockers, ())
+        task, _, _ = load_task_manifest(self.task_path)
+        permit, reasons = issue_provider_permit(snapshot, task, now=NOW)
+        self.assertIsNotNone(permit)
+        self.assertEqual(reasons, ())
 
     def test_fresh_complete_surfaces_can_issue_and_atomically_enqueue(self):
         snapshot = scan_root(self.root)
