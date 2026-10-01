@@ -23,6 +23,36 @@ Ein begrenzter Scout ist sinnvoll, wenn mindestens eines davon gilt:
 
 Normale Produktarbeit darf nicht blockieren, nur weil kein aktueller Scout existiert.
 
+## Suchbreite
+
+Gesucht wird nach dem **Problem**, nicht nur nach Projekten, die wie Loop42 aussehen.
+
+Mit den wörtlichen Begriffen aus Nutzerziel oder Projekt starten und dann bewusst
+auf Synonyme, Mechaniken und benachbarte Fachgebiete erweitern. Ein brauchbarer
+Kandidat muss sich nicht selbst als KI-Agent, Loop oder Orchestrator bezeichnen,
+wenn er denselben Fehlermodus löst.
+
+Sinnvolle Suchfamilien sind unter anderem:
+
+- KI / Agenten / Prompts / Context Engineering / Memory / Evals / Grader;
+- Durable Workflows / State Machines / Checkpoints / Replay / Reconciliation;
+- Distributed Systems / Idempotency / Optimistic Concurrency / Leases / Fencing /
+  Event Sourcing / Saga / Outbox;
+- Queues / Worker / Supervision / Retry / Circuit Breaker / Dead-Letter Handling /
+  Backpressure / begrenzte Parallelität;
+- inkrementelle Buildsysteme / Dependency Graphs / Invalidierung /
+  content-addressed State / Reproduzierbarkeit / Caching;
+- Policy / Provenance / Attestations / Audit / Autorisierung;
+- Fault Injection / Chaos Engineering / Model Checking / Property-based Testing;
+- relevante technische Regelsysteme, wenn ihr Problem zum Consumer-Fall passt.
+
+Ein Scout soll relevante Familien stichprobenartig mischen, statt nur kleine
+Varianten derselben Produktkategorie zu suchen. Keyword-Erweiterung ist eine
+Discovery-Heuristik und keine Erlaubnis, einen größeren Backlog zu erzeugen.
+
+Ein ähnliches Produkt ist weder Voraussetzung noch automatisch ein guter Fund.
+Bevorzugt wird die kleinste übertragbare Mechanik, die das aktuelle Problem löst.
+
 ## Scout-Contract
 
 Ein Scout braucht:
