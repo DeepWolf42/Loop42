@@ -57,6 +57,7 @@ def assess_retry(
     attempt: int,
     max_attempts: int,
     fresh_evidence: bool,
+    side_effect_possible: bool,
     side_effect_state: SideEffectState | None = None,
     base_delay_seconds: int = 10,
     max_delay_seconds: int = 600,
@@ -65,8 +66,9 @@ def assess_retry(
 
     attempt is the number of the attempt that just ended, starting at 1.
     A retry is considered only for an explicitly classified transient failure,
-    fresh evidence, remaining budget, and either no side effect or a freshly
-    reconciled NOT_APPLIED side effect.
+    fresh evidence, remaining budget, and an explicit declaration of whether
+    a side effect was possible. A possible side effect requires a freshly
+    reconciled NOT_APPLIED state before retry can remain eligible.
     """
     if not isinstance(failure, FailureClass):
         raise TypeError("failure must be FailureClass")
@@ -76,10 +78,16 @@ def assess_retry(
     _positive_int("max_delay_seconds", max_delay_seconds)
     if type(fresh_evidence) is not bool:
         raise TypeError("fresh_evidence must be boolean")
+    if type(side_effect_possible) is not bool:
+        raise TypeError("side_effect_possible must be boolean")
     if side_effect_state is not None and not isinstance(
         side_effect_state, SideEffectState
     ):
         raise TypeError("side_effect_state must be SideEffectState or None")
+    if not side_effect_possible and side_effect_state is not None:
+        raise ValueError(
+            "side_effect_state must be omitted when side_effect_possible is false"
+        )
 
     remaining = max(0, max_attempts - attempt)
 
@@ -96,6 +104,14 @@ def assess_retry(
             RetryDecision.RECONCILE,
             None,
             ("retry_evidence_not_fresh",),
+            remaining,
+        )
+
+    if side_effect_possible and side_effect_state is None:
+        return RetryAssessment(
+            RetryDecision.RECONCILE,
+            None,
+            ("side_effect_state_missing",),
             remaining,
         )
 
@@ -137,8 +153,10 @@ def assess_retry(
         )
 
     reasons = ["verified_transient_failure", "retry_budget_available"]
-    if side_effect_state is SideEffectState.NOT_APPLIED:
+    if side_effect_possible:
         reasons.append("side_effect_confirmed_not_applied")
+    else:
+        reasons.append("no_side_effect_possible")
     return RetryAssessment(
         RetryDecision.RETRY_AFTER_BACKOFF,
         _backoff_delay(attempt, base_delay_seconds, max_delay_seconds),
