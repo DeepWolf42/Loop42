@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import re
 import sys
 from typing import Any
 
@@ -37,6 +38,7 @@ from tools.harness.worker_dispatch import (
 TASK_SCHEMA = "loop42.drive-task.v1"
 HOST_SCHEMA = "loop42.drive-host-state.v1"
 ARTIFACT_SCHEMA = "loop42.drive-artifact.v1"
+PROPOSAL_SCHEMA = "loop42.drive-proposal.v1"
 SNAPSHOT_SCHEMA = "loop42.drive-folder-snapshot.v1"
 LEGACY_SCHEMA = "loop42.drive-legacy-reconciliation.v1"
 
@@ -48,6 +50,10 @@ ARCHIVE = "99_Archive"
 HOST_STATE_FILE = "loop42-host-state.json"
 REQUIRED_SURFACES = (INBOX, RESULTS, LOGS, ERRORS, ARCHIVE)
 MAX_JSON_BYTES = 1024 * 1024
+MAX_PROPOSAL_BYTES = 2 * 1024 * 1024
+_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}")
+_SHA_RE = re.compile(r"[0-9a-f]{7,64}")
+_FP_RE = re.compile(r"[0-9a-f]{64}")
 
 
 def _strict_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -307,11 +313,114 @@ def _artifact_json(value: AttemptArtifact) -> dict[str, Any]:
 
 
 @dataclass(frozen=True)
+class ProposalEvidence:
+    task_id: str
+    attempt_id: str
+    source_revision: str
+    context_fingerprint: str
+    observed_at: datetime
+    worker_session_id: str
+    prompt_contract_sha256: str
+    model_id: str
+    content_file: str
+    content_sha256: str
+
+    def __post_init__(self) -> None:
+        for name, value in (
+            ("task_id", self.task_id),
+            ("attempt_id", self.attempt_id),
+            ("worker_session_id", self.worker_session_id),
+        ):
+            if not isinstance(value, str) or not _ID_RE.fullmatch(value):
+                raise ValueError(f"invalid proposal {name}")
+        if not isinstance(self.source_revision, str) or not _SHA_RE.fullmatch(self.source_revision):
+            raise ValueError("proposal source_revision must be a lowercase Git revision")
+        for name, value in (
+            ("context_fingerprint", self.context_fingerprint),
+            ("prompt_contract_sha256", self.prompt_contract_sha256),
+            ("content_sha256", self.content_sha256),
+        ):
+            if not isinstance(value, str) or not _FP_RE.fullmatch(value):
+                raise ValueError(f"proposal {name} must be a SHA-256 hex digest")
+        if not isinstance(self.model_id, str) or not self.model_id.strip() or len(self.model_id) > 256:
+            raise ValueError("proposal model_id must be bounded non-empty text")
+        if (
+            not isinstance(self.content_file, str)
+            or not self.content_file
+            or Path(self.content_file).name != self.content_file
+            or self.content_file.startswith(".")
+        ):
+            raise ValueError("proposal content_file must be a safe sibling filename")
+        _iso(self.observed_at)
+
+
+def _proposal(value: dict[str, Any], *, where: str, results_dir: Path) -> ProposalEvidence:
+    _expect_keys(
+        value,
+        required={
+            "schema",
+            "task_id",
+            "attempt_id",
+            "source_revision",
+            "context_fingerprint",
+            "observed_at",
+            "worker_session_id",
+            "prompt_contract_sha256",
+            "model_id",
+            "content_file",
+            "content_sha256",
+        },
+        where=where,
+    )
+    if value["schema"] != PROPOSAL_SCHEMA:
+        raise ValueError(f"{where}.schema must be {PROPOSAL_SCHEMA}")
+    proposal = ProposalEvidence(
+        task_id=value["task_id"],
+        attempt_id=value["attempt_id"],
+        source_revision=value["source_revision"],
+        context_fingerprint=value["context_fingerprint"],
+        observed_at=_timestamp(value["observed_at"], f"{where}.observed_at"),
+        worker_session_id=value["worker_session_id"],
+        prompt_contract_sha256=value["prompt_contract_sha256"],
+        model_id=value["model_id"],
+        content_file=value["content_file"],
+        content_sha256=value["content_sha256"],
+    )
+    content_path = results_dir / proposal.content_file
+    if not content_path.is_file():
+        raise ValueError(f"{where}: proposal content file is missing")
+    raw = content_path.read_bytes()
+    if not raw or len(raw) > MAX_PROPOSAL_BYTES:
+        raise ValueError(f"{where}: proposal content must be between 1 byte and 2 MiB")
+    import hashlib
+    actual = hashlib.sha256(raw).hexdigest()
+    if actual != proposal.content_sha256:
+        raise ValueError(f"{where}: proposal content fingerprint mismatch")
+    return proposal
+
+
+def _proposal_json(value: ProposalEvidence) -> dict[str, Any]:
+    return {
+        "task_id": value.task_id,
+        "attempt_id": value.attempt_id,
+        "source_revision": value.source_revision,
+        "context_fingerprint": value.context_fingerprint,
+        "observed_at": _iso(value.observed_at),
+        "worker_session_id": value.worker_session_id,
+        "prompt_contract_sha256": value.prompt_contract_sha256,
+        "model_id": value.model_id,
+        "content_file": value.content_file,
+        "content_sha256": value.content_sha256,
+    }
+
+
+@dataclass(frozen=True)
 class FolderSnapshot:
     root: Path
     observation: HostObservation | None
     unidentified_worker_count: int
     tasks: tuple[DispatchTask, ...]
+    proposals: tuple[ProposalEvidence, ...]
     artifacts: tuple[AttemptArtifact, ...]
     legacy_files: tuple[tuple[str, str], ...]
     missing_surfaces: tuple[str, ...]
@@ -331,6 +440,22 @@ class FolderSnapshot:
         # unresolved legacy queue item in Inbox blocks replacement dispatch.
         if any(surface == INBOX for surface, _name in self.legacy_files):
             blockers.append("legacy_inbox_requires_reconciliation")
+        unresolved_proposals = [
+            proposal
+            for proposal in self.proposals
+            if not any(
+                artifact.kind in {ArtifactKind.RESULT, ArtifactKind.ERROR}
+                and artifact.complete
+                and artifact.valid
+                and artifact.task_id == proposal.task_id
+                and artifact.attempt_id == proposal.attempt_id
+                and artifact.source_revision == proposal.source_revision
+                and artifact.context_fingerprint == proposal.context_fingerprint
+                for artifact in self.artifacts
+            )
+        ]
+        if unresolved_proposals:
+            blockers.append("unverified_proposal_requires_verification")
         return tuple(blockers)
 
 
@@ -350,6 +475,7 @@ def scan_root(root: Path) -> FolderSnapshot:
     errors: list[str] = []
     legacy: list[tuple[str, str]] = []
     tasks: list[DispatchTask] = []
+    proposals: list[ProposalEvidence] = []
     artifacts: list[AttemptArtifact] = []
 
     observation = None
@@ -383,6 +509,21 @@ def scan_root(root: Path) -> FolderSnapshot:
         elif path.suffix.lower() in {".md", ".txt"}:
             legacy.append((INBOX, path.name))
 
+    proposal_content_files: set[str] = set()
+    results_dir = root / RESULTS
+    for path in _surface_files(root, RESULTS):
+        if path.name.endswith(".proposal.json"):
+            try:
+                proposal = _proposal(
+                    _load_json_file(path),
+                    where=path.name,
+                    results_dir=results_dir,
+                )
+                proposals.append(proposal)
+                proposal_content_files.add(proposal.content_file)
+            except (OSError, TypeError, ValueError) as error:
+                errors.append(str(error))
+
     surfaces = (
         (RESULTS, ".result.json", ArtifactKind.RESULT),
         (ERRORS, ".error.json", ArtifactKind.ERROR),
@@ -401,7 +542,10 @@ def scan_root(root: Path) -> FolderSnapshot:
                     )
                 except (OSError, TypeError, ValueError) as error:
                     errors.append(str(error))
-            elif path.suffix.lower() in {".md", ".txt"}:
+            elif (
+                path.suffix.lower() in {".md", ".txt"}
+                and not (surface == RESULTS and path.name in proposal_content_files)
+            ):
                 legacy.append((surface, path.name))
 
     return FolderSnapshot(
@@ -409,6 +553,7 @@ def scan_root(root: Path) -> FolderSnapshot:
         observation=observation,
         unidentified_worker_count=unidentified_worker_count,
         tasks=tuple(tasks),
+        proposals=tuple(proposals),
         artifacts=tuple(artifacts),
         legacy_files=tuple(sorted(legacy)),
         missing_surfaces=missing,
@@ -423,6 +568,7 @@ def snapshot_json(snapshot: FolderSnapshot) -> dict[str, Any]:
         "observation": _observation_json(snapshot.observation),
         "unidentified_worker_count": snapshot.unidentified_worker_count,
         "tasks": [_task_payload(item) for item in snapshot.tasks],
+        "proposals": [_proposal_json(item) for item in snapshot.proposals],
         "artifacts": [_artifact_json(item) for item in snapshot.artifacts],
         "legacy_files": [
             {"surface": surface, "name": name}
