@@ -108,9 +108,11 @@ it as a completed proposal.
 The current Ollama adapter uses the documented `/api/chat` JSON-schema `format`
 field and requests temperature 0. Its proposal contains bounded
 `summary / known / proven / open / discarded / next / evidence_paths` fields and
-records the exact schema fingerprint in the result. Duplicate JSON keys, non-standard
-JSON constants, unexpected fields, invalid types, overlong entries and an empty
-`next` list fail closed.
+records the exact schema fingerprint and a SHA-256 fingerprint of the system/task
+prompt contract in the result. The prompt fingerprint is identity for later
+evaluation and replay comparison; it is not proof that one prompt is better.
+Duplicate JSON keys, non-standard JSON constants, unexpected fields, invalid types,
+overlong entries and an empty `next` list fail closed.
 
 A structurally valid proposal is still model output, not evidence or execution
 authority. It must be reconciled against task/attempt/revision/context identity and
@@ -122,6 +124,35 @@ streaming, completion metadata, and structured-output guidance including local
 validation and lower temperature. Loop42 independently implements its validation;
 no Ollama implementation code is imported.
 
+
+## Verified completion receipt
+
+A successful worker `RESULT` must carry a verification-receipt fingerprint.
+The receipt itself is produced outside the worker result by an independent verifier
+or verification step and binds:
+
+- exact task and attempt identity;
+- exact source revision and context fingerprint;
+- a SHA-256 fingerprint of the verified output/subject;
+- verifier identity plus verifier revision;
+- the complete ordered acceptance-criteria set;
+- PASS / FAIL / UNKNOWN per criterion;
+- content-addressed evidence references for every PASS criterion.
+
+`verification_receipt.py` canonically fingerprints this content and validates it
+against the exact `DispatchTask`. Omitted, reordered or non-passing acceptance
+criteria fail closed. A RESULT without a receipt fingerprint is invalid.
+
+The receipt hash is content addressing, not authentication: it detects receipt
+mutation and binds identities/evidence, but it does not prove who controlled the
+verifier. Consumer authorization and any stronger signature/attestation policy stay
+separate.
+
+Pattern provenance: SLSA provenance research revision
+`82b296d49e4c8301e7db565f23620ffe89092a0c`, `spec/provenance.md` blob
+`769ed89d04dae9fa081eebf5af85777b9d522765`, was used as a conceptual reference
+for verifiable production/provenance metadata. Loop42 independently implements its
+own receipt contract and does not copy SLSA specification text or code.
 
 ## Machine-readable action policy
 

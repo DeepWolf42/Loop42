@@ -44,3 +44,14 @@ The fixture is simulated. It preserves the decision failure mode, not a claim ab
 ## External pattern scout v1
 
 `external_pattern_scout_v1.json` freezes bounded external scouting: candidates must be problem-linked, provenance-aware and value-checked rather than adopted because they are popular.
+
+
+## Recovery fault matrix v1
+
+`recovery_fault_matrix_v1.json` freezes fail-closed behavior for interruption
+and ambiguity cases across worker reconciliation and side-effect reconciliation.
+It is a simulated fixture, not evidence that a real consumer adapter has passed
+the same faults. The matrix covers applied-but-response-lost side effects, stale
+observations, partial terminal results, late prior-attempt results, duplicate
+worker sessions, host loss after historic activity and safety-stop changes after
+permit issue.

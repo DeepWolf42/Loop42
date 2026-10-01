@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "name": "recovery_fault_matrix_v1",
+  "purpose": "Freeze fail-closed recovery behavior under interruption, stale evidence, delayed results and concurrency faults.",
+  "basis": {
+    "loop42_main": "944a2868fc7b93e346eaee770476c2711bd4c1c4",
+    "fixture_only": true
+  },
+  "cases": [
+    {
+      "name": "lost_response_after_side_effect_applied",
+      "expected": {
+        "side_effect_state": "applied",
+        "may_reconsider": false
+      }
+    },
+    {
+      "name": "stale_side_effect_observation",
+      "expected": {
+        "side_effect_state": "unknown",
+        "may_reconsider": false
+      }
+    },
+    {
+      "name": "partial_terminal_result",
+      "expected": {
+        "task_lifecycle": "unknown",
+        "can_dispatch": false
+      }
+    },
+    {
+      "name": "late_result_from_prior_attempt",
+      "expected": {
+        "can_dispatch": false,
+        "reason": "late_result_requires_reconciliation"
+      }
+    },
+    {
+      "name": "duplicate_worker_sessions",
+      "expected": {
+        "task_lifecycle": "conflict",
+        "can_dispatch": false
+      }
+    },
+    {
+      "name": "host_off_after_historic_start",
+      "expected": {
+        "host": "unreachable",
+        "worker": "unknown",
+        "task_lifecycle": "unknown"
+      }
+    },
+    {
+      "name": "safety_stop_after_permit",
+      "expected": {
+        "permit_valid": false
+      }
+    }
+  ]
+}
