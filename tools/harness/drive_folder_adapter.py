@@ -184,11 +184,13 @@ def _session(value: Any, index: int, where: str) -> WorkerSession:
     )
 
 
-def _host_observation(value: dict[str, Any], where: str) -> HostObservation:
+def _host_observation(
+    value: dict[str, Any], where: str
+) -> tuple[HostObservation, int]:
     _expect_keys(
         value,
         required={"schema", "observed_at", "session_id", "reachable"},
-        optional={"worker_sessions", "safety_stop"},
+        optional={"worker_sessions", "safety_stop", "unidentified_worker_count"},
         where=where,
     )
     if value["schema"] != HOST_SCHEMA:
@@ -196,14 +198,24 @@ def _host_observation(value: dict[str, Any], where: str) -> HostObservation:
     sessions = value.get("worker_sessions", [])
     if not isinstance(sessions, list):
         raise ValueError(f"{where}.worker_sessions must be an array")
-    return HostObservation(
-        observed_at=_timestamp(value["observed_at"], f"{where}.observed_at"),
-        session_id=value["session_id"],
-        reachable=value["reachable"],
-        worker_sessions=tuple(
-            _session(item, index, where) for index, item in enumerate(sessions)
+    unidentified = value.get("unidentified_worker_count", 0)
+    if (
+        not isinstance(unidentified, int)
+        or isinstance(unidentified, bool)
+        or unidentified < 0
+    ):
+        raise ValueError(f"{where}.unidentified_worker_count must be a non-negative integer")
+    return (
+        HostObservation(
+            observed_at=_timestamp(value["observed_at"], f"{where}.observed_at"),
+            session_id=value["session_id"],
+            reachable=value["reachable"],
+            worker_sessions=tuple(
+                _session(item, index, where) for index, item in enumerate(sessions)
+            ),
+            safety_stop=value.get("safety_stop", False),
         ),
-        safety_stop=value.get("safety_stop", False),
+        unidentified,
     )
 
 
@@ -298,6 +310,7 @@ def _artifact_json(value: AttemptArtifact) -> dict[str, Any]:
 class FolderSnapshot:
     root: Path
     observation: HostObservation | None
+    unidentified_worker_count: int
     tasks: tuple[DispatchTask, ...]
     artifacts: tuple[AttemptArtifact, ...]
     legacy_files: tuple[tuple[str, str], ...]
@@ -311,6 +324,8 @@ class FolderSnapshot:
             blockers.append("provider_surface_missing")
         if self.errors:
             blockers.append("provider_evidence_invalid")
+        if self.unidentified_worker_count:
+            blockers.append("unidentified_worker_session")
         # Historical legacy result/error/archive files are retained evidence and
         # must not permanently poison an otherwise clean provider. Only an
         # unresolved legacy queue item in Inbox blocks replacement dispatch.
@@ -338,10 +353,13 @@ def scan_root(root: Path) -> FolderSnapshot:
     artifacts: list[AttemptArtifact] = []
 
     observation = None
+    unidentified_worker_count = 0
     host_path = root / LOGS / HOST_STATE_FILE
     if host_path.is_file():
         try:
-            observation = _host_observation(_load_json_file(host_path), HOST_STATE_FILE)
+            observation, unidentified_worker_count = _host_observation(
+                _load_json_file(host_path), HOST_STATE_FILE
+            )
         except (OSError, TypeError, ValueError) as error:
             errors.append(str(error))
 
@@ -389,6 +407,7 @@ def scan_root(root: Path) -> FolderSnapshot:
     return FolderSnapshot(
         root=root,
         observation=observation,
+        unidentified_worker_count=unidentified_worker_count,
         tasks=tuple(tasks),
         artifacts=tuple(artifacts),
         legacy_files=tuple(sorted(legacy)),
@@ -402,6 +421,7 @@ def snapshot_json(snapshot: FolderSnapshot) -> dict[str, Any]:
         "schema": SNAPSHOT_SCHEMA,
         "root": str(snapshot.root),
         "observation": _observation_json(snapshot.observation),
+        "unidentified_worker_count": snapshot.unidentified_worker_count,
         "tasks": [_task_payload(item) for item in snapshot.tasks],
         "artifacts": [_artifact_json(item) for item in snapshot.artifacts],
         "legacy_files": [
