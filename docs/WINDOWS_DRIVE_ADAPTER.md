@@ -75,6 +75,22 @@ The write is atomic on the local filesystem (`fsync` + replace), but that does
 **not** prove that cloud sync completed. The adapter reports
 `cloud_sync_confirmed: false`; cloud/provider arrival must be observed separately.
 
+## Unverified worker proposals
+
+A worker/model response is not a terminal result. Modern workers may therefore
+write a proposal manifest using `loop42.drive-proposal.v1` plus a sibling content
+file in `10_Results`.
+
+The proposal manifest binds task/attempt/source/context identity, worker session,
+prompt-contract SHA-256, model identifier, content filename and content SHA-256.
+The adapter verifies the sibling content hash before accepting the proposal as
+provider evidence.
+
+A proposal never becomes `TaskLifecycle.SUCCEEDED` by itself and blocks replacement
+dispatch as `unverified_proposal_requires_verification` until matching terminal
+RESULT/ERROR evidence exists. This preserves the boundary "model output is a claim,
+not verified completion."
+
 ## Terminal artifacts
 
 Modern provider artifacts use `loop42.drive-artifact.v1`.
@@ -170,10 +186,11 @@ the complete provider identity/reconciliation lifecycle without an AI model:
 1. fresh idle host -> permit;
 2. permit-revalidated atomic local queue write;
 3. identified worker session -> RUNNING;
-4. receipt-bound result while worker still owns the attempt -> SUCCEEDED but not
+4. identity-bound proposal -> still unverified and dispatch-blocking;
+5. receipt-bound result while worker still owns the attempt -> SUCCEEDED but not
    dispatchable;
-5. fresh idle worker evidence -> SUCCEEDED and dispatchable;
-6. a new attempt can receive a new permit.
+6. fresh idle worker evidence -> SUCCEEDED and dispatchable;
+7. a new attempt can receive a new permit.
 
 This proves the Loop42 provider/control-plane path only. It intentionally does not
 claim real Google Drive synchronization, real Windows worker integration, or a model
