@@ -25,7 +25,7 @@ Loop42 stellt generische Entwicklungsmechanik bereit für:
 - GitHub-Visibility- und Freshness-Prüfungen
 - wiederverwendbare Context- und Navigationshelfer
 - Frozen-Scenario-Evaluation
-- Candidate Learning und kontrollierte Evolution
+- Candidate Learning und kontrollierte Evolution\n- evidenzbasierte Hygiene-/Entropy-Klassifikation ohne automatisches Löschen
 
 ## Designprinzipien
 
