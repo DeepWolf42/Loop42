@@ -7,6 +7,7 @@ from tools.harness.verification_receipt import (
     EvidenceRef,
     VerificationReceipt,
     receipt_fingerprint,
+    result_artifact_from_receipt,
     validate_receipt,
 )
 from tools.harness.worker_dispatch import DispatchTask
@@ -118,6 +119,25 @@ class VerificationReceiptTests(unittest.TestCase):
                 "tests are green",
                 CriterionStatus.PASS,
                 (),
+            )
+
+    def test_valid_receipt_builds_terminal_result_with_same_fingerprint(self):
+        value = receipt()
+        artifact = result_artifact_from_receipt(
+            value,
+            task(),
+            observed_at=NOW,
+            subject_fingerprint=SUBJECT,
+        )
+        self.assertEqual(artifact.receipt_fingerprint, receipt_fingerprint(value))
+        self.assertTrue(artifact.success)
+
+    def test_invalid_receipt_cannot_become_terminal_result(self):
+        with self.assertRaisesRegex(ValueError, "task_identity_mismatch"):
+            result_artifact_from_receipt(
+                receipt(attempt="attempt-2"),
+                task(),
+                observed_at=NOW,
             )
 
     def test_subject_mismatch_is_not_valid(self):
