@@ -71,7 +71,7 @@ Before handing setup steps to a human, check whether the path is actually possib
 
 ## Where Loop42 fits
 
-Loop42 is project-agnostic. The **consumer project owns its product truth**; Loop42 supplies the reusable working method and supporting mechanics.
+Loop42 is project-agnostic. **Consumer projects keep their own product state.** Loop42 supplies the reusable working method and supporting mechanics around that state.
 
 CORA is the first consumer project. CORA keeps its own product state and pins an exact verified Loop42 revision rather than automatically following every new commit on `main`.
 
