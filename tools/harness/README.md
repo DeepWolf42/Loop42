@@ -148,3 +148,21 @@ again. `APPLIED`, `CONFLICT` and `UNKNOWN` never justify blind replay.
 This is runtime-neutral. ChatGPT Work, another cloud agent, a local worker or a
 future adapter may all use the same contract; no runtime session becomes product
 truth.
+
+
+## Evidence-gated retry policy
+
+retry_policy.py is a pure decision boundary between failed work and any later
+scheduler or adapter. It deliberately refuses the usual "worker disappeared, so
+try again" shortcut.
+
+RETRY_AFTER_BACKOFF is returned only for a freshly evidenced transient failure
+with remaining attempt budget and no ambiguous side effect. When a side effect
+may have happened, side_effect_reconcile.py must first classify it; only
+NOT_APPLIED can remain retry-eligible. UNKNOWN or CONFLICT returns RECONCILE,
+APPLIED/permanent/budget-exhausted returns DO_NOT_RETRY, and a safety stop
+returns OPERATOR_REQUIRED.
+
+The delay uses bounded exponential backoff, but the result never schedules,
+queues, starts or authorizes another attempt. Consumers must still apply current
+policy, approval and provider preconditions.
