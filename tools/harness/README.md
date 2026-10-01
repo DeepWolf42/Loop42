@@ -124,8 +124,10 @@ without Ollama.
 The provider contract is documented in `docs/WINDOWS_DRIVE_ADAPTER.md`.
 It requires complete Inbox/Results/Logs/Error/Archive surfaces, strict JSON
 identity for modern work, and fresh host/session evidence before dispatch.
-Legacy Markdown/text jobs remain explicit UNKNOWN evidence and block replacement
-dispatch until consciously reconciled.
+Legacy Markdown/text jobs remain explicit evidence. Historical legacy
+Result/Error/Archive files do not poison dispatch forever; an unresolved legacy
+Inbox job remains UNKNOWN and blocks replacement dispatch until consciously
+reconciled.
 
 The adapter can atomically write a modern local queue manifest only after a
 previously issued `DispatchPermit` is revalidated against a fresh provider
