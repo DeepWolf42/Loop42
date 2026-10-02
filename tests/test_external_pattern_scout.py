@@ -17,6 +17,11 @@ class ExternalPatternScoutTests(unittest.TestCase):
         self.assertIn("Search for the **problem**", text)
         self.assertIn("adjacent disciplines", text)
         self.assertIn("A similar product is neither required nor sufficient", text)
+        self.assertIn("## Perspective probe", text)
+        self.assertIn("downstream lens", text)
+        self.assertIn("inversion lens", text)
+        self.assertIn("outside lens", text)
+        self.assertIn("not a brainstorming quota", text)
 
     def test_consumer_truth_boundary_is_explicit(self):
         text = (ROOT / "docs/EXTERNAL_PATTERN_SCOUT.md").read_text(encoding="utf-8")

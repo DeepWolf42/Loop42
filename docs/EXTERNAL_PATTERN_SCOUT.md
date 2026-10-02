@@ -53,6 +53,23 @@ heuristic, not permission to create a larger backlog.
 A similar product is neither required nor sufficient. Prefer the smallest
 transferable mechanism that addresses the current problem.
 
+## Perspective probe
+
+When uncertainty, repeated failure, or a substantial design choice justifies it,
+the scout MAY spend one bounded pass reframing the problem before selecting
+candidates. Use only the lenses that can change the search or pre-mortem:
+
+- **downstream lens** — if the current plan succeeds, what becomes the next
+  bottleneck, invalidated assumption, or operator burden?
+- **inversion lens** — which central assumption would make the current framing
+  wrong, and can removing or reversing a dependency expose a simpler route?
+- **outside lens** — how would an operator, maintainer, safety reviewer, or
+  adjacent discipline describe the same problem?
+
+The probe produces at most one or two concrete alternate hypotheses or search
+directions. It is not a brainstorming quota and MUST be skipped when it adds no
+distinct decision, evidence target, or failure hypothesis.
+
 ## Scout contract
 
 A scout must be bounded by:

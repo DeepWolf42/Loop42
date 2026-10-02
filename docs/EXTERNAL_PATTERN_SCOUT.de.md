@@ -53,6 +53,26 @@ Discovery-Heuristik und keine Erlaubnis, einen größeren Backlog zu erzeugen.
 Ein ähnliches Produkt ist weder Voraussetzung noch automatisch ein guter Fund.
 Bevorzugt wird die kleinste übertragbare Mechanik, die das aktuelle Problem löst.
 
+## Perspektiv-Probe
+
+Wenn Unsicherheit, wiederholtes Scheitern oder eine wesentliche Designentscheidung
+es rechtfertigt, DARF der Scout das Problem in einem begrenzten Durchlauf neu
+betrachten, bevor Kandidaten ausgewählt werden. Nur Linsen verwenden, die Suche
+oder Pre-Mortem tatsächlich verändern können:
+
+- **Danach-Linse** — wenn der aktuelle Plan funktioniert, was wird zum nächsten
+  Engpass, zur ungültigen Annahme oder zum Bedienaufwand?
+- **Umkehr-Linse** — welche zentrale Annahme würde den aktuellen Problemrahmen
+  falsch machen, und zeigt Entfernen oder Umkehren einer Abhängigkeit einen
+  einfacheren Weg?
+- **Außen-Linse** — wie würde ein Operator, Maintainer, Safety-Reviewer oder ein
+  benachbartes Fachgebiet dasselbe Problem beschreiben?
+
+Die Probe liefert höchstens ein oder zwei konkrete alternative Hypothesen oder
+Suchrichtungen. Sie ist keine Brainstorming-Pflicht und MUSS entfallen, wenn sie
+keine eigene Entscheidung, kein neues Evidence-Ziel und keine neue
+Fehlerhypothese erzeugt.
+
 ## Scout-Contract
 
 Ein Scout braucht:

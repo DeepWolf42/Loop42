@@ -30,6 +30,9 @@
     "preferred_outcome": "ADOPT_CANDIDATE",
     "preferred_candidate": "SmallCheckpointPattern",
     "must_search_adjacent_domains": true,
-    "must_not_require_similar_product": true
+    "must_not_require_similar_product": true,
+    "must_probe_downstream_effects": true,
+    "must_probe_alternate_frame": true,
+    "must_bound_perspective_probe": true
   }
 }
