@@ -89,6 +89,31 @@ Bevor ein weiterer Agent, geplanter Task, Spezialisten-Job oder Monitoring-Loop 
 
 Ein kohärenter Task mit mehreren verwandten Quellen ist mehreren überlappenden Watchern vorzuziehen. Freie Kapazität für unerwartete oder besonders wertvolle Arbeit soll bewusst erhalten bleiben.
 
+## Ressourcen- und Client-Fit
+
+Ausführungskapazität und Client-Verfügbarkeit sind ausdrückliche Voraussetzungen.
+
+Vergleiche vor einer Eskalation oder Aufteilung die gesamten Ausführungskosten der brauchbaren Wege: knappe Modell-/Agenten-Kapazität, Tool-Aufrufe, wiederholtes Laden des Kontexts, Operator-Aufwand, Latenz, Fehler-/Recovery-Risiko und Qualität der Verifikation. Direkte Überlegung oder ein enger Tool-Aufruf genügt oft; eine feste Chat-zuerst-Reihenfolge ist aber nicht vorgeschrieben. Ein Spezialist oder ein länger laufender Agent kann die begrenzte Aufgabe mit geringeren Gesamtkosten und gleich guter oder besserer Verifikation abschließen. Bündele kompatible Arbeit, wenn dadurch Kontext nicht mehrfach geladen werden muss; Verifikation und Verantwortlichkeit müssen klar bleiben.
+
+Behandle tarifabhängige Kontingente, Rate Limits, Modell-/Agenten-Nutzung, Task-Slots und Kontext als endliche Ressourcen. Verbrauche knappe Kapazität nicht durch wiederholte vollständige Abgleiche, doppelte Prüfungen, vermeidbares Polling oder erneutes Lesen von Evidenz, die für die Entscheidung noch aktuell genug ist. Halte Reserven für Fehler, hochwertige Umsetzung und Recovery frei.
+
+Prüfe auch den aktiven Client oder Host. Browser, Desktop, Mobilgerät und automatisierte Laufzeit können selbst im selben Konto unterschiedliche Fähigkeiten anbieten. Fehlt die gewählte Aktion im aktuellen Client, wiederhole gescheiterte Versuche nicht endlos und gib keine langen unbrauchbaren Klickpfade vor. Bereite die begrenzte Arbeit vor, wechsle oder verschiebe sie auf einen geeigneten Client, wenn praktikabel, oder wähle einen einfacheren Ausweichweg, der das Ziel erhält.
+
+## Tool-Routing und Client-Übergabe
+
+Wähle Tools nach Aufgabenform und gesamten Ausführungskosten statt nach einer festen Eskalationsleiter. Stufen dürfen übersprungen werden, wenn ein Spezialistenweg klar günstiger oder zuverlässiger ist.
+
+- Nutze direkte Überlegung, wenn weder frischer externer Zustand noch Dateiänderung oder spezielle Ausführung nötig ist.
+- Nutze einen engen Connector-/Tool-Aufruf, wenn eine maßgebliche Quelle oder begrenzte Aktion genügt.
+- Nutze ein Spezialwerkzeug, wenn seine fachliche Fähigkeit Korrektheit, Qualität oder Operator-Aufwand wesentlich verbessert, etwa Design-Tools für bearbeitbare UI-Arbeit.
+- Nutze einen Coding-/Repository-Agenten, wenn Umsetzung, Repository-Prüfung, Tests oder Patch-Iteration die Aufgabe bestimmen.
+- Nutze länger laufende oder appübergreifende Ausführung, wenn das Ziel mehrere Systeme oder Schritte umfasst und sonst wiederholten Kontextaufbau oder manuelle Orchestrierung erfordert.
+- Rufe nicht mehrere überlappende Tools nur zur gefühlten Absicherung auf; ein zusätzliches Tool braucht eigenständigen Evidenz- oder Ausführungswert.
+
+Ist der gewählte Weg im aktuellen Client nicht verfügbar, erstelle eine begrenzte Übergabe statt die Aufgabe von vorn zu beginnen. Verwende den vorhandenen Arbeitsnachweis oder Chat und keinen zweiten Zustandsspeicher. Die Übergabe enthält nur das Nötige: Ziel, maßgebliche Live-Basis/Revisionen, abgeschlossene Vorbereitung, gewähltes Tool/Vorgehen, verbleibende Aktion, Akzeptanz-/Stop-Bedingung und noch erforderliche geschützte Freigaben.
+
+Prüfe bei Wiederaufnahme nur veränderliche Abhängigkeiten und Live-HEADs, die die Übergabe ungültig machen könnten. Stabile Vorbereitung und unbeeinflusste Evidenz werden wiederverwendet.
+
 ## Verhalten bei fehlendem Fit
 
 Wenn Capability Fit fehlschlägt:

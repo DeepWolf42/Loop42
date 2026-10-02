@@ -44,3 +44,7 @@ The fixture is simulated. It preserves the decision failure mode, not a claim ab
 ## External pattern scout v1
 
 `external_pattern_scout_v1.json` freezes bounded external scouting: candidates must be problem-linked, provenance-aware and value-checked rather than adopted because they are popular.
+
+## Execution Fit: tool routing / client handoff v1
+
+`execution_fit_tool_routing_client_handoff_v1.json` freezes two related rules: choose the best-fit execution path by total cost rather than a mandatory chat-first ladder, and when the current client lacks a required capability, preserve a bounded handoff without duplicating preparation or creating another state store. Resume checks only mutable dependencies that can invalidate the remaining action.
