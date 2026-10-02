@@ -88,6 +88,16 @@ Before creating another agent, scheduled task, specialist role or monitoring loo
 
 Prefer one coherent task with several related sources over several overlapping watchers. Preserve spare capacity for unexpected or high-value work.
 
+## Resource and client fit
+
+Execution capacity and client availability are explicit prerequisites.
+
+Before escalating a task, check whether a cheaper path is sufficient. Prefer direct reasoning or a narrow tool call before a heavyweight agent/workflow; use specialist or long-running execution only when it adds material value. Group compatible work when that avoids repeated context loading, but keep verification and ownership clear.
+
+Treat plan-bounded quotas, rate limits, model/agent usage, task slots and context as finite resources. Do not spend scarce capacity on repeated full reconciliations, duplicate checks, polling that can be event-driven, or re-reading evidence that is still fresh enough for the decision. Preserve reserve capacity for failures, high-value implementation and recovery.
+
+Also verify the active client or host. Browser, desktop, mobile and automated runtimes can expose different capabilities even under the same account. If the selected action is unavailable on the current client, do not loop on failed attempts or provide long unusable click-paths. Prepare the bounded work, switch/defer to a capable client when practical, or choose a lower-friction fallback that preserves the goal.
+
 ## Failure behavior
 
 If Capability Fit fails:
