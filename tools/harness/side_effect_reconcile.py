@@ -71,6 +71,7 @@ class SideEffectObservation:
     state_fingerprint: str
     complete: bool = True
     valid: bool = True
+    quiescent_action_id: str | None = None
 
     def __post_init__(self) -> None:
         _aware_utc(self.observed_at)
@@ -83,6 +84,11 @@ class SideEffectObservation:
             raise ValueError("state_fingerprint must be a SHA-256 hex digest")
         if type(self.complete) is not bool or type(self.valid) is not bool:
             raise TypeError("complete and valid must be boolean")
+        if self.quiescent_action_id is not None and (
+            not isinstance(self.quiescent_action_id, str)
+            or not _ID_RE.fullmatch(self.quiescent_action_id)
+        ):
+            raise ValueError("invalid quiescent_action_id")
 
 
 @dataclass(frozen=True)
@@ -101,8 +107,9 @@ def reconcile_side_effect(
 ) -> SideEffectReconciliation:
     """Classify fresh post-interruption evidence without replaying an action.
 
-    ``may_reconsider`` means only that fresh evidence still matches the exact
-    pre-action state. It is not permission to execute: policy, authorization and
+    ``may_reconsider`` requires the exact pre-action state and provider evidence
+    that this action attempt cannot still complete. It is not permission to execute:
+    policy, authorization and
     provider preconditions must be evaluated again before any new side effect.
     """
     if not isinstance(intent, SideEffectIntent):
@@ -144,6 +151,10 @@ def reconcile_side_effect(
             SideEffectState.APPLIED, ("desired_state_observed",), False
         )
     if observation.state_fingerprint == intent.before_fingerprint:
+        if observation.quiescent_action_id != intent.action_id:
+            return SideEffectReconciliation(
+                SideEffectState.UNKNOWN, ("prior_attempt_not_proven_quiescent",), False
+            )
         return SideEffectReconciliation(
             SideEffectState.NOT_APPLIED, ("pre_action_state_observed",), True
         )
