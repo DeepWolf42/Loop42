@@ -98,6 +98,21 @@ Treat plan-bounded quotas, rate limits, model/agent usage, task slots and contex
 
 Also verify the active client or host. Browser, desktop, mobile and automated runtimes can expose different capabilities even under the same account. If the selected action is unavailable on the current client, do not loop on failed attempts or provide long unusable click-paths. Prepare the bounded work, switch/defer to a capable client when practical, or choose a lower-friction fallback that preserves the goal.
 
+## Tool routing and client handoff
+
+Choose tools by task shape and total execution cost, not by a fixed escalation ladder. Tiers may be skipped when a specialist path is clearly cheaper or more reliable.
+
+- Use direct reasoning when no fresh external state, file mutation or specialized execution is required.
+- Use a narrow connector/tool call when one authoritative source or bounded action is enough.
+- Use a specialist tool when domain-specific capability materially improves correctness, fidelity or operator effort, for example design tools for editable UI work.
+- Use a coding/repository agent when implementation, repository inspection, tests or patch iteration dominate the task.
+- Use long-running or cross-app execution when the goal spans several systems/steps and would otherwise require repeated context reconstruction or manual orchestration.
+- Do not invoke several overlapping tools merely to increase confidence; add another tool only when it contributes distinct evidence or execution value.
+
+If the selected path is unavailable on the current client, produce a bounded handoff instead of restarting the task from scratch. Reuse the existing work record/chat; do not create a second state store. The handoff should contain only what the receiving client needs: goal, authoritative live basis/revisions, completed preparation, selected tool/path, remaining action, acceptance/stop condition, and any protected approval still required.
+
+On resume, re-check only mutable dependencies and live heads that could invalidate the handoff. Stable preparation and unaffected evidence should be reused rather than re-derived.
+
 ## Failure behavior
 
 If Capability Fit fails:
