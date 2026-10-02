@@ -1,0 +1,47 @@
+{
+  "schema": "loop42-frozen-scenario-v1",
+  "id": "execution_fit_tool_routing_client_handoff_v1",
+  "title": "Route work to the best-fit tool and preserve a bounded client handoff",
+  "basis": {
+    "kind": "simulated_fixture",
+    "version": 1,
+    "note": "Generic routing fixture. Tool and client names are capability categories, not fixed product assumptions."
+  },
+  "goal": "Complete a bounded multi-step task with the lowest total execution cost without duplicating work when the current client lacks one required capability.",
+  "input_state": {
+    "fresh_external_state_required": true,
+    "editable_ui_artifact_required": true,
+    "repository_patch_required": false,
+    "cross_app_steps": 2,
+    "current_client_supports_specialist_ui_tool": false,
+    "alternate_client_supports_specialist_ui_tool": true,
+    "stable_preparation_already_complete": true,
+    "live_repository_head_may_change": true,
+    "protected_action_required": false
+  },
+  "bad_behavior": [
+    "force_chat_first_for_every_step",
+    "rebuild_editable_ui_with_generic_chat_when_specialist_tool_is_required",
+    "invoke_multiple_overlapping_tools_for_the_same_evidence",
+    "restart_research_and_preparation_after_switching_clients",
+    "create_a_second_persistent_state_store_for_the_handoff",
+    "recheck_stable_evidence_that_cannot_affect_the_remaining_action"
+  ],
+  "required_behavior": [
+    "select_tool_by_task_shape_and_total_execution_cost",
+    "skip_unneeded_execution_tiers",
+    "prepare_a_bounded_handoff_when_the_current_client_lacks_the_selected_capability",
+    "reuse_existing_work_record_or_chat_for_handoff",
+    "include_goal_live_basis_completed_preparation_selected_path_remaining_action_stop_condition_and_protected_approvals",
+    "on_resume_recheck_only_mutable_dependencies_that_can_invalidate_the_handoff",
+    "reuse_stable_preparation_and_unaffected_evidence"
+  ],
+  "expected_outcome": {
+    "duplicate_preparation_runs": 0,
+    "overlapping_tool_invocations_without_distinct_value": 0,
+    "new_parallel_state_stores": 0,
+    "specialist_tool_used_on_capable_client": true,
+    "stable_preparation_reused": true,
+    "mutable_live_head_rechecked_before_write": true
+  }
+}
