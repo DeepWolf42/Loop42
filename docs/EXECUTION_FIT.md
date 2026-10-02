@@ -92,7 +92,7 @@ Prefer one coherent task with several related sources over several overlapping w
 
 Execution capacity and client availability are explicit prerequisites.
 
-Before escalating a task, check whether a cheaper path is sufficient. Prefer direct reasoning or a narrow tool call before a heavyweight agent/workflow; use specialist or long-running execution only when it adds material value. Group compatible work when that avoids repeated context loading, but keep verification and ownership clear.
+Before escalating or decomposing a task, compare the total execution cost of viable paths. Count scarce model/agent quota, tool calls, repeated context loading, operator effort, latency, failure/recovery risk and verification quality together. Prefer direct reasoning or a narrow tool call when sufficient, but do not force a chat-first sequence when one specialist or long-running agent can finish the bounded task with lower total cost and equal or better verification. Group compatible work when that avoids repeated context loading, but keep verification and ownership clear.
 
 Treat plan-bounded quotas, rate limits, model/agent usage, task slots and context as finite resources. Do not spend scarce capacity on repeated full reconciliations, duplicate checks, polling that can be event-driven, or re-reading evidence that is still fresh enough for the decision. Preserve reserve capacity for failures, high-value implementation and recovery.
 
