@@ -51,7 +51,7 @@ Operator effort is also a real cost. Do not make the operator perform setup or n
 
 Scarce execution capacity is part of Execution Fit, not an invitation to consume the maximum available capability on every run.
 
-- Use the lowest-cost execution mode that can reliably produce the required delta; do not escalate to a heavyweight agent, long-running work mode, specialist model or additional worker when direct reasoning, a single tool call or a bounded local action is sufficient.
+- Choose the lowest-total-cost reliable path for the required delta, considering scarce model/agent quota, tool calls, repeated context loading, operator effort, latency, failure/recovery risk and verification quality together. Do not assume that chat-first is cheapest: a single specialist or long-running agent may be more efficient than many fragmented turns when it materially reduces total work.
 - Batch related reads, checks and edits when this reduces repeated context loading or orchestration overhead without hiding responsibility or weakening verification.
 - Treat subscription quotas, rate limits, agent slots, context windows and other plan-bounded resources as finite. Preserve headroom for high-value or blocked work instead of burning quota on redundant reconciliation, repeated polling or ritual re-analysis.
 - Reuse verified current state. Re-run expensive reconciliation only when freshness materially matters, the live source changed, recovery is uncertain, or the expected information gain justifies it.
