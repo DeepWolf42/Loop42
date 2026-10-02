@@ -47,6 +47,17 @@ Process exists to improve the product or development system. If a loop/check pro
 
 Operator effort is also a real cost. Do not make the operator perform setup or navigation steps whose prerequisites, availability or expected value have not been established. Before creating another persistent task or agent role, try to complete the work in the current run, fold it into an existing coherent task, or delegate bounded preparation to a suitable local worker. Preserve spare capacity when possible.
 
+## Resource and interface budget
+
+Scarce execution capacity is part of Execution Fit, not an invitation to consume the maximum available capability on every run.
+
+- Use the lowest-cost execution mode that can reliably produce the required delta; do not escalate to a heavyweight agent, long-running work mode, specialist model or additional worker when direct reasoning, a single tool call or a bounded local action is sufficient.
+- Batch related reads, checks and edits when this reduces repeated context loading or orchestration overhead without hiding responsibility or weakening verification.
+- Treat subscription quotas, rate limits, agent slots, context windows and other plan-bounded resources as finite. Preserve headroom for high-value or blocked work instead of burning quota on redundant reconciliation, repeated polling or ritual re-analysis.
+- Reuse verified current state. Re-run expensive reconciliation only when freshness materially matters, the live source changed, recovery is uncertain, or the expected information gain justifies it.
+- Check client/runtime capability before choosing an interaction path. Mobile, desktop, browser and automation hosts may expose different features; do not assume parity. Prepare or defer a bounded action to a capable client rather than repeatedly failing on an unsupported one.
+- Record a capacity boundary as a valid stop reason. Exhausting the available quota is not a reason to lower verification quality or create parallel truth.
+
 ## Operator sovereignty
 
 Bounded autonomy reduces interruptions, not authority. Protected decisions remain with the operator: cost-bearing actions, publication/release, repository visibility, real machine actions, safety/quality boundary changes, destructive or materially irreversible actions, and major product-direction changes outside the authorized goal.
