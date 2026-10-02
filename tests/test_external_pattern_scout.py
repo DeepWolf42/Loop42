@@ -39,6 +39,9 @@ class ExternalPatternScoutTests(unittest.TestCase):
         self.assertTrue(expected["direct_code_reuse_requires_license_review"])
         self.assertTrue(expected["must_search_adjacent_domains"])
         self.assertTrue(expected["must_not_require_similar_product"])
+        self.assertTrue(expected["must_probe_downstream_effects"])
+        self.assertTrue(expected["must_probe_alternate_frame"])
+        self.assertTrue(expected["must_bound_perspective_probe"])
         self.assertEqual(expected["preferred_candidate"], "SmallCheckpointPattern")
 
 
