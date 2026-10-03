@@ -89,3 +89,17 @@ Do not infer a duplicate from a matching filename, infer an orphan from a
 partial scan, or infer disposable state from age alone. Historical and frozen
 compatibility material may be intentionally retained. Missing, stale or
 incomplete evidence stays unknown.
+
+## Evidence-bound candidate evaluation
+
+Consumers that compare multiple viable options may use the generic
+[evidence-bound candidate evaluation contract](CANDIDATE_EVIDENCE_CONTRACT.md).
+It reuses Matrixloop reconciliation and evidence boundaries to keep hard
+constraints, UNKNOWN states, deterministic candidate identity, reproducibility
+and optional consumer-defined Pareto reduction explicit.
+
+Loop42 owns only the generic mechanics. Candidate meaning, domain requirements,
+engineering/safety margins, objective definitions, recommendation semantics and
+all execution authority remain with the consumer. No consumer pin advances by
+adding this contract.
+
