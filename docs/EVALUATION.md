@@ -30,6 +30,26 @@ Prefer observable measures:
 - recovery quality;
 - token/time/tool-call overhead where measurable.
 
+## Real agent transcript evaluation
+
+Frozen scenarios may also evaluate an actual harness/model run rather than only static contracts or deterministic helpers.
+
+The provider-neutral transcript contract in `tools/evaluation/agent_transcript.py` separates:
+
+- the exact scenario and Loop42 revision;
+- harness/model identity;
+- which observations the harness can actually capture;
+- tool/capability calls and canonical argument identity;
+- tool results, explicit errors and evidence identifiers;
+- final answer text;
+- token usage when the harness exposes it.
+
+The evaluator reports routing, repeated identical calls, malformed/invalid requests, evidence citation, answer/uncertainty requirements and measurable overhead. Missing capture capability remains `UNKNOWN`; it is never inferred from another field.
+
+Repeat policy belongs to the frozen scenario. An identical read may be wasteful in one scenario and a justified re-check after externally changed state in another. Loop42 therefore does not impose one global zero-repeat rule.
+
+A transcript score is evaluation evidence only. It is not a verification receipt, model authority, tool authority, consumer-state mutation or proof that an uncaptured action occurred. A real-agent quality claim requires a real captured run tied to the exact harness/model/version and scenario basis; synthetic fixtures test the evaluator only.
+
 ## Challenger tests
 
 At least some scenarios should deliberately include:
