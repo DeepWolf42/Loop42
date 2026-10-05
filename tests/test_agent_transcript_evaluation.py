@@ -1,8 +1,13 @@
 import copy
+import json
+from pathlib import Path
 import unittest
 
 from tools.evaluation.agent_transcript import evaluate_agent_transcript
 
+
+ROOT = Path(__file__).resolve().parents[1]
+SCENARIO_PATH = ROOT / "tests" / "frozen_scenarios" / "agent_transcript_eval_v1.json"
 
 SCENARIO = {
     "schema": "loop42.agent-eval-scenario.v1",
@@ -97,6 +102,19 @@ def transcript():
 
 
 class AgentTranscriptEvaluationTests(unittest.TestCase):
+    def test_frozen_scenario_preserves_non_authority_and_real_run_gate(self):
+        frozen = json.loads(SCENARIO_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(frozen["schema"], "loop42.agent-eval-scenario.v1")
+        self.assertFalse(frozen["expected_boundary"]["evaluation_is_authority"])
+        self.assertFalse(
+            frozen["expected_boundary"]["missing_capture_fields_are_inferred"]
+        )
+        self.assertTrue(
+            frozen["expected_boundary"][
+                "real_harness_run_required_before_claiming_real_agent_quality"
+            ]
+        )
+
     def test_good_transcript_passes_with_explicit_basis_and_evidence(self):
         report = evaluate_agent_transcript(transcript(), SCENARIO)
         self.assertEqual(report["verdict"], "PASS")
