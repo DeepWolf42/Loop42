@@ -220,6 +220,26 @@ class AgentTranscriptEvaluationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluate_agent_transcript(value, SCENARIO)
 
+    def test_missing_result_in_complete_capture_fails_closed(self):
+        value = transcript()
+        value["events"] = [
+            event
+            for event in value["events"]
+            if not (
+                event["type"] == "tool_result"
+                and event["call_id"] == "c2"
+            )
+        ]
+        with self.assertRaises(ValueError):
+            evaluate_agent_transcript(value, SCENARIO)
+
+    def test_duplicate_result_in_complete_capture_fails_closed(self):
+        value = transcript()
+        duplicate = copy.deepcopy(value["events"][1])
+        value["events"].insert(2, duplicate)
+        with self.assertRaises(ValueError):
+            evaluate_agent_transcript(value, SCENARIO)
+
     def test_nonfinite_arguments_fail_closed(self):
         value = transcript()
         value["events"][0]["arguments"] = {"threshold": float("nan")}
