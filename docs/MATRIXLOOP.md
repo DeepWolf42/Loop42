@@ -66,9 +66,11 @@ Independent models/reviewers may challenge the system, but their findings are hy
 
 ## External pattern scouting
 
-Before inventing substantial new infrastructure or orchestration, Matrixloop may run a bounded external pattern scout. A scheduled maintenance scout may also look for newly useful patterns without blocking normal product work.
+Before inventing substantial new infrastructure or orchestration, first search the current project-owned capability surface and open work for an existing fit. Treat this as a bounded **search → select → verify** pass: describe the needed capability in task terms, retrieve a small set of plausible existing tools/adapters/skills/workflows/contracts, choose by current authority/evidence/cost fit, and verify the selected candidate against the current target and revision before relying on it.
 
-Scouting is an input to TARGET / PRE-MORTEM, not another loop stage. Discovery does not authorize adoption: relevance, project fit, expected value, provenance/license status and reproduction against the current source of truth still apply.
+If no suitable owned capability exists, Matrixloop may run a bounded external pattern scout. A scheduled maintenance scout may also look for newly useful patterns without blocking normal product work. External prompt/skill libraries are discovery inputs only: do not auto-install, auto-execute or grant them authority merely because retrieval found a match.
+
+Scouting and capability retrieval are inputs to TARGET / PRE-MORTEM, not another loop stage. Discovery does not authorize adoption: relevance, project fit, expected value, provenance/license status and reproduction against the current source of truth still apply. Skip the lookup when the current reconciled state already proves that the exact suitable capability is known; reuse-before-reinvention must reduce duplicated work, not add ritual overhead.
 
 See `docs/EXTERNAL_PATTERN_SCOUT.md`.
 
