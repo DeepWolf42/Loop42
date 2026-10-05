@@ -275,10 +275,17 @@ def _transcript(raw: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("captured transcript requires exactly one final answer")
     if capture["token_usage"] and len(usages) != 1:
         raise ValueError("captured transcript requires exactly one usage event")
-    if capture["tool_results"] and any(
-        result["call_id"] not in call_ids for result in results
-    ):
-        raise ValueError("tool result references an uncaptured call")
+    if capture["tool_results"]:
+        if any(result["call_id"] not in call_ids for result in results):
+            raise ValueError("tool result references an uncaptured call")
+        result_ids = [result["call_id"] for result in results]
+        if len(result_ids) != len(set(result_ids)):
+            raise ValueError("captured tool results must be unique per call")
+        missing_results = call_ids - set(result_ids)
+        if missing_results:
+            raise ValueError(
+                f"captured tool calls missing results: {sorted(missing_results)}"
+            )
 
     return {
         "basis": {
