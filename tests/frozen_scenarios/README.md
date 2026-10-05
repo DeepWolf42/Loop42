@@ -23,7 +23,6 @@ CORA product state, Arthur, printer/slicer/material/HIL behavior and CORA Recove
 
 A frozen failure is treated as a regression unless the behavior change is explicit, the expected scenario is deliberately revised, and affected consumer evidence is re-run against the new exact revision. Passing a frozen suite never authorizes automatic deletion of predecessor material.
 
-
 ## Execution Fit: private repository / paid feature v1
 
 `execution_fit_private_repo_paid_feature_v1.json` freezes a generic operator-friction regression:
@@ -44,3 +43,9 @@ The fixture is simulated. It preserves the decision failure mode, not a claim ab
 ## External pattern scout v1
 
 `external_pattern_scout_v1.json` freezes bounded external scouting: candidates must be problem-linked, provenance-aware and value-checked rather than adopted because they are popular.
+
+## Agent transcript evaluation v1
+
+`agent_transcript_eval_v1.json` freezes a simulated stale-context/capability trap for the provider-neutral transcript evaluator. The expected route is to read current state first, inspect the relevant capability, avoid unjustified duplicate calls, cite returned evidence, and expose uncertainty or unavailability in the final answer.
+
+The scenario pins Loop42 `2ec351ec6ddc9dba455e8e75930e9aaee8dbe7c6`. Its fixture is synthetic and proves only evaluator behavior. A real harness/model quality claim requires a separately captured real run bound to exact harness/model/version and scenario identity.
