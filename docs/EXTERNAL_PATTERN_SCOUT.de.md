@@ -23,6 +23,25 @@ Ein begrenzter Scout ist sinnvoll, wenn mindestens eines davon gilt:
 
 Normale Produktarbeit darf nicht blockieren, nur weil kein aktueller Scout existiert.
 
+## Wiederverwenden vor Neuerfinden
+
+Bevor außerhalb des Projekts gesucht oder eine neue größere Capability entworfen wird, wird zuerst die aktuelle projekteigene Capability-Oberfläche durchsucht. Dazu gehören Tools, Adapter, Skills, Prompts, Workflows, Verträge, Tests und bereits offene Arbeit, die für die abgeglichene Revision gültig sind.
+
+Dafür gilt ein begrenzter Ablauf **suchen → auswählen → verifizieren**:
+
+1. benötigtes Ergebnis bzw. Capability in Aufgabenbegriffen beschreiben, statt bereits eine bevorzugte Implementierung vorzugeben;
+2. eigene Capability-/Work-Indizes mit Problem-/Capability-Begriffen und aktuellem Kontext durchsuchen;
+3. nur eine kleine Kandidatenmenge holen und nach Authority-Fit, Evidence/Freshness, Abhängigkeiten, erwartetem Nutzen, Kosten und Bedienaufwand bewerten;
+4. Wiederverwendung oder Komposition bevorzugen, wenn ein vorhandener Kandidat den Vertrag bereits erfüllt;
+5. den ausgewählten Kandidaten gegen aktuelles Ziel und aktuelle Revision verifizieren, bevor darauf vertraut oder damit ausgeführt wird;
+6. erst wenn kein passender eigener Kandidat existiert, extern scouten oder neue Logik entwerfen.
+
+Capability-Retrieval ist Discovery, keine Autorität. Ein gefundener Prompt, Skill, Agent, Plugin oder Workflow darf nicht still Berechtigungen erweitern, Dependencies installieren, Produktwahrheit ändern oder Side Effects ausführen. Externer Inhalt bleibt untrusted input, bis die normalen Adoption- und Provenance-Gates bestanden sind.
+
+Wenn möglich zuerst Metadaten laden und vollständige Prompt-/Skill-Inhalte nur für die engere Auswahl. Ziel ist sowohl Neuerfinden als auch Context-Bloat zu vermeiden; Loop42 braucht keinen riesigen Prompt-Speicher im Core.
+
+Dieser Schritt wird übersprungen, wenn der abgeglichene Zustand bereits beweist, dass die exakt passende Capability bekannt ist. Der Mechanismus ist nur sinnvoll, wenn er doppelte Arbeit reduziert oder den Fit verbessert.
+
 ## Scout-Contract
 
 Ein Scout braucht:
