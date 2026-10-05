@@ -22,6 +22,7 @@ The entries below were carried forward from CORA's verified 2026-09-26 Factory p
 | Microsoft Agent Framework | https://github.com/microsoft/agent-framework | MIT | workflow/checkpoint/resume research |
 | LangGraph | https://github.com/langchain-ai/langgraph | MIT | durable execution/checkpoint/human-interrupt research |
 | Intrinsic Core | https://github.com/intrinsic-ai/intrinsic-core | Apache-2.0 | generic architecture/HAL/runtime-boundary research where applicable |
+| REA / Reverse Engineer Anything | https://github.com/morluto/rea | MIT | real-agent transcript evaluation pattern: scenario-bound tool routing, duplicate-call detection, evidence use, epistemic/authority honesty and token/tool overhead; pinned research revision `38b293329ca06c424a58bb59a28728f19015ce22`; Loop42 implementation is independent standard-library code, no REA runtime or implementation code imported |
 | Anthropic skills repository | https://github.com/anthropics/skills | file/repository-specific; no single root license relied upon | progressive-disclosure/skill-evaluation research only; check a specific file's license before reuse |
 
 No implementation code from these projects is intentionally imported by the current Loop42 v0.1 extraction. The extracted context and bounded Ollama-harness code is project-owned code derived from the already-proven CORA implementation path, with its exact CORA extraction basis recorded in the corresponding Loop42 documentation and frozen scenarios.
