@@ -151,6 +151,12 @@ class OllamaChangeSetProvider:
                 raise ValueError("worker proposal exceeds request_verification capability")
         except (UnicodeError, json.JSONDecodeError, ValueError) as error:
             raise ValueError("Ollama returned invalid structured worker proposal") from error
+        reported_model = response.get("model")
+        accepted_models = {self.model}
+        if ":" not in self.model:
+            accepted_models.add(self.model + ":latest")
+        if not isinstance(reported_model, str) or reported_model not in accepted_models:
+            raise ValueError("Ollama reported a different or missing model identity")
         usage = WorkerUsage(
             input_tokens=response.get("prompt_eval_count") if isinstance(response.get("prompt_eval_count"), int) else None,
             output_tokens=response.get("eval_count") if isinstance(response.get("eval_count"), int) else None,
@@ -158,17 +164,17 @@ class OllamaChangeSetProvider:
         return WorkerResult(
             status=WorkerStatus.PROPOSAL,
             provider="ollama",
-            model=response.get("model") if isinstance(response.get("model"), str) and response.get("model") else self.model,
+            model=reported_model,
             task_id=request.task_id,
             attempt_id=request.attempt_id,
             source_revision=request.source_revision,
             context_fingerprint=request.context_fingerprint,
-            rationale_summary=parsed["rationale_summmary"],
+            rationale_summary=parsed["rationale_summary"],
             evidence=parsed["evidence"],
             changeset=parsed["changeset"],
             usage=usage,
             raw_response_fingerprint=hashlib.sha256(raw).hexdigest(),
-         )
+        )
 
     @property
     def proposal_schema_fingerprint(self) -> str:
