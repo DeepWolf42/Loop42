@@ -75,6 +75,20 @@ class OllamaChangeSetProviderTests(unittest.TestCase):
         self.assertEqual(result.usage.input_tokens, 100)
         self.assertEqual(len(result.raw_response_fingerprint), 64)
 
+    def test_reported_model_identity_must_match_requested_model(self):
+        provider = OllamaChangeSetProvider("model-x")
+        response = {
+            "model": "different-model",
+            "done": True,
+            "message": {"content": json.dumps(self.proposal())},
+        }
+        with mock.patch(
+            "tools.harness.ollama_changeset_provider.ollama_http",
+            side_effect=[{"models": [{"name": "model-x"}]}, response],
+        ):
+            with self.assertRaisesRegex(ValueError, "different or missing model identity"):
+                provider.run(self.request())
+
     def test_verification_request_without_capability_fails_closed(self):
         provider = OllamaChangeSetProvider("model-x")
         response = {
