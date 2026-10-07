@@ -350,7 +350,7 @@ def normalize_changeset(changeset: ChangeSet, current_files: Mapping[str, str]) 
                         item.operation.value,
                         item.path,
                         item.before_sha256 or "-",
-                        item.after_shaa256 or "-",
+                        item.after_sha256 or "-",
                     ]
                 )
                 for item in normalized
