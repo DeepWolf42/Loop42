@@ -246,8 +246,8 @@ class AttemptRunnerTests(unittest.TestCase):
             try:
                 self.assertEqual(result.status, AttemptStatus.REJECTED)
                 self.assertIn(expected, result.reason)
-                self.assertEqual((result.workspace.root / "x.py").read_text(), "x = 1\\n")
-                self.assertEqual((repo / "x.py").read_text(), "x = 1\\n")
+                self.assertEqual((result.workspace.root / "x.py").read_text(), "x = 1\n")
+                self.assertEqual((repo / "x.py").read_text(), "x = 1\n")
             finally:
                 remove_worktree(result.workspace)
 
