@@ -1,4 +1,5 @@
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -87,6 +88,52 @@ class CompletionGatesTests(unittest.TestCase):
         p.write_text('{"schema":"a","schema":"a"}')
         with self.assertRaisesRegex(ValueError, "duplicate JSON"):
             load_contract(p)
+
+    def test_actual_loop42_worker_identity_regression_is_detected(self):
+        """A fresh committed semantic mutation must fail the real worker suite."""
+        baseline = Path(__file__).resolve().parents[1]
+        for rel in (
+            "tools/__init__.py",
+            "tools/harness/__init__.py",
+            "tools/harness/worker_dispatch.py",
+            "tests/test_worker_dispatch.py",
+        ):
+            target = self.repo / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(baseline / rel, target)
+
+        def git(*args):
+            return subprocess.run(
+                ["git", *args], cwd=self.repo, check=True,
+                capture_output=True, text=True,
+            ).stdout.strip()
+
+        self.gate["argv"] = [
+            sys.executable, "-m", "unittest", "discover",
+            "-s", "tests", "-p", "test_worker_dispatch.py",
+        ]
+        self.gate["criterion"] = "Real Loop42 worker identity regression passes"
+        self.gate["expect_line"] = "OK"
+        self.gate["timeout_seconds"] = 30
+        git("add", ".")
+        git("commit", "-qm", "snapshot real worker module and tests")
+        clean_sha = git("rev-parse", "HEAD")
+        baseline_report = verify(self.contract, self.repo, expected_revision=clean_sha, run=True)
+        self.assertTrue(baseline_report["complete"], baseline_report)
+
+        # Simulate a real bug: falsely accept a stale source revision.
+        worker = self.repo / "tools/harness/worker_dispatch.py"
+        original = worker.read_text(encoding="utf-8")
+        needle = "and artifact.source_revision == task.source_revision"
+        self.assertIn(needle, original)
+        worker.write_text(original.replace(needle, "and True", 1), encoding="utf-8")
+        git("add", "tools/harness/worker_dispatch.py")
+        git("commit", "-qm", "intentionally break revision identity matching")
+        bad_sha = git("rev-parse", "HEAD")
+        failing_report = verify(self.contract, self.repo, expected_revision=bad_sha, run=True)
+        self.assertFalse(failing_report["complete"], failing_report)
+        self.assertEqual(failing_report["gates"][0]["status"], "FAIL")
+
 
     def test_changed_gate_changes_definition_digest(self):
         r1 = verify(self.contract, self.repo, expected_revision=self.rev, run=True)
