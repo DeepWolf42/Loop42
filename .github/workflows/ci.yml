@@ -21,3 +21,6 @@ jobs:
           python-version: "3.12"
       - name: Run repository policy tests
         run: python -m unittest discover -s tests -p "test_*.py"
+      - name: Verify opt-in completion gates on exact checked-out revision
+        run: |
+          python -m tools.checks.completion_gates tests/frozen_scenarios/loop42_completion_gates_v1.json --repo . --expected-revision "$(git rev-parse HEAD)" --run
