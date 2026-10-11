@@ -1,4 +1,5 @@
 import subprocess
+from dataclasses import replace
 import sys
 import tempfile
 import unittest
@@ -77,7 +78,7 @@ class FakeProvider:
                 rationale_summary="wrong",
                 **common,
             )
-        verification = () if self.mode == "unverified" else ("unit:file",)
+        verification = () if self.mode == "unverified" else (("unit:missing",) if self.mode == "missing_check" else ("unit:file",))
         return WorkerResult(
             status=WorkerStatus.PROPOSAL,
             rationale_summary="change x",
@@ -229,6 +230,42 @@ class AttemptRunnerTests(unittest.TestCase):
             finally:
                 remove_worktree(result.workspace)
 
+
+
+    def assert_preflight_rejected(self, capabilities, *, mode="proposal", expected):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            repo, revision = make_repo(root)
+            parent = root / "workspaces"
+            parent.mkdir()
+            request = replace(self.request(revision), allowed_capabilities=capabilities)
+            result = run_autonomous_attempt(
+                repo, parent, request, FakeProvider(mode),
+                self.registry(), rules=ALLOW,
+            )
+            try:
+                self.assertEqual(result.status, AttemptStatus.REJECTED)
+                self.assertIn(expected, result.reason)
+                self.assertEqual((result.workspace.root / "x.py").read_text(), "x = 1\\n")
+                self.assertEqual((repo / "x.py").read_text(), "x = 1\\n")
+            finally:
+                remove_worktree(result.workspace)
+
+    def test_denied_proposal_capability_cannot_change_workspace(self):
+        self.assert_preflight_rejected(
+            ("request_verification",), expected="propose_changes",
+        )
+
+    def test_denied_verification_capability_cannot_change_workspace(self):
+        self.assert_preflight_rejected(
+            ("propose_changes",), expected="request_verification",
+        )
+
+    def test_unknown_verification_id_cannot_change_workspace(self):
+        self.assert_preflight_rejected(
+            ("propose_changes", "request_verification"),
+            mode="missing_check", expected="unknown verification",
+        )
 
 if __name__ == "__main__":
     unittest.main()
