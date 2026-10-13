@@ -110,6 +110,29 @@ class DriveFolderAdapterTests(unittest.TestCase):
         self.assertIsNone(permit)
         self.assertIn("legacy_inbox_requires_reconciliation", reasons)
 
+    def test_recovered_legacy_job_with_historic_error_blocks_dispatch(self):
+        # A legacy error is not an identity-bound terminal receipt: the old
+        # task may be recovered into Inbox and start again after interruption.
+        name = "025_CORA_G92_CodeReview_b7f08ec_20260929.md"
+        (self.root / INBOX / name).write_text("legacy review\\n", encoding="utf-8")
+        (self.root / ERRORS / ("2026-10-02_12-39-47_" + name)).write_text(
+            "earlier empty model reply\\n", encoding="utf-8"
+        )
+
+        snapshot = scan_root(self.root)
+        state = legacy_reconcile(snapshot, name)
+        self.assertEqual(state["state"], "unknown")
+        self.assertFalse(state["can_retry"])
+        self.assertFalse(state["can_dispatch_replacement"])
+        self.assertIn("legacy_task_present", state["reasons"])
+        self.assertIn("legacy_error_candidate_present", state["reasons"])
+        self.assertIn("terminal_identity_unverifiable", state["reasons"])
+
+        task, _, _ = load_task_manifest(self.task_path)
+        permit, reasons = issue_provider_permit(snapshot, task, now=NOW)
+        self.assertIsNone(permit)
+        self.assertIn("legacy_inbox_requires_reconciliation", reasons)
+
     def test_historic_legacy_results_do_not_poison_new_dispatch(self):
         (self.root / RESULTS / "2026-09-28_old_review.md").write_text(
             "historic result\n",
