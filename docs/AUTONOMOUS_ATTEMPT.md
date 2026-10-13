@@ -26,7 +26,7 @@ structured attempt result
 
 The request's source revision is resolved to the exact full commit before the provider is called. The provider result must repeat the exact task ID, attempt ID, full source revision and context fingerprint or the attempt fails closed.
 
-A provider BLOCKED/FAILED result causes no code change. A proposal is snapshotted from the isolated worktree, normalized and policy-gated before apply.
+A provider BLOCKED/FAILED result causes no code change. The attempt runner itself (not only the provider adapter) verifies `propose_changes` is permitted, checks `request_verification` when verification is requested, and resolves every requested verification ID against the consumer-owned registry **before applying any change**. Unknown checks or disallowed capabilities reject the proposal with the isolated worktree unchanged. A permitted proposal is snapshotted from the isolated worktree, normalized and policy-gated before apply.
 
 A changed workspace is only `VERIFIED` when at least one requested, pre-registered verification ran and all returned success. If no verification is requested the result is explicitly `APPLIED_UNVERIFIED`. Failed verification leaves the candidate change inside the isolated worktree for later retry/recovery analysis; it never changes the operator's normal checkout.
 

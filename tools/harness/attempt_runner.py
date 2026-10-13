@@ -185,6 +185,16 @@ def run_autonomous_attempt(
 
     assert worker.changeset is not None
     try:
+        # Providers are untrusted proposal sources. The runtime must enforce
+        # capabilities even when an adapter omits its own preflight check.
+        if "propose_changes" not in bound.allowed_capabilities:
+            raise ValueError("propose_changes capability is not allowed")
+        if worker.changeset.requested_verification:
+            if "request_verification" not in bound.allowed_capabilities:
+                raise ValueError("request_verification capability is not allowed")
+            # Reject unknown IDs before touching the isolated worktree; a
+            # post-apply registry failure must never leave a needless edit.
+            verification_registry.resolve(worker.changeset.requested_verification)
         snapshot = _snapshot_proposal_paths(lease.root, worker.changeset)
         normalized = normalize_changeset(worker.changeset, snapshot)
         permit = issue_changeset_permit(
