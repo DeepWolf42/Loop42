@@ -1,0 +1,37 @@
+{
+  "schema": "loop42.completion-gates.v1",
+  "gates": [
+    {
+      "id": "worker-reconciliation",
+      "criterion": "Loop42 current worker-reconciliation behaviors (including task identity, stale evidence and blocked retries) pass",
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_worker_dispatch.py"
+      ],
+      "expect_line": "OK",
+      "timeout_seconds": 120
+    },
+    {
+      "id": "completion-regression",
+      "criterion": "Completion-gate positive and negative controls still pass",
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_completion_gates.py"
+      ],
+      "expect_line": "OK",
+      "timeout_seconds": 120
+    }
+  ]
+}
