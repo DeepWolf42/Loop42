@@ -56,6 +56,30 @@ The existing DeepThought watchdog already has a 15-second supervision loop, so t
 intended deployment is to invoke this one-shot evidence writer from that existing
 loop rather than creating another scheduler or supervisor.
 
+### Legacy supervisor / local recovery cutover guard
+
+The 2026-09-29 Drive-synchronized historical supervisor source restores
+`C:\DeepThought\QueueRecovery\*.jobbackup` into `00_Inbox` without a modern
+task/attempt identity or DispatchPermit. The corresponding legacy worker consumes
+those markdown files. A cleared Drive Inbox alone is therefore **not proof** that
+another legacy attempt cannot start.
+
+Before emitting a fresh host observation, the one-shot Windows writer must:
+- observe the **existing** `C:\DeepThought\QueueRecovery` directory; if it cannot
+  be inspected, fail closed without publishing a new healthy observation;
+- enumerate local `*.jobbackup` recovery backups and running
+  `DeepThought-24x7.ps1` supervisor processes;
+- set `safety_stop: true` (dispatch inhibit, **not** a claim of GPU overheating)
+  if either is present; retain the preexisting physical safety-marker checks;
+- report those two counts only in its local diagnostic stdout, without adding
+  unsupported fields to the strict provider host-state JSON.
+
+No backup is deleted, moved, retried or marked complete. Removing the old
+supervisor, reconciling attempt 025, assessing existing watchdog marker-latching
+and reviewing the **actual installed** PowerShell scripts remain separate
+operator-controlled cutover requirements. A green repository test does not
+establish a live Windows/Ollama/Drive E2E or make a legacy worker safe to start.
+
 ## Modern task manifest
 
 A new queue item uses `loop42.drive-task.v1` and contains:

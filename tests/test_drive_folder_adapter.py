@@ -225,6 +225,17 @@ class DriveFolderAdapterTests(unittest.TestCase):
                 now=NOW,
             )
 
+    def test_host_cutover_block_with_empty_inbox_prevents_new_permit(self):
+        # An old local QueueRecovery backup or legacy supervisor is not part of
+        # the Drive Inbox; the Windows host writer must encode that as safety_stop.
+        # The existing provider adapter must refuse a fresh, otherwise idle host.
+        self.write_host(safety=True)
+        snapshot = scan_root(self.root)
+        self.assertEqual(list((self.root / INBOX).iterdir()), [])
+        task, _, _ = load_task_manifest(self.task_path)
+        permit, _reasons = issue_provider_permit(snapshot, task, now=NOW)
+        self.assertIsNone(permit)
+
     def test_unverified_proposal_blocks_dispatch_until_terminal_verification(self):
         task, _, _ = load_task_manifest(self.task_path)
         content_name = "review-cora__a1.proposal.md"
@@ -421,6 +432,12 @@ class DriveFolderAdapterTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("loop42.drive-host-state.v1", script)
         self.assertIn("unidentified_worker_count", script)
+        # The live legacy Windows supervisor can replay local backups even
+        # while the Drive Inbox appears empty. Preserve the fail-closed guard.
+        self.assertIn("QueueRecovery", script)
+        self.assertIn("DeepThought-24x7", script)
+        self.assertIn("legacyRecoveryBlocked", script)
+        self.assertIn("legacy_recovery_backup_count", script)
         self.assertIn("[System.IO.File]::Replace", script)
         self.assertNotIn("Start-Process", script)
         self.assertNotIn("Invoke-RestMethod", script)

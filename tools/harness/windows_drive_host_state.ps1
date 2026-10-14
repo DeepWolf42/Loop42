@@ -17,6 +17,7 @@ $WorkerSessionSchema = 'loop42.windows-worker-session.v1'
 $Logs = Join-Path $DriveRoot '90_Logs'
 $Target = Join-Path $Logs 'loop42-host-state.json'
 $WorkerSessionFile = Join-Path $RuntimeRoot 'loop42-worker-session.json'
+$RecoveryRoot = Join-Path $RuntimeRoot 'QueueRecovery'
 $OverheatFlag = Join-Path $RuntimeRoot 'STOPPED_OVERHEAT.flag'
 $WatchdogFailFlag = Join-Path $RuntimeRoot 'WATCHDOG_FAILURE.flag'
 
@@ -94,23 +95,43 @@ if (-not (Test-Path -LiteralPath $Logs -PathType Container)) {
 if (-not (Test-Path -LiteralPath $RuntimeRoot -PathType Container)) {
     throw "Runtime root unavailable: $RuntimeRoot"
 }
+# An absent local recovery directory is UNKNOWN, not proof that no old work can replay.
+if (-not (Test-Path -LiteralPath $RecoveryRoot -PathType Container)) {
+    throw "Legacy recovery root unavailable: $RecoveryRoot"
+}
 
 $os = Get-CimInstance Win32_OperatingSystem
 $boot = [datetimeoffset]$os.LastBootUpTime
 $hostSession = 'host-' + $boot.ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
 
+# One authoritative process snapshot covers both the worker and the legacy
+# supervisor. The latter can restore QueueRecovery backups without a DispatchPermit.
+$processSnapshot = @(Get-CimInstance Win32_Process -ErrorAction Stop)
 $workers = @(
-    Get-CimInstance Win32_Process -ErrorAction Stop |
+    $processSnapshot |
     Where-Object {
         $_.Name -match '^(powershell|pwsh)(\.exe)?$' -and
         $_.CommandLine -match $WorkerScriptPattern
     } |
     ForEach-Object { Get-Process -Id $_.ProcessId -ErrorAction Stop }
 )
+$legacySupervisors = @(
+    $processSnapshot |
+    Where-Object {
+        $_.Name -match '^(powershell|pwsh)(\.exe)?$' -and
+        $_.CommandLine -match 'DeepThought-24x7\.ps1'
+    }
+)
+$recoveryBackups = @(
+    Get-ChildItem -LiteralPath $RecoveryRoot -File -Filter '*.jobbackup' -ErrorAction Stop
+)
 
 $workerEvidence = Read-WorkerSession $workers
+# This is a dispatch-inhibiting gate, not a claim that overheating occurred.
+$legacyRecoveryBlocked = ($legacySupervisors.Count -gt 0 -or $recoveryBackups.Count -gt 0)
 $safetyStop = (Test-Path -LiteralPath $OverheatFlag -PathType Leaf) -or
-              (Test-Path -LiteralPath $WatchdogFailFlag -PathType Leaf)
+              (Test-Path -LiteralPath $WatchdogFailFlag -PathType Leaf) -or
+              $legacyRecoveryBlocked
 
 $payload = [ordered]@{
     schema = $HostSchema
@@ -146,6 +167,9 @@ finally {
     host_state = $Target
     host_session_id = $hostSession
     worker_process_count = $workers.Count
+    legacy_supervisor_process_count = $legacySupervisors.Count
+    legacy_recovery_backup_count = $recoveryBackups.Count
+    legacy_recovery_blocks_dispatch = [bool]$legacyRecoveryBlocked
     unidentified_worker_count = $workerEvidence.Unidentified
     worker_identity_error = $workerEvidence.Error
     safety_stop = [bool]$safetyStop
