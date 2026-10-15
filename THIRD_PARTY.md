@@ -22,6 +22,7 @@ The entries below were carried forward from CORA's verified 2026-09-26 Factory p
 | DSPy | https://github.com/stanfordnlp/dspy | MIT | prompt/evaluation research: compare prompt/program candidates against explicit metrics and validation scenarios; pinned research revision `98a4deebcf5dd30c02ea86a5abc46b8ae877111c`; no DSPy runtime/code imported |
 | Promptfoo | https://github.com/promptfoo/promptfoo | MIT | prompt regression/assertion and adversarial-evaluation research; pinned research revision `0e1e076298e1f2fd27fd80fd6a413047293c0eae`; no Promptfoo runtime/code imported |
 | Chaos Mesh | https://github.com/chaos-mesh/chaos-mesh | Apache-2.0 | fault-injection/chaos-testing research for deliberate recovery ambiguity scenarios; pinned research revision `c859a9c63164920478099947c8fa730ecb220477`; no Chaos Mesh runtime/code imported |
+| Leonxlnx/unlazy | https://github.com/Leonxlnx/unlazy | MIT; inspected revision `16671491f6679ad9378f52604d3bc2415b4120c7` | executable-completion-gate principles researched and independently implemented in `tools/checks/completion_gates.py`; no upstream source or runtime imported |
 | mini-SWE-agent | https://github.com/SWE-agent/mini-swe-agent | MIT | small bounded agent-loop/run-budget research |
 | Microsoft Agent Framework | https://github.com/microsoft/agent-framework | MIT | workflow/checkpoint/resume research |
 | LangGraph | https://github.com/langchain-ai/langgraph | MIT | durable execution/checkpoint/human-interrupt research |
