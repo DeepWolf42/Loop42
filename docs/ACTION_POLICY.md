@@ -57,7 +57,8 @@ different pre-action and desired SHA-256 fingerprints. A fresh provider re-read
 using the same target and projection scope is classified as:
 
 - `APPLIED`: the desired fingerprint is present. Do not replay.
-- `NOT_APPLIED`: the exact pre-action fingerprint is still present. The action
+- `NOT_APPLIED`: the exact pre-action fingerprint is still present **and** the
+  provider proves the original attempt cannot still complete. The action
   may be reconsidered, but the old policy result, approval and provider
   preconditions are not durable authority; evaluate them again before any write.
 - `CONFLICT`: the target/scope differs or the target state has diverged. Do not
@@ -73,3 +74,29 @@ an `APPLIED` or `NOT_APPLIED` result.
 
 This contract is pure classification. It never executes the action, never
 persists approval and never turns `NOT_APPLIED` into automatic permission.
+
+### In-flight requests and delayed observations
+
+A fresh read can overtake an earlier write. A timeout, lost tool response,
+runtime restart or cancelled chat does not prove that the provider cancelled
+the request. Unchanged target state alone therefore returns `UNKNOWN` with
+`prior_attempt_not_proven_quiescent`, and `may_reconsider` remains false.
+
+The adapter may set `SideEffectObservation.quiescent_action_id` only after
+provider evidence establishes that the exact `SideEffectIntent.action_id`
+cannot produce a later effect (for example a terminal operation status or an
+acknowledged cancellation/fence), followed by a coherent authoritative target
+read. The ID must identify a unique attempt, not a reused task label. An old
+attempt's proof cannot settle a new one. Absence in an eventually consistent
+listing, elapsed time and the loss of the caller's process are not this proof.
+If the provider cannot establish it, leave the attempt `UNKNOWN`; do not infer
+failure or replay. Observing the desired state still suppresses replay without
+claiming which actor caused that state.
+
+Consumers persist intent/evidence through their existing Recovery authority;
+this classifier does not create a journal or durable runtime. After restart,
+rediscover available tools and read current authoritative sources before
+classifying. Neither a remembered capability nor an old ALLOW result is proof
+that a tool, permission or provider precondition still exists. DispatchPermit
+remains the separate pre-queue-write check. These rules apply to Work and local
+workers equally; adapter/end-to-end verification remains necessary.
