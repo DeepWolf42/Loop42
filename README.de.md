@@ -123,7 +123,7 @@ Loop42 ist ein öffentliches Entwicklungs-Repository.
 
 Die **v0.1 Extraction-/Consumer-Binding-Foundation ist verifiziert**. Wiederverwendbare Context-/Harness-Mechanik, Frozen-CORA-Equivalence und der Exact-Revision-Consumer-Profile-Contract sind vorhanden.
 
-CORA pinnt derzeit die verifizierte Loop42-Revision `de5be0fa5e085d63c8f98fe683f9936828478dbf`. Dieser Pin ist absichtlich exakt; Loop42 `main` darf unabhängig davon weiterlaufen.
+Stand 2026-10-13 pinnt CORA die Loop42-Revision `5470cd0b36774698a69c6ff61ff1a016dab036b8` im Consumer-Profil auf `cora/development`. Der Pin ist exakt und verifiziert (Loop42 [Main-CI](https://github.com/DeepWolf42/Loop42/actions/runs/38123996570), CORA [Integrations-CI](https://github.com/DeepWolf42/C.O.R.A./actions/runs/38409208130)); er folgt Loop42 `main` nicht automatisch. Für spätere Pin-Änderungen ist das CORA-Consumer-Profil die verbindliche Quelle.
 
 Loop42 steht unter der MIT-Lizenz.
 
