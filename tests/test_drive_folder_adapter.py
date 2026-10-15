@@ -438,10 +438,67 @@ class DriveFolderAdapterTests(unittest.TestCase):
         self.assertIn("DeepThought-24x7", script)
         self.assertIn("legacyRecoveryBlocked", script)
         self.assertIn("legacy_recovery_backup_count", script)
+        self.assertIn("WATCHDOG_HEARTBEAT.txt", script)
+        self.assertIn("Read-Loop42WatchdogEvidence", script)
+        self.assertIn("watchdog_heartbeat_reason", script)
+        self.assertIn("(-not $watchdogEvidence.Healthy)", script)
         self.assertIn("[System.IO.File]::Replace", script)
         self.assertNotIn("Start-Process", script)
         self.assertNotIn("Invoke-RestMethod", script)
         self.assertNotIn("ollama", script.lower())
+
+
+    def test_windows_watchdog_heartbeat_gate_in_real_pwsh_when_available(self):
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("pwsh is not available in this environment")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(__file__).resolve().parents[1]
+            source = str(root / "tools/harness/windows_drive_host_state.ps1")
+            heartbeat = str(Path(directory) / "heartbeat.txt")
+            quoted_source = source.replace("'", "''")
+            quoted_heartbeat = heartbeat.replace("'", "''")
+            script = (
+                "$tokens=$null; $errors=$null; "
+                "$ast=[System.Management.Automation.Language.Parser]::ParseFile("
+                f"'{quoted_source}', [ref]$tokens, [ref]$errors); "
+                "if ($errors.Count) { throw 'Windows status writer parse failed' }; "
+                "$functionAst=$ast.Find({param($node) "
+                "$node -is [System.Management.Automation.Language.FunctionDefinitionAst] "
+                "-and $node.Name -eq 'Read-Loop42WatchdogEvidence'}, $true); "
+                "if ($null -eq $functionAst) { throw 'watchdog helper missing' }; "
+                ". ([scriptblock]::Create($functionAst.Extent.Text)); "
+                "$now=[datetimeoffset]::Parse('2026-10-15T06:00:00+00:00'); "
+                f"$hb='{quoted_heartbeat}'; "
+                "$cases=@("
+                "@{name='fresh_ok';raw=($now.ToString('o')+'|OK|55');count=1;ok=$true},"
+                "@{name='missing';raw=$null;count=1;ok=$false},"
+                "@{name='no_process';raw=($now.ToString('o')+'|OK|55');count=0;ok=$false},"
+                "@{name='duplicate_watchdog';raw=($now.ToString('o')+'|OK|55');count=2;ok=$false},"
+                "@{name='stale';raw=($now.AddSeconds(-61).ToString('o')+'|OK|55');count=1;ok=$false},"
+                "@{name='future';raw=($now.AddSeconds(1).ToString('o')+'|OK|55');count=1;ok=$false},"
+                "@{name='hot';raw=($now.ToString('o')+'|OK|80');count=1;ok=$false},"
+                "@{name='read_error';raw=($now.ToString('o')+'|GPU_READ_ERROR_1|-');count=1;ok=$false},"
+                "@{name='bad_timestamp';raw='garbage|OK|40';count=1;ok=$false}"
+                ");"
+                "foreach ($case in $cases) { "
+                "if ($null -eq $case.raw) { Remove-Item -LiteralPath $hb -Force -ErrorAction SilentlyContinue } "
+                "else { [System.IO.File]::WriteAllText($hb,$case.raw) }; "
+                "$result=Read-Loop42WatchdogEvidence -HeartbeatPath $hb -ObservedAtUtc $now "
+                "-WatchdogProcessCount $case.count; "
+                "if ($result.Healthy -ne $case.ok) { throw ('Watchdog gate failed: '+$case.name) }"
+                "}"
+            )
+            completed = subprocess.run(
+                [pwsh, "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(
+                completed.returncode, 0,
+                msg=completed.stdout + completed.stderr,
+            )
 
     def test_no_model_identity_roundtrip(self):
         scenario_path = (

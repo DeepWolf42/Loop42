@@ -6,7 +6,10 @@ param(
     [string]$RuntimeRoot = 'C:\DeepThought',
 
     [Parameter(Mandatory=$false)]
-    [string]$WorkerScriptPattern = 'DeepThought-Away\.ps1'
+    [string]$WorkerScriptPattern = 'DeepThought-Away\.ps1',
+
+    [Parameter(Mandatory=$false)]
+    [string]$WatchdogScriptPattern = 'DeepThought-Watchdog\.ps1'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -20,6 +23,7 @@ $WorkerSessionFile = Join-Path $RuntimeRoot 'loop42-worker-session.json'
 $RecoveryRoot = Join-Path $RuntimeRoot 'QueueRecovery'
 $OverheatFlag = Join-Path $RuntimeRoot 'STOPPED_OVERHEAT.flag'
 $WatchdogFailFlag = Join-Path $RuntimeRoot 'WATCHDOG_FAILURE.flag'
+$WatchdogHeartbeat = Join-Path $RuntimeRoot 'WATCHDOG_HEARTBEAT.txt'
 
 function Test-Id([string]$Value) {
     return ($null -ne $Value -and $Value -match '^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$')
@@ -86,6 +90,49 @@ function Read-WorkerSession([System.Diagnostics.Process[]]$WorkerProcesses) {
     }
 }
 
+# Purely reads an existing legacy watchdog heartbeat; never starts or stops
+# the watchdog or uses the heartbeat as proof of a physical safety guarantee.
+function Read-Loop42WatchdogEvidence {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][string]$HeartbeatPath,
+        [Parameter(Mandatory=$true)][datetimeoffset]$ObservedAtUtc,
+        [Parameter(Mandatory=$true)][int]$WatchdogProcessCount
+    )
+
+    if ($WatchdogProcessCount -ne 1) {
+        return [pscustomobject]@{ Healthy = $false; Reason = 'watchdog_process_not_unique' }
+    }
+    if (-not (Test-Path -LiteralPath $HeartbeatPath -PathType Leaf)) {
+        return [pscustomobject]@{ Healthy = $false; Reason = 'watchdog_heartbeat_missing' }
+    }
+    try {
+        $item = Get-Item -LiteralPath $HeartbeatPath -ErrorAction Stop
+        if ($item.Length -lt 1 -or $item.Length -gt 256) {
+            throw 'watchdog heartbeat size invalid'
+        }
+        $line = (Get-Content -LiteralPath $HeartbeatPath -Raw -Encoding ASCII -ErrorAction Stop).Trim()
+        $parts = $line -split '\|', 3
+        if ($parts.Count -ne 3 -or $parts[1] -ne 'OK' -or $parts[2] -notmatch '^[0-9]{1,3}$') {
+            throw 'watchdog heartbeat state invalid'
+        }
+        $at = [datetimeoffset]::ParseExact(
+            $parts[0], 'o', [System.Globalization.CultureInfo]::InvariantCulture
+        )
+        $age = ($ObservedAtUtc.ToUniversalTime() - $at.ToUniversalTime()).TotalSeconds
+        if ($age -lt 0 -or $age -gt 60) {
+            throw 'watchdog heartbeat missing freshness'
+        }
+        if ([int]$parts[2] -ge 80) {
+            throw 'watchdog reported high temperature'
+        }
+        return [pscustomobject]@{ Healthy = $true; Reason = 'fresh_watchdog_ok' }
+    }
+    catch {
+        return [pscustomobject]@{ Healthy = $false; Reason = 'watchdog_heartbeat_invalid_or_unsafe' }
+    }
+}
+
 if (-not (Test-Path -LiteralPath $DriveRoot -PathType Container)) {
     throw "Drive root unavailable: $DriveRoot"
 }
@@ -125,17 +172,30 @@ $legacySupervisors = @(
 $recoveryBackups = @(
     Get-ChildItem -LiteralPath $RecoveryRoot -File -Filter '*.jobbackup' -ErrorAction Stop
 )
+$watchdogs = @(
+    $processSnapshot |
+    Where-Object {
+        $_.Name -match '^(powershell|pwsh)(\.exe)?$' -and
+        $_.CommandLine -match $WatchdogScriptPattern
+    }
+)
+$observedAtUtc = [datetimeoffset]::Now.ToUniversalTime()
+$watchdogEvidence = Read-Loop42WatchdogEvidence `
+    -HeartbeatPath $WatchdogHeartbeat `
+    -ObservedAtUtc $observedAtUtc `
+    -WatchdogProcessCount $watchdogs.Count
 
 $workerEvidence = Read-WorkerSession $workers
 # This is a dispatch-inhibiting gate, not a claim that overheating occurred.
 $legacyRecoveryBlocked = ($legacySupervisors.Count -gt 0 -or $recoveryBackups.Count -gt 0)
 $safetyStop = (Test-Path -LiteralPath $OverheatFlag -PathType Leaf) -or
               (Test-Path -LiteralPath $WatchdogFailFlag -PathType Leaf) -or
-              $legacyRecoveryBlocked
+              $legacyRecoveryBlocked -or
+              (-not $watchdogEvidence.Healthy)
 
 $payload = [ordered]@{
     schema = $HostSchema
-    observed_at = ([datetimeoffset]::Now.ToUniversalTime().ToString('o'))
+    observed_at = $observedAtUtc.ToString('o')
     session_id = $hostSession
     reachable = $true
     safety_stop = [bool]$safetyStop
@@ -170,6 +230,8 @@ finally {
     legacy_supervisor_process_count = $legacySupervisors.Count
     legacy_recovery_backup_count = $recoveryBackups.Count
     legacy_recovery_blocks_dispatch = [bool]$legacyRecoveryBlocked
+    watchdog_process_count = $watchdogs.Count
+    watchdog_heartbeat_reason = $watchdogEvidence.Reason
     unidentified_worker_count = $workerEvidence.Unidentified
     worker_identity_error = $workerEvidence.Error
     safety_stop = [bool]$safetyStop

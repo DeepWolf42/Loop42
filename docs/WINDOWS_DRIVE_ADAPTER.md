@@ -71,7 +71,14 @@ Before emitting a fresh host observation, the one-shot Windows writer must:
   `DeepThought-24x7.ps1` supervisor processes;
 - set `safety_stop: true` (dispatch inhibit, **not** a claim of GPU overheating)
   if either is present; retain the preexisting physical safety-marker checks;
-- report those two counts only in its local diagnostic stdout, without adding
+- require exactly one identifiable historical watchdog process and a valid
+  `C:\DeepThought\WATCHDOG_HEARTBEAT.txt` containing a fresh `OK` and a
+  below-threshold temperature reading; missing, future, malformed, older-than-60s,
+  duplicate-process, read-error or high-temperature evidence forces
+  `safety_stop: true`. The legacy watchdog writes this heartbeat every 15 seconds.
+  This is a **conservative dispatch gate**, not independent physical GPU protection,
+  proof that the watchdog will remain alive, or a replacement for manual review;
+- report these diagnostics only in local stdout without adding
   unsupported fields to the strict provider host-state JSON.
 
 No backup is deleted, moved, retried or marked complete. Removing the old
