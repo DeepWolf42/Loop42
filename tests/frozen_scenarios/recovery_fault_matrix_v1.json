@@ -22,6 +22,20 @@
       }
     },
     {
+      "name": "unchanged_target_prior_write_inflight",
+      "expected": {
+        "side_effect_state": "unknown",
+        "may_reconsider": false
+      }
+    },
+    {
+      "name": "quiescence_of_other_attempt",
+      "expected": {
+        "side_effect_state": "unknown",
+        "may_reconsider": false
+      }
+    },
+    {
       "name": "partial_terminal_result",
       "expected": {
         "task_lifecycle": "unknown",

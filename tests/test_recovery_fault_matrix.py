@@ -108,6 +108,34 @@ class RecoveryFaultMatrixTests(unittest.TestCase):
         self.assertEqual(stale.state.value, exp["side_effect_state"])
         self.assertEqual(stale.may_reconsider, exp["may_reconsider"])
 
+    def test_unchanged_target_does_not_prove_inflight_write_finished(self):
+        matrix = expected()
+        intent = SideEffectIntent(
+            action_id="write-1",
+            action="write",
+            target="consumer:queue:item",
+            state_scope="consumer.queue.item.v1",
+            before_fingerprint="d" * 64,
+            desired_fingerprint="e" * 64,
+        )
+        for case_name, quiescent_id in (
+            ("unchanged_target_prior_write_inflight", None),
+            ("quiescence_of_other_attempt", "write-older"),
+        ):
+            with self.subTest(case_name=case_name):
+                observation = SideEffectObservation(
+                    observed_at=NOW,
+                    target=intent.target,
+                    state_scope=intent.state_scope,
+                    state_fingerprint=intent.before_fingerprint,
+                    quiescent_action_id=quiescent_id,
+                )
+                reconciled = reconcile_side_effect(intent, now=NOW, observation=observation)
+                exp = matrix[case_name]
+                self.assertEqual(reconciled.state.value, exp["side_effect_state"])
+                self.assertEqual(reconciled.may_reconsider, exp["may_reconsider"])
+                self.assertIn("prior_attempt_not_proven_quiescent", reconciled.reasons)
+
     def test_partial_and_late_result_cases(self):
         matrix = expected()
 

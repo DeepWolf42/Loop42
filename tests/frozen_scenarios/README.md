@@ -55,6 +55,7 @@ The fixture is simulated. It preserves the decision failure mode, not a claim ab
 and ambiguity cases across worker reconciliation and side-effect reconciliation.
 It is a simulated fixture, not evidence that a real consumer adapter has passed
 the same faults. The matrix covers applied-but-response-lost side effects, stale
-observations, partial terminal results, late prior-attempt results, duplicate
-worker sessions, host loss after historic activity and safety-stop changes after
-permit issue.
+observations, unchanged targets while an earlier write might still complete,
+quiescence evidence for the wrong attempt, partial terminal results, late
+prior-attempt results, duplicate worker sessions, host loss after historic
+activity and safety-stop changes after permit issue.
