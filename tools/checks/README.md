@@ -42,3 +42,7 @@ python -m tools.checks.hygiene --input hygiene.json
 
 The input schema is `loop42.hygiene-input.v1`; the deterministic report schema
 is `loop42.hygiene-report.v1`.
+
+## Opt-in completion gate checks
+
+See [Completion gates](../../docs/COMPLETION_GATES.md) for the controlled unlazy-inspired experiment, safety limits, exact-revision binding and use of `python -m tools.checks.completion_gates`. The checker is inspection-only unless `--run` is explicitly supplied; it is not a sandbox, Stop hook or authority to merge.
