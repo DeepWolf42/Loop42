@@ -148,3 +148,9 @@ again. `APPLIED`, `CONFLICT` and `UNKNOWN` never justify blind replay.
 This is runtime-neutral. ChatGPT Work, another cloud agent, a local worker or a
 future adapter may all use the same contract; no runtime session becomes product
 truth.
+
+An unchanged target does not prove that a timed-out write has ended. Before
+`NOT_APPLIED` can be returned, the observation must carry provider-proven
+`quiescent_action_id` matching the unique intent attempt. Otherwise it remains
+`UNKNOWN` and cannot be reconsidered. See `docs/ACTION_POLICY.md` for the
+provider-evidence requirements; a silent or cancelled caller is not sufficient.
