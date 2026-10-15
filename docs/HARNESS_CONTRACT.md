@@ -108,11 +108,9 @@ it as a completed proposal.
 The current Ollama adapter uses the documented `/api/chat` JSON-schema `format`
 field and requests temperature 0. Its proposal contains bounded
 `summary / known / proven / open / discarded / next / evidence_paths` fields and
-records the exact schema fingerprint and a SHA-256 fingerprint of the system/task
-prompt contract in the result. The prompt fingerprint is identity for later
-evaluation and replay comparison; it is not proof that one prompt is better.
-Duplicate JSON keys, non-standard JSON constants, unexpected fields, invalid types,
-overlong entries and an empty `next` list fail closed.
+records the exact schema fingerprint in the result. Duplicate JSON keys, non-standard
+JSON constants, unexpected fields, invalid types, overlong entries and an empty
+`next` list fail closed.
 
 A structurally valid proposal is still model output, not evidence or execution
 authority. It must be reconciled against task/attempt/revision/context identity and

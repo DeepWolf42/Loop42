@@ -28,7 +28,7 @@ Boundary:
 - Ollama structured outputs are requested with an explicit JSON schema and temperature 0;
 - malformed, ambiguous or duplicate-key JSON is rejected instead of being treated as a proposal;
 - the validated proposal uses bounded `summary / known / proven / open / discarded / next / evidence_paths` fields;
-- the result records SHA-256 fingerprints of the exact proposal schema and prompt contract as well as the snapshot fingerprint and Git HEAD;
+- the result records a SHA-256 of the exact proposal schema as well as the snapshot fingerprint and Git HEAD;
 - model output cannot checkpoint, commit, push, publish or operate physical systems.
 
 Consumer projects keep their own action/approval policy.
