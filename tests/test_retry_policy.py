@@ -1,11 +1,17 @@
 import unittest
+from datetime import datetime, timedelta, timezone
 
 from tools.harness.retry_policy import (
     FailureClass,
     RetryDecision,
     assess_retry,
 )
-from tools.harness.side_effect_reconcile import SideEffectState
+from tools.harness.side_effect_reconcile import (
+    SideEffectIntent,
+    SideEffectObservation,
+    SideEffectState,
+    reconcile_side_effect,
+)
 
 
 class RetryPolicyTests(unittest.TestCase):
@@ -78,6 +84,64 @@ class RetryPolicyTests(unittest.TestCase):
         self.assertEqual(missing.decision, RetryDecision.RECONCILE)
         self.assertIsNone(missing.delay_seconds)
         self.assertIn("side_effect_state_missing", missing.reasons)
+
+    def test_retry_requires_prior_attempt_proven_quiescent(self):
+        now = datetime(2026, 10, 15, 9, 0, tzinfo=timezone.utc)
+        intent = SideEffectIntent(
+            action_id="attempt-1",
+            action="write",
+            target="repo:config.txt",
+            state_scope="repo.file.v1",
+            before_fingerprint="a" * 64,
+            desired_fingerprint="b" * 64,
+        )
+
+        def observe(**overrides):
+            values = dict(
+                observed_at=now,
+                target=intent.target,
+                state_scope=intent.state_scope,
+                state_fingerprint=intent.before_fingerprint,
+            )
+            values.update(overrides)
+            return reconcile_side_effect(
+                intent,
+                now=now,
+                observation=SideEffectObservation(**values),
+            )
+
+        # The unchanged file can be read before an interrupted write finishes.
+        # A caller cannot safely turn that observation into NOT_APPLIED.
+        for evidence in (
+            {},
+            {"quiescent_action_id": "another-attempt"},
+            {
+                "quiescent_action_id": intent.action_id,
+                "observed_at": now - timedelta(seconds=301),
+            },
+        ):
+            with self.subTest(evidence=evidence):
+                reconciled = observe(**evidence)
+                self.assertEqual(reconciled.state, SideEffectState.UNKNOWN)
+                self.assertFalse(reconciled.may_reconsider)
+                retry = self.assess(
+                    side_effect_possible=True,
+                    side_effect_state=reconciled.state,
+                )
+                self.assertEqual(retry.decision, RetryDecision.RECONCILE)
+                self.assertIsNone(retry.delay_seconds)
+
+        # A matching provider-proven quiescence marker is a required
+        # prerequisite, not by itself an execution permission.
+        confirmed = observe(quiescent_action_id=intent.action_id)
+        self.assertEqual(confirmed.state, SideEffectState.NOT_APPLIED)
+        self.assertTrue(confirmed.may_reconsider)
+        eligible = self.assess(
+            side_effect_possible=True,
+            side_effect_state=confirmed.state,
+        )
+        self.assertEqual(eligible.decision, RetryDecision.RETRY_AFTER_BACKOFF)
+        self.assertEqual(eligible.delay_seconds, 10)
 
     def test_safety_stop_requires_operator_and_permanent_failure_stops(self):
         safety = self.assess(failure=FailureClass.SAFETY_STOP)
