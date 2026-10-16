@@ -49,3 +49,7 @@ The fixture is simulated. It preserves the decision failure mode, not a claim ab
 `agent_transcript_eval_v1.json` freezes a simulated stale-context/capability trap for the provider-neutral transcript evaluator. The expected route is to read current state first, inspect the relevant capability, avoid unjustified duplicate calls, cite returned evidence, and expose uncertainty or unavailability in the final answer.
 
 The scenario pins Loop42 `2ec351ec6ddc9dba455e8e75930e9aaee8dbe7c6`. Its fixture is synthetic and proves only evaluator behavior. A real harness/model quality claim requires a separately captured real run bound to exact harness/model/version and scenario identity.
+
+## Execution Fit: tool routing / client handoff v1
+
+`execution_fit_tool_routing_client_handoff_v1.json` freezes two related rules: choose the best-fit execution path by total cost rather than a mandatory chat-first ladder, and when the current client lacks a required capability, preserve a bounded handoff without duplicating preparation or creating another state store. Resume checks only mutable dependencies that can invalidate the remaining action.
