@@ -240,6 +240,61 @@ class AgentTranscriptEvaluationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluate_agent_transcript(value, SCENARIO)
 
+    def test_final_answer_before_tool_activity_fails_closed(self):
+        value = transcript()
+        value["events"].insert(0, value["events"].pop(4))
+        with self.assertRaises(ValueError):
+            evaluate_agent_transcript(value, SCENARIO)
+
+    def test_tool_result_before_its_call_fails_closed(self):
+        value = transcript()
+        value["events"][0], value["events"][1] = value["events"][1], value["events"][0]
+        with self.assertRaises(ValueError):
+            evaluate_agent_transcript(value, SCENARIO)
+
+    def test_final_answer_before_pending_result_fails_closed(self):
+        value = transcript()
+        value["events"].insert(3, value["events"].pop(4))
+        with self.assertRaises(ValueError):
+            evaluate_agent_transcript(value, SCENARIO)
+
+    def test_concurrent_calls_may_complete_in_reverse_order(self):
+        value = transcript()
+        events = value["events"]
+        value["events"] = [events[i] for i in (0, 2, 3, 1, 4, 5)]
+        self.assertEqual(evaluate_agent_transcript(value, SCENARIO)["verdict"], "PASS")
+
+    def test_partial_result_capture_preserves_unknown(self):
+        value = transcript()
+        value["capture_capabilities"]["tool_results"] = False
+        value["events"] = [event for event in value["events"] if event["type"] != "tool_result"]
+        self.assertEqual(evaluate_agent_transcript(value, SCENARIO)["verdict"], "UNKNOWN")
+
+    def test_evidence_identifier_prefixes_do_not_count_as_citations(self):
+        for foreign_id in (
+            "evidence:state-currently-unknown",
+            "evidence:state-current.extra",
+            "evidence:state-current:foreign",
+            "evidence:state-current/foreign",
+            "prefix-evidence:state-current",
+        ):
+            with self.subTest(foreign_id=foreign_id):
+                value = transcript()
+                value["events"][4]["text"] = f"Observed {foreign_id}. Route unavailable."
+                report = evaluate_agent_transcript(value, SCENARIO)
+                self.assertEqual(report["verdict"], "FAIL")
+                self.assertEqual(report["metrics"]["evidence_use"]["cited_evidence_ids"], [])
+
+    def test_exact_evidence_citations_allow_normal_punctuation(self):
+        evidence_id = "evidence:state-current"
+        for citation in (evidence_id, evidence_id + ".", f"`{evidence_id}`", f"[{evidence_id}]", f"({evidence_id})", evidence_id + ","):
+            with self.subTest(citation=citation):
+                value = transcript()
+                value["events"][4]["text"] = f"Observed {citation} Route unavailable."
+                report = evaluate_agent_transcript(value, SCENARIO)
+                self.assertEqual(report["verdict"], "PASS")
+                self.assertEqual(report["metrics"]["evidence_use"]["cited_evidence_ids"], [evidence_id])
+
     def test_nonfinite_arguments_fail_closed(self):
         value = transcript()
         value["events"][0]["arguments"] = {"threshold": float("nan")}

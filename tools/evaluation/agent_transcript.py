@@ -83,6 +83,17 @@ def _metric(status: str, **details: Any) -> dict[str, Any]:
     return {"status": status, **details}
 
 
+def _cites_evidence(answer: str, evidence_id: str) -> bool:
+    # Identifier characters must not extend a reference on either side.
+    # A terminal full stop may punctuate a reference in ordinary prose.
+    identifier_chars = r"A-Za-z0-9._:/-"
+    pattern = (
+        rf"(?<![{identifier_chars}]){re.escape(evidence_id)}"
+        rf"(?=$|[^{identifier_chars}]|\.(?=$|[^{identifier_chars}]))"
+    )
+    return re.search(pattern, answer) is not None
+
+
 def _scenario(raw: Mapping[str, Any]) -> dict[str, Any]:
     _fields(
         raw,
@@ -201,6 +212,8 @@ def _transcript(raw: Mapping[str, Any]) -> dict[str, Any]:
     for index, raw_event in enumerate(events):
         event = _mapping(raw_event, f"events[{index}]")
         kind = event.get("type")
+        if answers and kind in {"tool_call", "tool_result"}:
+            raise ValueError("tool activity cannot follow the final answer")
         if kind == "tool_call":
             if not capture["tool_calls"]:
                 raise ValueError("tool_call contradicts capture capabilities")
@@ -226,6 +239,9 @@ def _transcript(raw: Mapping[str, Any]) -> dict[str, Any]:
                 "tool_result",
                 {"error_code"},
             )
+            call_id = _identifier(event["call_id"], "call_id")
+            if call_id not in call_ids:
+                raise ValueError("tool result must follow its captured call")
             if event["status"] not in {"success", "error", "unavailable"}:
                 raise ValueError("unsupported tool result status")
             evidence_ids = event["evidence_ids"]
@@ -239,7 +255,7 @@ def _transcript(raw: Mapping[str, Any]) -> dict[str, Any]:
                 error_code = _identifier(error_code, "error_code")
             results.append(
                 {
-                    "call_id": _identifier(event["call_id"], "call_id"),
+                    "call_id": call_id,
                     "status": event["status"],
                     "evidence_ids": evidence_ids,
                     "error_code": error_code,
@@ -249,6 +265,10 @@ def _transcript(raw: Mapping[str, Any]) -> dict[str, Any]:
             if not capture["final_answer"]:
                 raise ValueError("final_answer contradicts capture capabilities")
             _fields(event, {"type", "text"}, "final_answer")
+            if capture["tool_results"] and call_ids - {
+                result["call_id"] for result in results
+            }:
+                raise ValueError("final answer cannot precede captured tool results")
             answers.append(_text(event["text"], "final answer", 50_000))
         elif kind == "usage":
             if not capture["token_usage"]:
@@ -397,7 +417,7 @@ def evaluate_agent_transcript(
         cited = [
             evidence_id
             for evidence_id in evidence_ids
-            if evidence_id in (tr["answer"] or "")
+            if _cites_evidence(tr["answer"] or "", evidence_id)
         ]
         metrics["evidence_use"] = _metric(
             "PASS" if cited else "FAIL",
