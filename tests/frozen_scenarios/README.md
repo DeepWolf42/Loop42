@@ -54,3 +54,7 @@ A legacy file in Inbox with no structured terminal evidence remains UNKNOWN: it 
 not inferred RUNNING from historic logs, not inferred FAILED from silence, and does
 not authorize retry or replacement dispatch. The legacy file remains operator-owned
 evidence until consciously reconciled.
+
+## Execution Fit: tool routing / client handoff v1
+
+`execution_fit_tool_routing_client_handoff_v1.json` freezes two related rules: choose the best-fit execution path by total cost rather than a mandatory chat-first ladder, and when the current client lacks a required capability, preserve a bounded handoff without duplicating preparation or creating another state store. Resume checks only mutable dependencies that can invalidate the remaining action.
