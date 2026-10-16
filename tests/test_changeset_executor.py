@@ -80,6 +80,33 @@ class ChangeSetExecutorTests(unittest.TestCase):
                 issue_changeset_permit(root, changes, interactive=False, rules=ALLOW)
             self.assertEqual(outside.read_text(), "x")
 
+    def test_symlink_parent_is_refused_without_writing_outside_workspace(self):
+        if not hasattr(os, "symlink"):
+            self.skipTest("symlink unavailable")
+        with tempfile.TemporaryDirectory() as raw, tempfile.TemporaryDirectory() as outside_raw:
+            root = Path(raw)
+            outside = Path(outside_raw)
+            try:
+                os.symlink(outside, root / "linked", target_is_directory=True)
+            except OSError:
+                self.skipTest("symlink creation unavailable")
+            proposal = ChangeSet((CreateChange("linked/new.txt", "unexpected\n"),))
+            changes = normalize_changeset(proposal, {})
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                issue_changeset_permit(root, changes, interactive=False, rules=ALLOW)
+            self.assertFalse((outside / "new.txt").exists())
+
+    def test_revoked_write_policy_blocks_apply_before_side_effects(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            changes = self.normalized(root)
+            permit = issue_changeset_permit(root, changes, interactive=False, rules=ALLOW)
+            with self.assertRaises(PermissionError):
+                apply_changeset(root, changes, permit, interactive=False, rules=())
+            self.assertEqual((root / "mod.py").read_text(encoding="utf-8"), "a = 1\n")
+            self.assertEqual((root / "old.txt").read_text(encoding="utf-8"), "old\n")
+            self.assertFalse((root / "new.txt").exists())
+
     def test_normal_exception_rolls_back_already_applied_files(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
