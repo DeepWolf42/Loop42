@@ -53,3 +53,14 @@ The scenario pins Loop42 `2ec351ec6ddc9dba455e8e75930e9aaee8dbe7c6`. Its fixture
 ## Execution Fit: tool routing / client handoff v1
 
 `execution_fit_tool_routing_client_handoff_v1.json` freezes two related rules: choose the best-fit execution path by total cost rather than a mandatory chat-first ladder, and when the current client lacks a required capability, preserve a bounded handoff without duplicating preparation or creating another state store. Resume checks only mutable dependencies that can invalidate the remaining action.
+
+## Recovery fault matrix v1
+
+`recovery_fault_matrix_v1.json` freezes fail-closed behavior for interruption
+and ambiguity cases across worker reconciliation and side-effect reconciliation.
+It is a simulated fixture, not evidence that a real consumer adapter has passed
+the same faults. The matrix covers applied-but-response-lost side effects, stale
+observations, unchanged targets while an earlier write might still complete,
+quiescence evidence for the wrong attempt, partial terminal results, late
+prior-attempt results, duplicate worker sessions, host loss after historic
+activity and safety-stop changes after permit issue.

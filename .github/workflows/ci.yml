@@ -2,7 +2,7 @@ name: Loop42 CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "verification/core-2026-10-17"]
   pull_request:
 
 permissions:
