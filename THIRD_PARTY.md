@@ -37,17 +37,17 @@ No implementation code from these projects is intentionally imported by the curr
 
 Loop42 currently uses normal GitHub/Python tooling rather than vendoring it:
 
-- `actions/checkout` - MIT; CI pin currently references commit `3d3c42e5aac5ba805825da76410c181273ba90b1` (v7.0.1)
-- `actions/setup-python` - MIT; CI pin currently references commit `5fda3b95a4ea91299a34e894583c3862153e4b97` (v7.0.0)
-- `gacts/gitleaks` - MIT; CI pin currently references commit `4fd785dcdaf557fda64e05b0ae033b8f7d82fb81` (v1.3). It installs and runs the MIT-licensed `gitleaks/gitleaks` scanner, currently pinned by workflow input to v8.29.1. No scanner or wrapper code is vendored.
-- GitHub Dependabot - hosted GitHub service used for grouped GitHub Actions version-update PRs; no Dependabot implementation is vendored in Loop42.
+- `actions/checkout` — MIT; CI pin currently references commit `3d3c42e5aac5ba805825da76410c181273ba90b1` (v7.0.1)
+- `actions/setup-python` — MIT; CI pin currently references commit `5fda3b95a4ea91299a34e894583c3862153e4b97` (v7.0.0)
+- `gacts/gitleaks` — MIT; CI pin currently references commit `4fd785dcdaf557fda64e05b0ae033b8f7d82fb81` (v1.3). It installs and runs the MIT-licensed `gitleaks/gitleaks` scanner, currently pinned by workflow input to v8.29.1. No scanner or wrapper code is vendored.
+- GitHub Dependabot — hosted GitHub service used for grouped GitHub Actions version-update PRs; no Dependabot implementation is vendored in Loop42.
 - Python standard library / `unittest` for the v0.1 test surface
 
 A future packaged/distributed Loop42 release must run a fresh dependency/file/license audit instead of treating this source-level list as an SBOM.
 
 ## Project-owned assets
 
-- `docs/assets/loop42-mark.webp` - project-owned Loop42 visual asset. Origin/reuse rights were explicitly attested by the operator on 2026-09-29 as created by/for this project rather than sourced from a third party.
+- `docs/assets/loop42-mark.webp` — project-owned Loop42 visual asset. Origin/reuse rights were explicitly attested by the operator on 2026-09-29 as created by/for this project rather than sourced from a third party.
 
 ## Provenance rule
 
