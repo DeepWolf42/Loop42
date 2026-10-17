@@ -123,6 +123,35 @@ validation and lower temperature. Loop42 independently implements its validation
 no Ollama implementation code is imported.
 
 
+## Verified completion receipt
+
+A successful worker `RESULT` must carry a verification-receipt fingerprint.
+The receipt itself is produced outside the worker result by an independent verifier
+or verification step and binds:
+
+- exact task and attempt identity;
+- exact source revision and context fingerprint;
+- a SHA-256 fingerprint of the verified output/subject;
+- verifier identity plus verifier revision;
+- the complete ordered acceptance-criteria set;
+- PASS / FAIL / UNKNOWN per criterion;
+- content-addressed evidence references for every PASS criterion.
+
+`verification_receipt.py` canonically fingerprints this content and validates it
+against the exact `DispatchTask`. Omitted, reordered or non-passing acceptance
+criteria fail closed. A RESULT without a receipt fingerprint is invalid.
+
+The receipt hash is content addressing, not authentication: it detects receipt
+mutation and binds identities/evidence, but it does not prove who controlled the
+verifier. Consumer authorization and any stronger signature/attestation policy stay
+separate.
+
+Pattern provenance: SLSA provenance research revision
+`82b296d49e4c8301e7db565f23620ffe89092a0c`, `spec/provenance.md` blob
+`769ed89d04dae9fa081eebf5af85777b9d522765`, was used as a conceptual reference
+for verifiable production/provenance metadata. Loop42 independently implements its
+own receipt contract and does not copy SLSA specification text or code.
+
 ## Machine-readable action policy
 
 Harness consumers may classify a proposed action through the pure action-policy
@@ -136,3 +165,40 @@ rule. A headless run cannot satisfy ASK_USER, so it resolves to DENY.
 Policy rules are decision inputs only. They do not execute tools, create durable
 consent, supersede consumer authority, or bypass the pre-side-effect dispatch
 revalidation rule. See `docs/ACTION_POLICY.md`.
+
+
+## Evidence-gated retry policy
+
+Retry timing is separate from retry admissibility. A worker failure, missing
+heartbeat, interrupted runtime or model statement does not by itself justify
+another attempt.
+
+A consumer may use the pure retry classifier only after it has fresh evidence
+for the previous attempt. Automatic retry is eligible only when all of these
+conditions hold:
+
+- the failure is explicitly classified as transient;
+- the evidence used for that classification is fresh;
+- the bounded attempt budget still has capacity;
+- the caller explicitly declares whether the previous attempt could have
+  produced a side effect; and
+- when a side effect was possible, post-interruption reconciliation explicitly
+  confirms it as NOT_APPLIED.
+
+A possible side effect with no reconciled state, UNKNOWN state or CONFLICT state
+returns RECONCILE rather than retry. Declaring no side effect is an explicit
+input, not the default meaning of a missing state. An already APPLIED side effect, a
+permanent failure or an exhausted attempt budget returns DO_NOT_RETRY. A latched
+safety stop returns OPERATOR_REQUIRED.
+
+Only after these gates pass does the classifier return a bounded exponential
+backoff delay. That delay is scheduling input, not execution authority. A
+consumer must still re-evaluate current policy, authorization and provider
+preconditions before another attempt.
+
+Pattern provenance: OpenAI Symphony, Apache-2.0, revision
+be10a1b79df723d6d7612b5651c8522704dafb2e, SPEC.md blob
+cd24131a1e2358cbfecc4f6efb028fc9fc6edefc documents bounded exponential-backoff
+retry in a reconciled orchestration loop. Loop42 independently implements only
+the generic bounded-backoff idea and combines it with its stricter
+evidence/replay gates; no Symphony implementation code or runtime is imported.

@@ -182,6 +182,10 @@ class WorkerDispatchTests(unittest.TestCase):
         self.assertEqual(state.worker, WorkerHealth.FAILED)
         self.assertFalse(state.can_dispatch)
 
+    def test_success_result_without_receipt_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "RESULT requires receipt_fingerprint"):
+            artifact(ArtifactKind.RESULT)
+
     def test_matching_complete_result_requires_exact_identity_and_surfaces_receipt(self):
         state = reconcile_worker(
             now=NOW,
