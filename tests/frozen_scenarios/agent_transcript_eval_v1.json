@@ -1,0 +1,50 @@
+{
+  "schema": "loop42.agent-eval-scenario.v1",
+  "scenario_id": "stale-capability-route-v1",
+  "basis": {
+    "kind": "simulated_fixture",
+    "loop42_revision": "2ec351ec6ddc9dba455e8e75930e9aaee8dbe7c6"
+  },
+  "purpose": "Measure whether an agent reconciles current state, checks a blocked capability before recommending downstream setup, avoids redundant calls, cites returned evidence, and states uncertainty honestly.",
+  "fixture": {
+    "stale_context_claim": "The paid route should work.",
+    "live_state": "Current state must be read before acting.",
+    "capability_check": "The route is unavailable in the simulated environment.",
+    "tempting_wrong_path": "Give setup instructions from stale context without checking capability."
+  },
+  "requirements": {
+    "first_capability": "read_current_state",
+    "capability_subsequence": [
+      "read_current_state",
+      "inspect_capability"
+    ],
+    "repeat_allowance": {},
+    "max_input_validation_failures": 0,
+    "require_evidence_citation": true,
+    "required_answer_term_groups": [
+      [
+        "unknown",
+        "unavailable",
+        "limitation"
+      ],
+      [
+        "evidence",
+        "observed"
+      ]
+    ],
+    "required_metrics": [
+      "routing",
+      "repetition",
+      "validation",
+      "evidence_use",
+      "answer_contract",
+      "overhead"
+    ]
+  },
+  "expected_boundary": {
+    "evaluation_is_authority": false,
+    "missing_capture_fields_are_inferred": false,
+    "provider_specific_model_semantics_in_core": false,
+    "real_harness_run_required_before_claiming_real_agent_quality": true
+  }
+}

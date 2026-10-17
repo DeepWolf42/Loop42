@@ -74,6 +74,12 @@ class WorkerProviderContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             WorkerUsage(input_tokens=-1)
 
+    def test_proposal_rejects_non_changeset_payload(self):
+        with self.assertRaises(TypeError):
+            WorkerResult(WorkerStatus.PROPOSAL, 'example', 'model', 'task', 'attempt',
+                         'a' * 40, 'b' * 64, '', changeset={'unvalidated': True})
+
+
 
 if __name__ == "__main__":
     unittest.main()

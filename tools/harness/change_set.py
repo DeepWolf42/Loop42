@@ -45,6 +45,11 @@ def _validate_path(path: str) -> str:
         raise ValueError("path must not contain empty, dot, or parent segments")
     if any(not _PATH_PART_RE.fullmatch(part) for part in parts):
         raise ValueError("invalid path segment")
+    for part in parts:
+        if (any(ord(char) < 32 or ord(char) == 127 or char in ':<>"|?*' for char in part)
+                or part.endswith((' ', '.')) or part.casefold() == '.git'
+                or re.fullmatch(r'(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?', part, re.IGNORECASE)):
+            raise ValueError("path contains an unsafe or nonportable segment")
     return path
 
 
@@ -77,7 +82,7 @@ class ModifyChange:
         _validate_sha256(self.base_sha256, "base_sha256")
         _bounded_text(self.search, "search", allow_empty=False)
         _bounded_text(self.replace, "replace")
-        if self.expected_matches != 1:
+        if type(self.expected_matches) is not int or self.expected_matches != 1:
             raise ValueError("ChangeSet v1 requires expected_matches=1")
 
 
@@ -116,7 +121,7 @@ class ChangeSet:
         if any(not isinstance(item, (ModifyChange, CreateChange, DeleteChange)) for item in changes):
             raise TypeError("changes contains an unsupported change type")
         paths = [item.path for item in changes]
-        if len(set(paths)) != len(paths):
+        if len({path.casefold() for path in paths}) != len(paths):
             raise ValueError("a ChangeSet may contain at most one operation per path")
         verifications = tuple(self.requested_verification)
         if len(verifications) > _MAX_VERIFICATIONS:
@@ -308,8 +313,8 @@ def normalize_changeset(changeset: ChangeSet, current_files: Mapping[str, str]) 
                 raise ValueError(f"modify target does not exist: {path}")
             if sha256_text(before) != change.base_sha256:
                 raise ValueError(f"modify base hash mismatch: {path}")
-            matches = before.count(change.search)
-            if matches != 1:
+            first = before.find(change.search)
+            if first < 0 or before.find(change.search, first + 1) >= 0:
                 raise ValueError(f"modify search must match exactly once: {path}")
             after = before.replace(change.search, change.replace, 1)
             if after == before:
@@ -365,3 +370,31 @@ def normalize_changeset(changeset: ChangeSet, current_files: Mapping[str, str]) 
         unified_diff=diff,
         fingerprint=sha256_text(fingerprint_source),
     )
+
+
+def validate_normalized_changeset(value: NormalizedChangeSet) -> None:
+    """Reconstruct public dataclass values before trusting paths or fingerprints."""
+    if not isinstance(value, NormalizedChangeSet):
+        raise TypeError("changeset must be NormalizedChangeSet")
+    changes = []
+    current = {}
+    for item in value.files:
+        if not isinstance(item, NormalizedFileChange):
+            raise ValueError("invalid normalized file change")
+        if item.operation is ChangeOperation.CREATE:
+            if item.before_text is not None or item.before_sha256 is not None:
+                raise ValueError("invalid normalized create basis")
+            changes.append(CreateChange(item.path, item.after_text))
+        elif item.operation is ChangeOperation.DELETE:
+            if item.after_text is not None or item.after_sha256 is not None:
+                raise ValueError("invalid normalized delete target")
+            current[item.path] = item.before_text
+            changes.append(DeleteChange(item.path, item.before_sha256))
+        elif item.operation is ChangeOperation.MODIFY:
+            current[item.path] = item.before_text
+            changes.append(ModifyChange(item.path, item.before_sha256, item.before_text, item.after_text))
+        else:
+            raise ValueError("invalid normalized operation")
+    expected = normalize_changeset(ChangeSet(tuple(changes), value.requested_verification), current)
+    if expected != value:
+        raise ValueError("normalized changeset payload or fingerprint mismatch")

@@ -121,6 +121,8 @@ class WorkerResult:
         object.__setattr__(self, "evidence", evidence)
         if self.status is WorkerStatus.PROPOSAL and self.changeset is None:
             raise ValueError("proposal result requires a ChangeSet")
+        if self.changeset is not None and not isinstance(self.changeset, ChangeSet):
+            raise TypeError("changeset must be ChangeSet")
         if self.status is not WorkerStatus.PROPOSAL and self.changeset is not None:
             raise ValueError("only proposal results may carry a ChangeSet")
         if not isinstance(self.usage, WorkerUsage):
