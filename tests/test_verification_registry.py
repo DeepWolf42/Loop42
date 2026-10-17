@@ -51,7 +51,7 @@ class VerificationRegistryTests(unittest.TestCase):
                 VerificationSpec("verbose", (sys.executable, "-c", "print('x' * 4096)")),
             ))
             result = run_verifications(Path(raw), ("verbose",), registry, output_limit=128)[0]
-            self.assertTrue(result.passed)
+            self.assertFalse(result.passed)
             self.assertTrue(result.output_truncated)
             self.assertLessEqual(len(result.output.encode('utf-8')), 128)
 

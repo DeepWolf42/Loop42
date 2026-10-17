@@ -24,8 +24,8 @@ class ChangeSetExecutorTests(unittest.TestCase):
     def normalized(self, root: Path):
         old = "old\n"
         mod = "a = 1\n"
-        (root / "old.txt").write_text(old, encoding="utf-8")
-        (root / "mod.py").write_text(mod, encoding="utf-8")
+        (root / "old.txt").write_bytes(old.encode("utf-8"))
+        (root / "mod.py").write_bytes(mod.encode("utf-8"))
         proposal = ChangeSet((
             ModifyChange("mod.py", sha256_text(mod), "a = 1", "a = 2"),
             CreateChange("new.txt", "new\n"),
@@ -128,6 +128,7 @@ class ChangeSetExecutorTests(unittest.TestCase):
             self.assertEqual((root / "mod.py").read_text(), "a = 1\n")
             self.assertEqual((root / "old.txt").read_text(), "old\n")
             self.assertFalse((root / "new.txt").exists())
+            self.assertFalse(list(root.glob('.loop42-stage-*')))
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ from tools.harness.action_policy import (
     PolicyRule,
     evaluate_action_policy,
 )
-from tools.harness.change_set import ChangeOperation, NormalizedChangeSet, sha256_text
+from tools.harness.change_set import ChangeOperation, NormalizedChangeSet, sha256_text, validate_normalized_changeset
 
 
 @dataclass(frozen=True)
@@ -49,7 +49,7 @@ class ChangeSetReceipt:
 
 def _root(value: Path) -> Path:
     root = Path(value)
-    if root.is_symlink() or not root.exists() or not root.is_dir():
+    if root.is_symlink() or root.is_junction() or not root.exists() or not root.is_dir():
         raise ValueError("workspace root must be an existing non-symlink directory")
     return root.resolve()
 
@@ -59,13 +59,18 @@ def _target(root: Path, relative: str) -> Path:
     parts = relative.split("/")
     for part in parts[:-1]:
         current = current / part
-        if current.is_symlink():
-            raise ValueError(f"symlink path component refused: {relative}")
+        if current.is_symlink() or current.is_junction():
+            raise ValueError(f"symlink or junction path component refused: {relative}")
         if not current.exists() or not current.is_dir():
             raise ValueError(f"parent directory does not exist: {relative}")
     target = current / parts[-1]
-    if target.is_symlink():
-        raise ValueError(f"symlink target refused: {relative}")
+    if target.is_symlink() or target.is_junction():
+        raise ValueError(f"symlink or junction target refused: {relative}")
+    resolved = target.resolve(strict=False)
+    if not resolved.is_relative_to(root):
+        raise ValueError(f"target escapes workspace: {relative}")
+    if any(part.casefold() == '.git' for part in resolved.relative_to(root).parts):
+        raise ValueError(f"Git metadata target refused: {relative}")
     return target
 
 
@@ -109,6 +114,7 @@ def _basis(
     workspace: Path,
     changeset: NormalizedChangeSet,
 ) -> tuple[str, tuple[tuple[str, str, int | None], ...]]:
+    validate_normalized_changeset(changeset)
     root = _root(workspace)
     states: list[tuple[str, str, int | None]] = []
     for item in changeset.files:
@@ -124,7 +130,8 @@ def _basis(
             raise ValueError(f"workspace basis hash mismatch: {item.path}")
         states.append((item.path, digest, mode))
     payload = "\n".join(
-        [changeset.fingerprint, *[f"{path}|{digest}|{mode if mode is not None else '-'}" for path, digest, mode in states]]
+        [changeset.fingerprint, str(root), str(root.stat().st_dev), str(root.stat().st_ino),
+         *[f"{path}|{digest}|{mode if mode is not None else '-'}" for path, digest, mode in states]]
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest(), tuple(states)
 
@@ -226,6 +233,7 @@ def apply_changeset(
     staged: dict[str, Path] = {}
     backups: dict[str, Path] = {}
     applied: list[str] = []
+    committed = False
     try:
         # Stage desired content before the first repository side effect.
         for item in changeset.files:
@@ -235,6 +243,7 @@ def apply_changeset(
                 staged[item.path] = _staged_write(target, item.after_text, mode if mode is not None else 0o644)
 
         # Recheck each exact target immediately before its own side effect.
+        validate_changeset_permit(root, changeset, permit, interactive=interactive, rules=rules)
         for item in changeset.files:
             target = _target(root, item.path)
             _assert_target_basis(target, item)
@@ -243,7 +252,8 @@ def apply_changeset(
                 os.replace(target, backup)
                 backups[item.path] = backup
             if item.after_text is not None:
-                os.replace(staged.pop(item.path), target)
+                os.replace(staged[item.path], target)
+                del staged[item.path]
             applied.append(item.path)
 
         # Verify exact desired state before discarding rollback backups.
@@ -271,10 +281,15 @@ def apply_changeset(
                 for item in changeset.files
             ),
         )
+        # Once cleanup begins, some originals no longer exist. Never roll back
+        # through this irreversible commit point on a cleanup error.
+        committed = True
         for backup in backups.values():
             backup.unlink(missing_ok=True)
         return receipt
     except BaseException:
+        if committed:
+            raise
         # Roll back process-visible failures. Hard interruption is reconciled later.
         for path in reversed(applied):
             item = next(entry for entry in changeset.files if entry.path == path)

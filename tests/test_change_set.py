@@ -123,6 +123,23 @@ class ChangeSetTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unexpected or missing fields"):
             parse_changeset(bad_change)
 
+    def test_nonportable_and_control_paths_are_rejected(self):
+        for path in ('C:/outside.txt', 'file:stream', 'a\x00b', 'line\nbreak',
+                     '.git/config', 'dir/.GIT/config', 'NUL.txt', 'a./b', 'a /b'):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                CreateChange(path, 'x')
+
+    def test_case_aliases_cannot_describe_two_operations_on_one_file(self):
+        with self.assertRaises(ValueError):
+            ChangeSet((CreateChange('File.txt', 'a'), CreateChange('file.txt', 'b')))
+
+    def test_overlapping_search_is_ambiguous(self):
+        with self.assertRaises(ValueError):
+            normalize_changeset(ChangeSet((ModifyChange('x', sha256_text('aaa'), 'aa', 'b'),)), {'x': 'aaa'})
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

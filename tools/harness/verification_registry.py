@@ -9,7 +9,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 import subprocess
-import tempfile
+import threading
+from tools.harness.verification_process import VerificationProcess
 from typing import Iterable, Tuple
 
 _ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}")
@@ -78,7 +79,7 @@ class VerificationResult:
 
     @property
     def passed(self) -> bool:
-        return not self.timed_out and self.exit_code == 0
+        return not self.timed_out and not self.output_truncated and self.exit_code == 0
 
 
 def _workspace_root(value: Path) -> Path:
@@ -108,28 +109,53 @@ def run_verifications(
     results: list[VerificationResult] = []
 
     for spec in specs:
-        with tempfile.TemporaryFile() as capture:
-            process = subprocess.Popen(
-                list(spec.argv),
-                cwd=root,
-                stdin=subprocess.DEVNULL,
-                stdout=capture,
-                stderr=subprocess.STDOUT,
-                shell=False,
-            )
-            timed_out = False
+        scope = VerificationProcess(spec.argv, root)
+        process = scope.process
+        captured = bytearray()
+        overflow = threading.Event()
+        reader_errors = []
+        def read_output():
             try:
-                exit_code = process.wait(timeout=spec.timeout_seconds)
-            except subprocess.TimeoutExpired:
-                timed_out = True
-                process.kill()
-                process.wait()
-                exit_code = None
-            capture.flush()
-            capture.seek(0)
-            raw = capture.read(output_limit + 1)
-        truncated = len(raw) > output_limit
-        raw = raw[:output_limit]
+                while True:
+                    chunk = process.stdout.read1(min(65536, output_limit + 1))
+                    if not chunk:
+                        break
+                    remaining = output_limit - len(captured)
+                    captured.extend(chunk[:remaining])
+                    if len(chunk) > remaining:
+                        overflow.set()
+                        break
+            except BaseException as error:
+                reader_errors.append(error)
+        reader = threading.Thread(target=read_output, daemon=True)
+        timed_out = False
+        import time
+        deadline = time.monotonic() + spec.timeout_seconds
+        try:
+            reader.start()
+            while process.poll() is None and not overflow.is_set():
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    timed_out = True
+                    break
+                overflow.wait(min(0.01, remaining))
+            exit_code = process.poll()
+        finally:
+            try:
+                # Also quiesce descendants after an otherwise successful parent.
+                scope.terminate()
+                reader.join(timeout=3)
+                if reader.is_alive():
+                    raise RuntimeError('verification output reader did not become quiescent')
+                process.stdout.close()
+            finally:
+                scope.close()
+        if reader_errors:
+            raise RuntimeError('verification output capture failed') from reader_errors[0]
+        truncated = overflow.is_set()
+        raw = bytes(captured)
+        if timed_out or truncated:
+            exit_code = None
         result = VerificationResult(
             identifier=spec.identifier,
             argv=spec.argv,

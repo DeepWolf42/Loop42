@@ -1,5 +1,10 @@
 # ChangeSet v1 contract
 
+Paths reject control characters, Windows drive/stream/device syntax, trailing
+dot/space aliases and Git metadata. Case-insensitive duplicate paths are rejected
+on every host. Search uniqueness includes overlapping matches. Before execution,
+normalized records must reconstruct to the same complete content and fingerprint.
+
 Loop42 treats model-produced code changes as proposals, not execution authority.
 
 ## Proposal operations
