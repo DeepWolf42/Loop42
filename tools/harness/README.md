@@ -115,6 +115,21 @@ actual Windows worker lifecycle and heartbeat write are tested together; histori
 partial chunks must never be mistaken for successful completion.
 
 
+## Verification receipts
+
+`verification_receipt.py` provides the content-addressed success-evidence layer
+between a worker proposal and a reconciled successful result. It binds one exact
+task/attempt/revision/context basis, the verified subject digest, verifier revision,
+the full ordered acceptance-criteria set and evidence fingerprints.
+
+Every PASS criterion requires evidence. FAIL or UNKNOWN never validates as a
+successful receipt. `worker_dispatch.py` therefore rejects a RESULT that lacks
+a receipt fingerprint.
+
+A receipt fingerprint is not a signature or identity proof. It gives deterministic
+content identity so adapters can verify the full receipt before surfacing its hash
+to the generic reconciler.
+
 ## Action policy decision
 
 `action_policy.py` is a pure pre-action decision boundary. A consumer describes
