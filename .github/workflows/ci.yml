@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  repository-policy:
+  repository-tests:
     strategy:
       fail-fast: false
       matrix:
@@ -32,3 +32,14 @@ jobs:
         shell: bash
         run: |
           python -m tools.checks.completion_gates tests/frozen_scenarios/loop42_completion_gates_v1.json --repo . --expected-revision "$(git rev-parse HEAD)" --run
+
+  repository-policy:
+    if: ${{ always() }}
+    needs: repository-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every platform test job to pass
+        shell: bash
+        env:
+          MATRIX_RESULT: ${{ needs.repository-tests.result }}
+        run: test "$MATRIX_RESULT" = success
