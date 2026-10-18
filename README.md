@@ -119,13 +119,16 @@ See the [Documentation Language Policy](docs/DOCUMENTATION_LANGUAGE_POLICY.md).
 
 ## Status
 
-Loop42 is a public development repository.
+Verified integrated baseline on 2026-10-18: `main` at `be040124cc387700a4268f0f99a691eabe481c48`.
 
-The **v0.1 extraction / consumer-binding foundation is verified**. Reusable context and harness mechanics, frozen CORA equivalence and the exact-revision consumer-profile contract are in place.
+- The extraction / exact-revision consumer-binding foundation remains in place.
+- PRs #30, #32, #42 and #43 are integrated: reusable evidence/worker contracts and policy-gated ChangeSet execution/verification are available. See [ChangeSet contract](docs/CHANGESET_CONTRACT.md) and [execution boundaries](docs/CHANGESET_EXECUTION.md).
+- [Post-merge CI](https://github.com/DeepWolf42/Loop42/actions/runs/39016473296) and [secret scan](https://github.com/DeepWolf42/Loop42/actions/runs/39016473226) passed. The suite ran 214 tests on Windows and Linux, with one platform-specific skip on Linux.
+- The agent transcript evaluator is integrated, but [#40](https://github.com/DeepWolf42/Loop42/issues/40) still needs an independently captured real harness/model run. Synthetic fixtures are not real-agent quality evidence.
+- Draft [#51](https://github.com/DeepWolf42/Loop42/pull/51) proposes bounded tool/plugin/skill selection; its candidate CI passed, but it is not integrated. Other open drafts (#31, #39, #44–#47, #49) are optional work, not shipped capabilities or prerequisites for every consumer task.
+- CORA still pins `5470cd0b36774698a69c6ff61ff1a016dab036b8`. The CORA consumer profile is authoritative; newer Loop42 functionality does not automatically become part of CORA.
 
-As verified on 2026-10-13, CORA pins Loop42 revision `5470cd0b36774698a69c6ff61ff1a016dab036b8` in its consumer profile on `cora/development`. This is an exact, verified pin (Loop42 [main CI](https://github.com/DeepWolf42/Loop42/actions/runs/38123996570), CORA [integration CI](https://github.com/DeepWolf42/C.O.R.A./actions/runs/38409208130)), not an automatic follow of Loop42 `main`. The CORA consumer profile remains the authoritative source for any future pin change.
-
-Loop42 is licensed under the MIT License.
+Loop42 is a public development repository licensed under the MIT License. These checks do not establish production deployment, real-model effectiveness or permission to operate a consumer's hardware.
 
 <details>
 <summary>Why 42?</summary>
