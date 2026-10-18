@@ -119,13 +119,17 @@ Siehe [Dokumentations-Sprachregel](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md).
 
 ## Status
 
-Loop42 ist ein öffentliches Entwicklungs-Repository.
+Verifizierte integrierte Basis am 18.10.2026: `main` auf `be040124cc387700a4268f0f99a691eabe481c48`.
 
-Die **v0.1 Extraction-/Consumer-Binding-Foundation ist verifiziert**. Wiederverwendbare Context-/Harness-Mechanik, Frozen-CORA-Equivalence und der Exact-Revision-Consumer-Profile-Contract sind vorhanden.
+- Die Grundlage für Extraction und exakte Consumer-Versionsbindung bleibt vorhanden.
+- PRs #30, #32, #42 und #43 sind integriert: wiederverwendbare Evidence-/Worker-Verträge sowie richtliniengebundene ChangeSet-Ausführung und Verifikation sind vorhanden. Siehe [ChangeSet-Vertrag](docs/CHANGESET_CONTRACT.md) und [Ausführungsgrenzen](docs/CHANGESET_EXECUTION.md).
+- [Post-Merge-CI](https://github.com/DeepWolf42/Loop42/actions/runs/39016473296) und [Secret-Scan](https://github.com/DeepWolf42/Loop42/actions/runs/39016473226) waren erfolgreich. Die Suite umfasste 214 Tests auf Windows und Linux, mit einem plattformspezifischen Skip auf Linux.
+- Der Agenten-Transcript-Evaluator ist integriert; [#40](https://github.com/DeepWolf42/Loop42/issues/40) benötigt weiterhin einen unabhängig aufgezeichneten echten Harness-/Modelllauf. Synthetische Fixtures sind kein Nachweis realer Agentenqualität.
+- Draft [#51](https://github.com/DeepWolf42/Loop42/pull/51) schlägt eine begrenzte Werkzeug-/Plugin-/Skill-Auswahl vor; seine Kandidaten-CI bestand, er ist aber nicht integriert. Weitere offene Drafts (#31, #39, #45–#47, #49) sind optionale Arbeit, keine ausgelieferten Fähigkeiten oder Voraussetzungen für jede Consumer-Aufgabe.
+- Der Ollama-spezifische Vorschlag [#44](https://github.com/DeepWolf42/Loop42/pull/44) ist als verworfen geschlossen. Branch und Historie bleiben erhalten; abhängige Drafts #45–#47 müssen vor Übernahme von diesem Stack getrennt werden. Bestehender optionaler Ollama-Code ist keine aktive Projektvoraussetzung.
+- CORA pinnt weiterhin `5470cd0b36774698a69c6ff61ff1a016dab036b8`. Verbindlich ist CORAs Consumer-Profil; neue Loop42-Funktionen werden nicht automatisch Bestandteil von CORA.
 
-Stand 2026-10-13 pinnt CORA die Loop42-Revision `5470cd0b36774698a69c6ff61ff1a016dab036b8` im Consumer-Profil auf `cora/development`. Der Pin ist exakt und verifiziert (Loop42 [Main-CI](https://github.com/DeepWolf42/Loop42/actions/runs/38123996570), CORA [Integrations-CI](https://github.com/DeepWolf42/C.O.R.A./actions/runs/38409208130)); er folgt Loop42 `main` nicht automatisch. Für spätere Pin-Änderungen ist das CORA-Consumer-Profil die verbindliche Quelle.
-
-Loop42 steht unter der MIT-Lizenz.
+Loop42 ist ein öffentliches Entwicklungs-Repository unter der MIT-Lizenz. Diese Prüfungen belegen weder produktiven Einsatz noch reale Modellwirksamkeit oder die Erlaubnis, Consumer-Hardware zu betreiben.
 
 <details>
 <summary>Warum 42?</summary>
