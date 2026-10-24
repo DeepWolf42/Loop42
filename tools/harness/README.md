@@ -130,6 +130,15 @@ A receipt fingerprint is not a signature or identity proof. It gives determinist
 content identity so adapters can verify the full receipt before surfacing its hash
 to the generic reconciler.
 
+Saved receipts can be restored with bounded strict `parse_receipt(bytes)`.
+`python -m tools.harness.verification_receipt_cli --input request.json` checks
+one saved receipt against a consumer-supplied current task, subject digest,
+trusted verifier basis, evidence digests and observation time. It emits a
+terminal artifact only after validation. It does not obtain or authenticate
+evidence, post results or repeat a worker. See
+[recovery boundary](../../docs/VERIFICATION_RECEIPT_RECOVERY.md)
+([Deutsch](../../docs/VERIFICATION_RECEIPT_RECOVERY.de.md)).
+
 ## Action policy decision
 
 `action_policy.py` is a pure pre-action decision boundary. A consumer describes

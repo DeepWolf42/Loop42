@@ -163,6 +163,69 @@ def receipt_fingerprint(receipt: VerificationReceipt) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def parse_receipt(raw: bytes) -> VerificationReceipt:
+    """Restore one bounded strict JSON receipt; this alone does not validate success.
+
+    Caller must independently authenticate the verifier and freshly check task,
+    subject and evidence before using the restored claim as terminal evidence.
+    """
+    if not isinstance(raw, bytes):
+        raise TypeError('receipt input must be bytes')
+    if not raw or len(raw) > 1024 * 1024:
+        raise ValueError('receipt input must be between 1 byte and 1 MiB')
+
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError('duplicate receipt JSON key')
+            result[key] = value
+        return result
+
+    def invalid_constant(value):
+        raise ValueError('non-standard JSON constant in receipt')
+
+    def exact(value, fields, where):
+        if not isinstance(value, dict) or set(value) != fields:
+            raise ValueError(f'{where} must contain exactly its declared fields')
+        return value
+
+    value = json.loads(raw.decode('utf-8'), object_pairs_hook=unique, parse_constant=invalid_constant)
+    exact(value, {'schema', 'task_id', 'attempt_id', 'source_revision', 'context_fingerprint',
+                  'subject_fingerprint', 'verifier_id', 'verifier_revision', 'verified_at', 'criteria'},
+          'receipt')
+    if value['schema'] != SCHEMA:
+        raise ValueError('unsupported verification receipt schema')
+    date = value['verified_at']
+    if not isinstance(date, str) or len(date) > 64:
+        raise ValueError('verified_at must be a bounded ISO-8601 timestamp')
+    verified_at = datetime.fromisoformat(date[:-1] + '+00:00' if date.endswith('Z') else date)
+    try:
+        _aware_utc(verified_at)
+    except OverflowError as error:
+        raise ValueError('verified_at cannot be represented in UTC') from error
+    raw_criteria = value['criteria']
+    if not isinstance(raw_criteria, list) or not 1 <= len(raw_criteria) <= 128:
+        raise ValueError('receipt must contain 1..128 criteria')
+    criteria = []
+    for item in raw_criteria:
+        exact(item, {'criterion', 'status', 'evidence'}, 'criterion')
+        evidence = item['evidence']
+        if not isinstance(evidence, list) or len(evidence) > 64:
+            raise ValueError('criterion evidence must contain at most 64 entries')
+        refs = []
+        for entry in evidence:
+            exact(entry, {'source', 'fingerprint'}, 'evidence')
+            refs.append(EvidenceRef(entry['source'], entry['fingerprint']))
+        criteria.append(CriterionVerification(item['criterion'], CriterionStatus(item['status']), tuple(refs)))
+    return VerificationReceipt(
+        task_id=value['task_id'], attempt_id=value['attempt_id'], source_revision=value['source_revision'],
+        context_fingerprint=value['context_fingerprint'], subject_fingerprint=value['subject_fingerprint'],
+        verifier_id=value['verifier_id'], verifier_revision=value['verifier_revision'],
+        verified_at=verified_at, criteria=tuple(criteria),
+    )
+
+
 def validate_receipt(
     receipt: VerificationReceipt,
     task: DispatchTask,
