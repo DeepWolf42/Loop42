@@ -42,9 +42,11 @@ def make_repo(root: Path) -> tuple[Path, str]:
     repo = root / "repo"
     repo.mkdir()
     git(repo, "init")
+    # This fixture's declared hashes refer to LF bytes on every platform.
+    git(repo, "config", "core.autocrlf", "false")
     git(repo, "config", "user.email", "loop42@example.invalid")
     git(repo, "config", "user.name", "Loop42 Tests")
-    (repo / "x.py").write_text("x = 1\n", encoding="utf-8")
+    (repo / "x.py").write_bytes(b"x = 1\n")
     git(repo, "add", "x.py")
     git(repo, "commit", "-m", "initial")
     return repo, git(repo, "rev-parse", "HEAD")
