@@ -24,14 +24,38 @@ class ChangeSetExecutorTests(unittest.TestCase):
     def normalized(self, root: Path):
         old = "old\n"
         mod = "a = 1\n"
-        (root / "old.txt").write_text(old, encoding="utf-8")
-        (root / "mod.py").write_text(mod, encoding="utf-8")
+        (root / "old.txt").write_bytes(old.encode("utf-8"))
+        (root / "mod.py").write_bytes(mod.encode("utf-8"))
         proposal = ChangeSet((
             ModifyChange("mod.py", sha256_text(mod), "a = 1", "a = 2"),
             CreateChange("new.txt", "new\n"),
             DeleteChange("old.txt", sha256_text(old)),
         ))
         return normalize_changeset(proposal, {"mod.py": mod, "old.txt": old})
+
+    def test_crlf_basis_and_output_are_byte_exact(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            before = "a = 1\r\n"
+            (root / "mod.py").write_bytes(before.encode("utf-8"))
+            changes = normalize_changeset(
+                ChangeSet((ModifyChange("mod.py", sha256_text(before), "a = 1", "a = 2"),)),
+                {"mod.py": before},
+            )
+            permit = issue_changeset_permit(root, changes, interactive=False, rules=ALLOW)
+            apply_changeset(root, changes, permit, interactive=False, rules=ALLOW)
+            self.assertEqual((root / "mod.py").read_bytes(), b"a = 2\r\n")
+
+    def test_line_endings_changed_after_permit_are_rejected(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            changes = self.normalized(root)
+            permit = issue_changeset_permit(root, changes, interactive=False, rules=ALLOW)
+            (root / "mod.py").write_bytes(b"a = 1\r\n")
+            with self.assertRaisesRegex(ValueError, "basis hash mismatch"):
+                apply_changeset(root, changes, permit, interactive=False, rules=ALLOW)
+            self.assertEqual((root / "mod.py").read_bytes(), b"a = 1\r\n")
+            self.assertFalse((root / "new.txt").exists())
 
     def test_headless_write_is_denied_without_explicit_policy(self):
         with tempfile.TemporaryDirectory() as raw:
