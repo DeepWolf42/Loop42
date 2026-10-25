@@ -115,6 +115,21 @@ actual Windows worker lifecycle and heartbeat write are tested together; histori
 partial chunks must never be mistaken for successful completion.
 
 
+## Verification receipts
+
+`verification_receipt.py` provides the content-addressed success-evidence layer
+between a worker proposal and a reconciled successful result. It binds one exact
+task/attempt/revision/context basis, the verified subject digest, verifier revision,
+the full ordered acceptance-criteria set and evidence fingerprints.
+
+Every PASS criterion requires evidence. FAIL or UNKNOWN never validates as a
+successful receipt. `worker_dispatch.py` therefore rejects a RESULT that lacks
+a receipt fingerprint.
+
+A receipt fingerprint is not a signature or identity proof. It gives deterministic
+content identity so adapters can verify the full receipt before surfacing its hash
+to the generic reconciler.
+
 ## Action policy decision
 
 `action_policy.py` is a pure pre-action decision boundary. A consumer describes
@@ -154,3 +169,20 @@ An unchanged target does not prove that a timed-out write has ended. Before
 `quiescent_action_id` matching the unique intent attempt. Otherwise it remains
 `UNKNOWN` and cannot be reconsidered. See `docs/ACTION_POLICY.md` for the
 provider-evidence requirements; a silent or cancelled caller is not sufficient.
+
+## Evidence-gated retry policy
+
+retry_policy.py is a pure decision boundary between failed work and any later
+scheduler or adapter. It deliberately refuses the usual "worker disappeared, so
+try again" shortcut.
+
+RETRY_AFTER_BACKOFF is returned only for a freshly evidenced transient failure
+with remaining attempt budget and no ambiguous side effect. When a side effect
+may have happened, side_effect_reconcile.py must first classify it; only
+NOT_APPLIED can remain retry-eligible. UNKNOWN or CONFLICT returns RECONCILE,
+APPLIED/permanent/budget-exhausted returns DO_NOT_RETRY, and a safety stop
+returns OPERATOR_REQUIRED.
+
+The delay uses bounded exponential backoff, but the result never schedules,
+queues, starts or authorizes another attempt. Consumers must still apply current
+policy, approval and provider preconditions.
