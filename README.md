@@ -117,15 +117,18 @@ Core human-facing documentation follows an **English + German** convention. Code
 
 See the [Documentation Language Policy](docs/DOCUMENTATION_LANGUAGE_POLICY.md).
 
-## Status
+## Status — 2026-10-25
 
-Loop42 is a public development repository.
+Integrated `main`: `6a4346e54c15b7341b9bc355d07acfeb0ae66755` (#52 documentation reconciliation, following #30/#32/#42/#43). Existing evidence/worker contracts and policy-gated ChangeSet execution remain integrated. These are development contracts, not general autonomous project execution.
 
-The **v0.1 extraction / consumer-binding foundation is verified**. Reusable context and harness mechanics, frozen CORA equivalence and the exact-revision consumer-profile contract are in place.
+- Open Draft [#61](https://github.com/DeepWolf42/Loop42/pull/61), `f3789e1b88787a7d3039d768a869b6ee15e2f938`: exact-task-bound local-client WorkerProvider. [Candidate CI40078394826](https://github.com/DeepWolf42/Loop42/actions/runs/40078394826) passed 228 tests on Windows/Ubuntu and both completion gates; secret scan40078394828 passed. Not integrated; output remains PROPOSAL.
+- Open Draft [#62](https://github.com/DeepWolf42/Loop42/pull/62), `88626aeb086e0dead93e6d632138be9a291cce1e`: persisted verification-receipt recovery and bounded regular-file CLI input. [Candidate CI40222635516](https://github.com/DeepWolf42/Loop42/actions/runs/40222635516) passed 234 tests (Ubuntu1/Windows2 skips), both gates, and secret scan40222635530 passed. Not integrated.
+- Draft [#72](https://github.com/DeepWolf42/Loop42/pull/72), `a58e392aafe5185697e3170297143d5f023f0b66`, adds a verifier-revision regression test on unmerged Draft #49. Local21 focused/154 total tests and both gates passed. Hosted CI **was not triggered**: that stacked base only triggers pull-request CI against main. Required checks on the eventual integration basis remain open.
+- Draft #51 tool/plugin/skill selection and other optional drafts remain proposals. Do not treat an older stack as a prerequisite or shipped capability. [Issue #40](https://github.com/DeepWolf42/Loop42/issues/40) remains the authoritative agent-evaluation acceptance record; narrow worker examples do not establish general model quality.
+- Private memory/reflection research is not integrated into this public product. No general learning, authenticated cross-project memory or automatic skill-adoption claim is made.
+- CORA remains a separate consumer and still pins `5470cd0b36774698a69c6ff61ff1a016dab036b8`. Its own profile determines adoption.
 
-As verified on 2026-10-13, CORA pins Loop42 revision `5470cd0b36774698a69c6ff61ff1a016dab036b8` in its consumer profile on `cora/development`. This is an exact, verified pin (Loop42 [main CI](https://github.com/DeepWolf42/Loop42/actions/runs/38123996570), CORA [integration CI](https://github.com/DeepWolf42/C.O.R.A./actions/runs/38409208130)), not an automatic follow of Loop42 `main`. The CORA consumer profile remains the authoritative source for any future pin change.
-
-Loop42 is licensed under the MIT License.
+The linked results qualify their exact code candidates, not this later documentation commit. PRs remain unmerged; no release, deployment, added permission or hardware authority is implied.
 
 <details>
 <summary>Why 42?</summary>
