@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.harness.worker_dispatch_cli import MAX_INPUT_BYTES, _read_input
 
@@ -71,6 +72,44 @@ finally:
             for path in (directory, str(Path(directory) / "missing")):
                 with self.subTest(path=path), self.assertRaises((ValueError, OSError)):
                     _read_input(path)
+
+    def test_known_final_symlink_is_rejected_before_opening_any_descriptor(self):
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "request.json"
+            target.write_bytes(b"{}")
+            with patch.object(Path, "is_symlink", return_value=True), patch("os.open", wraps=os.open) as opened:
+                with self.assertRaises(ValueError):
+                    _read_input(str(target))
+                opened.assert_not_called()
+
+    def test_real_final_symlink_never_becomes_request_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "request.json"
+            target.write_bytes(b"{}")
+            link = Path(directory) / "link.json"
+            try:
+                link.symlink_to(target)
+            except OSError as error:
+                if getattr(error, "winerror", None) == 1314:
+                    self.skipTest("Windows symlink creation privilege unavailable")
+                raise
+            with self.assertRaises(ValueError):
+                _read_input(str(link))
+
+    @unittest.skipUnless(os.name == "posix" and hasattr(os, "O_NOFOLLOW"),
+                         "atomic final-symlink defense requires POSIX O_NOFOLLOW")
+    def test_final_symlink_missed_by_precheck_is_rejected_by_open(self):
+        import errno
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "request.json"
+            target.write_bytes(b"{}")
+            link = Path(directory) / "link.json"
+            link.symlink_to(target)
+            # Deterministic open-boundary countercase, not a claimed live race.
+            with patch.object(Path, "is_symlink", return_value=False):
+                with self.assertRaises(OSError) as error:
+                    _read_input(str(link))
+                self.assertEqual(error.exception.errno, errno.ELOOP)
 
 
 if __name__ == "__main__":
