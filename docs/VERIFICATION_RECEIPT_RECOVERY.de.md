@@ -26,6 +26,16 @@ AttemptArtifact für den bestehenden Zustandsabgleich zurück. Ein Beleg aus der
 Zukunft wird abgewiesen. Fehler: Exit2 ohne Erfolgsobjekt auf stdout. Stdin
 ist ebenfalls möglich, die gesamte Anfrage ist auf 1 MiB begrenzt.
 
+Für `--input` akzeptieren Dispatch und Receipt-Recovery nur reguläre Dateien
+bis1MiB. Endpunkt-Symlinks, Verzeichnisse, Geräte und FIFO-Deskriptoren werden
+abgewiesen; Typ und Größe werden am geöffneten Deskriptor vor dem Lesen geprüft,
+die Bytegrenze zusätzlich danach. POSIX nutzt O_NONBLOCK/O_NOFOLLOW soweit
+verfügbar, Windows expliziten Binärmodus. Windows-Symlinkvorprüfung ist nicht
+atomar; Elternverzeichnisse dürfen weiterhin Symlinks enthalten. Dies ist keine
+Dateisystem-Sandbox, Authentifizierung oder allgemeine IO-Frist. `--input -`
+bleibt der ausdrückliche Streamweg mit bisherigem, vom Aufrufer geschlossenen
+Stdin/EOF-Vertrag; er erhält hier keine neue Zeitgrenze.
+
 Das Werkzeug beschafft oder authentifiziert keine Belege. Neu einlesen und
 Prüfervertrauen bleiben beim Verbraucher; passende selbst gelieferte Hashes
 sind kein Ausführungs-, Aktualitäts- oder physischer Nachweis. Es gibt keine

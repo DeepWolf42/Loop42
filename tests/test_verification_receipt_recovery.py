@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 
 from tools.harness.verification_receipt import parse_receipt, receipt_payload, receipt_fingerprint
@@ -98,6 +99,23 @@ class ReceiptRecoveryTests(unittest.TestCase):
         for criteria in (request()['receipt']['criteria'][:1],list(reversed(request()['receipt']['criteria']))):
             raw=request();raw['receipt']['criteria']=criteria
             with self.assertRaises(ValueError):run_request(raw)
+
+    def test_cli_file_input_accepts_current_receipt_and_rejects_invalid_sources(self):
+        root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'request.json'
+            command = [sys.executable, '-B', '-m', 'tools.harness.verification_receipt_cli',
+                       '--input', str(path)]
+            path.write_bytes(encoded(request()))
+            good = subprocess.run(command, cwd=root, capture_output=True, timeout=5)
+            self.assertEqual(good.returncode, 0, good.stderr)
+            self.assertTrue(json.loads(good.stdout)['artifact']['success'])
+            for raw in (b'', b'x' * (1024 * 1024 + 1)):
+                path.write_bytes(raw)
+                bad = subprocess.run(command, cwd=root, capture_output=True, timeout=5)
+                self.assertEqual(bad.returncode, 2, bad.stderr)
+                self.assertEqual(bad.stdout, b'')
+                self.assertNotIn(b'Traceback', bad.stderr)
 
     def test_cli_is_separate_process_and_fails_without_success_output(self):
         root=Path(__file__).resolve().parents[1]

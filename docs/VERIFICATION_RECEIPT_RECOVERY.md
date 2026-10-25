@@ -2,6 +2,16 @@
 
 # Recovering saved verification receipts
 
+Both Dispatch and receipt recovery restrict `--input` paths to regular files
+of at most1MiB. Final symlinks, directories, devices and FIFO descriptors are
+rejected. Type and size are checked on the opened descriptor before reading;
+the byte cap is checked again afterwards. POSIX uses O_NONBLOCK/O_NOFOLLOW where
+available; Windows uses binary mode explicitly. The Windows symlink precheck is
+not atomic, and parent-directory symlinks may still be followed. This is not a
+filesystem sandbox, authentication or a general IO deadline. `--input -` retains
+the explicit stdin stream boundary and its caller-owned EOF contract, without
+adding a new timeout.
+
 `parse_receipt(bytes)` restores the existing VerificationReceipt data contract
 from strict UTF-8 JSON: exact fields/schema, no duplicate keys/non-standard
 constants, timezone-aware timestamp, at most 1 MiB, 128 criteria and 64 evidence
