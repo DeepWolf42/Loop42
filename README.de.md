@@ -117,19 +117,18 @@ Menschenlesbare Kern-Dokumentation folgt grundsätzlich **Englisch + Deutsch**. 
 
 Siehe [Dokumentations-Sprachregel](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md).
 
-## Status
+## Status — 25.10.2026
 
-Verifizierte integrierte Basis am 18.10.2026: `main` auf `be040124cc387700a4268f0f99a691eabe481c48`.
+Integriertes `main`: `6a4346e54c15b7341b9bc355d07acfeb0ae66755` (#52 Dokumentationsabgleich nach #30/#32/#42/#43). Evidence-/Worker-Verträge und richtliniengebundene ChangeSet-Ausführung sind integriert. Das sind Entwicklungsverträge, keine allgemeine autonome Projektbearbeitung.
 
-- Die Grundlage für Extraction und exakte Consumer-Versionsbindung bleibt vorhanden.
-- PRs #30, #32, #42 und #43 sind integriert: wiederverwendbare Evidence-/Worker-Verträge sowie richtliniengebundene ChangeSet-Ausführung und Verifikation sind vorhanden. Siehe [ChangeSet-Vertrag](docs/CHANGESET_CONTRACT.md) und [Ausführungsgrenzen](docs/CHANGESET_EXECUTION.md).
-- [Post-Merge-CI](https://github.com/DeepWolf42/Loop42/actions/runs/39016473296) und [Secret-Scan](https://github.com/DeepWolf42/Loop42/actions/runs/39016473226) waren erfolgreich. Die Suite umfasste 214 Tests auf Windows und Linux, mit einem plattformspezifischen Skip auf Linux.
-- Der Agenten-Transcript-Evaluator ist integriert; [#40](https://github.com/DeepWolf42/Loop42/issues/40) benötigt weiterhin einen unabhängig aufgezeichneten echten Harness-/Modelllauf. Synthetische Fixtures sind kein Nachweis realer Agentenqualität.
-- Draft [#51](https://github.com/DeepWolf42/Loop42/pull/51) schlägt eine begrenzte Werkzeug-/Plugin-/Skill-Auswahl vor; seine Kandidaten-CI bestand, er ist aber nicht integriert. Weitere offene Drafts (#31, #39, #45–#47, #49) sind optionale Arbeit, keine ausgelieferten Fähigkeiten oder Voraussetzungen für jede Consumer-Aufgabe.
-- Der Ollama-spezifische Vorschlag [#44](https://github.com/DeepWolf42/Loop42/pull/44) ist als verworfen geschlossen. Branch und Historie bleiben erhalten; abhängige Drafts #45–#47 müssen vor Übernahme von diesem Stack getrennt werden. Bestehender optionaler Ollama-Code ist keine aktive Projektvoraussetzung.
-- CORA pinnt weiterhin `5470cd0b36774698a69c6ff61ff1a016dab036b8`. Verbindlich ist CORAs Consumer-Profil; neue Loop42-Funktionen werden nicht automatisch Bestandteil von CORA.
+- Offener Draft [#61](https://github.com/DeepWolf42/Loop42/pull/61), `f3789e1b88787a7d3039d768a869b6ee15e2f938`: exakt auftragsgebundener lokaler WorkerProvider. [Kandidaten-CI40078394826](https://github.com/DeepWolf42/Loop42/actions/runs/40078394826):228Tests unter Windows/Ubuntu und beide Completion-Gates bestanden; SecretScan40078394828 bestanden. Nicht integriert; Ausgabe bleibt PROPOSAL.
+- Offener Draft [#62](https://github.com/DeepWolf42/Loop42/pull/62), `88626aeb086e0dead93e6d632138be9a291cce1e`: gespeicherte VerificationReceipts für Recovery und begrenzte reguläre CLI-Eingabedateien. [Kandidaten-CI40222635516](https://github.com/DeepWolf42/Loop42/actions/runs/40222635516):234Tests (Ubuntu1/Windows2Skips), beide Gates sowie SecretScan40222635530 bestanden. Nicht integriert.
+- Draft [#72](https://github.com/DeepWolf42/Loop42/pull/72), `a58e392aafe5185697e3170297143d5f023f0b66`, ergänzt einen Prüferrevisions-Gegenfall auf ungemergtem Draft #49. Lokal21gezielte/154Gesamttests und beide Gates bestanden. Gehostete CI **nicht ausgelöst**: Der Workflow dieser gestapelten Basis berücksichtigt Pullrequests nur gegen main. Pflichtprüfungen auf der späteren Integrationsbasis bleiben offen.
+- Draft #51 zur Werkzeug-/Plugin-/Skill-Auswahl und weitere optionale Drafts bleiben Vorschläge. Ältere Stacks sind keine Voraussetzung oder ausgelieferte Funktion. [Issue #40](https://github.com/DeepWolf42/Loop42/issues/40) führt die Agentenevaluator-Abnahme; enge Workerbeispiele sind kein allgemeiner Modellqualitätsnachweis.
+- Private Memory-/Reflection-Forschung bleibt außerhalb des öffentlichen Produkts. Kein allgemeines Lernen, authentifiziertes projektübergreifendes Memory oder automatische Skill-Übernahme behauptet.
+- CORA bleibt eigenständiger Consumer mit Pin `5470cd0b36774698a69c6ff61ff1a016dab036b8`. Übernahme richtet sich nach seinem eigenen Profil.
 
-Loop42 ist ein öffentliches Entwicklungs-Repository unter der MIT-Lizenz. Diese Prüfungen belegen weder produktiven Einsatz noch reale Modellwirksamkeit oder die Erlaubnis, Consumer-Hardware zu betreiben.
+Die verlinkten Ergebnisse qualifizieren exakt ihre Codekandidaten, nicht diesen späteren Dokumentationscommit. Die Drafts bleiben ungemergt; keine Release-/Deployment-/Berechtigungs- oder Hardwarefreigabe.
 
 <details>
 <summary>Warum 42?</summary>

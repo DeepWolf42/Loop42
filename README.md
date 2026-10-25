@@ -117,19 +117,18 @@ Core human-facing documentation follows an **English + German** convention. Code
 
 See the [Documentation Language Policy](docs/DOCUMENTATION_LANGUAGE_POLICY.md).
 
-## Status
+## Status — 2026-10-25
 
-Verified integrated baseline on 2026-10-18: `main` at `be040124cc387700a4268f0f99a691eabe481c48`.
+Integrated `main`: `6a4346e54c15b7341b9bc355d07acfeb0ae66755` (#52 documentation reconciliation, following #30/#32/#42/#43). Existing evidence/worker contracts and policy-gated ChangeSet execution remain integrated. These are development contracts, not general autonomous project execution.
 
-- The extraction / exact-revision consumer-binding foundation remains in place.
-- PRs #30, #32, #42 and #43 are integrated: reusable evidence/worker contracts and policy-gated ChangeSet execution/verification are available. See [ChangeSet contract](docs/CHANGESET_CONTRACT.md) and [execution boundaries](docs/CHANGESET_EXECUTION.md).
-- [Post-merge CI](https://github.com/DeepWolf42/Loop42/actions/runs/39016473296) and [secret scan](https://github.com/DeepWolf42/Loop42/actions/runs/39016473226) passed. The suite ran 214 tests on Windows and Linux, with one platform-specific skip on Linux.
-- The agent transcript evaluator is integrated, but [#40](https://github.com/DeepWolf42/Loop42/issues/40) still needs an independently captured real harness/model run. Synthetic fixtures are not real-agent quality evidence.
-- Draft [#51](https://github.com/DeepWolf42/Loop42/pull/51) proposes bounded tool/plugin/skill selection; its candidate CI passed, but it is not integrated. Other open drafts (#31, #39, #45–#47, #49) are optional work, not shipped capabilities or prerequisites for every consumer task.
-- Ollama-specific proposal [#44](https://github.com/DeepWolf42/Loop42/pull/44) is closed as retired. Its branch/history are preserved; dependent drafts #45–#47 need separation from that stack before adoption. Existing optional Ollama code is not an active project requirement.
-- CORA still pins `5470cd0b36774698a69c6ff61ff1a016dab036b8`. The CORA consumer profile is authoritative; newer Loop42 functionality does not automatically become part of CORA.
+- Open Draft [#61](https://github.com/DeepWolf42/Loop42/pull/61), `f3789e1b88787a7d3039d768a869b6ee15e2f938`: exact-task-bound local-client WorkerProvider. [Candidate CI40078394826](https://github.com/DeepWolf42/Loop42/actions/runs/40078394826) passed 228 tests on Windows/Ubuntu and both completion gates; secret scan40078394828 passed. Not integrated; output remains PROPOSAL.
+- Open Draft [#62](https://github.com/DeepWolf42/Loop42/pull/62), `88626aeb086e0dead93e6d632138be9a291cce1e`: persisted verification-receipt recovery and bounded regular-file CLI input. [Candidate CI40222635516](https://github.com/DeepWolf42/Loop42/actions/runs/40222635516) passed 234 tests (Ubuntu1/Windows2 skips), both gates, and secret scan40222635530 passed. Not integrated.
+- Draft [#72](https://github.com/DeepWolf42/Loop42/pull/72), `a58e392aafe5185697e3170297143d5f023f0b66`, adds a verifier-revision regression test on unmerged Draft #49. Local21 focused/154 total tests and both gates passed. Hosted CI **was not triggered**: that stacked base only triggers pull-request CI against main. Required checks on the eventual integration basis remain open.
+- Draft #51 tool/plugin/skill selection and other optional drafts remain proposals. Do not treat an older stack as a prerequisite or shipped capability. [Issue #40](https://github.com/DeepWolf42/Loop42/issues/40) remains the authoritative agent-evaluation acceptance record; narrow worker examples do not establish general model quality.
+- Private memory/reflection research is not integrated into this public product. No general learning, authenticated cross-project memory or automatic skill-adoption claim is made.
+- CORA remains a separate consumer and still pins `5470cd0b36774698a69c6ff61ff1a016dab036b8`. Its own profile determines adoption.
 
-Loop42 is a public development repository licensed under the MIT License. These checks do not establish production deployment, real-model effectiveness or permission to operate a consumer's hardware.
+The linked results qualify their exact code candidates, not this later documentation commit. PRs remain unmerged; no release, deployment, added permission or hardware authority is implied.
 
 <details>
 <summary>Why 42?</summary>
