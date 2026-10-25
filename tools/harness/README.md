@@ -2,6 +2,15 @@
 
 Provider-specific harness adapters live behind Loop42's generic capability and authority contracts.
 
+## Existing local JSON client
+
+`local_client_provider.py` connects a consumer-owned, identity-checked local
+client to `WorkerProvider`. It binds the exact task/attempt/source/context to
+the input digest, validates the returned profile/mode/format and parses a
+strict ChangeSet. It grants no execution authority. See
+[contract and transport requirements](../../docs/LOCAL_CLIENT_PROVIDER.md)
+([Deutsch](../../docs/LOCAL_CLIENT_PROVIDER.de.md)).
+
 ## Local Ollama adapter
 
 `ollama_worker.py` is a deliberately narrow local adapter. It consumes the exact snapshot produced by the generic context tool and grants the model **proposal-only** authority.
