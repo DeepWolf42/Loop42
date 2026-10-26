@@ -110,6 +110,15 @@ class RefinementTrialTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate"):
             evaluate_refinement_trial(self._changed(lambda d: d["cases"][1].update(scenario_id=d["cases"][0]["scenario_id"])))
 
+    def test_same_verifier_id_with_different_revision_per_arm_rejected(self):
+        for index in (0, 1):
+            d = fixture()
+            before, after = d["cases"][index]["baseline"], d["cases"][index]["candidate"]
+            self.assertEqual(before["verifier_id"], after["verifier_id"])
+            after["verifier_revision"] = "c" * 40
+            with self.subTest(kind=d["cases"][index]["kind"]), self.assertRaisesRegex(ValueError, "verifier"):
+                evaluate_refinement_trial(d)
+
     def test_unknown_fields_rejected(self):
         with self.assertRaisesRegex(ValueError, "exact"):
             evaluate_refinement_trial(self._changed(lambda d: d.update(auto_apply=True)))
