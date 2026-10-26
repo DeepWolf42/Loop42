@@ -117,13 +117,13 @@ Core human-facing documentation follows an **English + German** convention. Code
 
 See the [Documentation Language Policy](docs/DOCUMENTATION_LANGUAGE_POLICY.md).
 
-## Status — 2026-10-25
+## Status — 2026-10-26
 
 Integrated code checkpoint: `d55096114e4561df61fa2e6140c1ed83436dbd3a` (through #61/#62, after the earlier core contracts and documentation reconciliation). The local-client proposal adapter and persisted-receipt recovery are now integrated; they do not grant general autonomous project execution.
 
 - Integrated [#61](https://github.com/DeepWolf42/Loop42/pull/61) at `0b6d1bb823167f8ed4e77c33cd99da7f96024e6d`: exact-task-bound local-client WorkerProvider. Output remains PROPOSAL; trusted transport, identity, timeouts and capture limits remain consumer responsibilities.
 - Integrated [#62](https://github.com/DeepWolf42/Loop42/pull/62) at `d55096114e4561df61fa2e6140c1ed83436dbd3a`: persisted verification-receipt recovery and bounded regular-file CLI input. The final integrated tree equals the independently reviewed combined candidate; a stored receipt still needs current source/subject/verifier evidence.
-- Draft [#72](https://github.com/DeepWolf42/Loop42/pull/72), `23a5ba3c87ff3fa4984433ec9f153de920cc73cf`, remains on unmerged #49 (`de2d250a00ce141fcd00a35200ee012103ef6e61`). Its refreshed [CI40232382948](https://github.com/DeepWolf42/Loop42/actions/runs/40232382948) passed 235 tests on its exact parent basis. Gitleaks did not trigger for that target branch. Before adoption, reconcile against the now newer main and run the then-required checks.
+- Draft [#49](https://github.com/DeepWolf42/Loop42/pull/49), `04e5bc89413cb55ae0017e72c7a727f972cea818`, is reconciled with main `a2935656a63a01e24ba56d3c424483d10d4282e7`: local268tests/gates and CI40289735270/secret scan40289735220 passed. Draft [#72](https://github.com/DeepWolf42/Loop42/pull/72), `a544a2f710d017ca42ae8d0685618062282cf5d4`, remains on parent49; local269tests/gates and CI40289739574 passed. Gitleaks did not run for that target branch. Both remain unmerged; run then-required checks before any later main retarget.
 - Draft #51 tool/plugin/skill selection and other optional drafts remain proposals. Do not treat an older stack as a prerequisite or shipped capability. [Issue #40](https://github.com/DeepWolf42/Loop42/issues/40) remains the authoritative agent-evaluation acceptance record; narrow worker examples do not establish general model quality.
 - Private memory/reflection research is not integrated into this public product. No general learning, authenticated cross-project memory or automatic skill-adoption claim is made.
 - CORA remains a separate consumer and still pins `5470cd0b36774698a69c6ff61ff1a016dab036b8`. Its own profile determines adoption.
