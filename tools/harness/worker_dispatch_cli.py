@@ -10,7 +10,9 @@ from __future__ import annotations
 import argparse
 from datetime import datetime
 import json
+import os
 from pathlib import Path
+import stat
 import sys
 from typing import Any
 
@@ -340,8 +342,26 @@ def run_request(request: dict[str, Any]) -> dict[str, Any]:
 def _read_input(path: str) -> bytes:
     if path == "-":
         return sys.stdin.buffer.read(MAX_INPUT_BYTES + 1)
-    with Path(path).open("rb") as stream:
-        return stream.read(MAX_INPUT_BYTES + 1)
+    source = Path(path)
+    if source.is_symlink():
+        raise ValueError("request path must not be a symlink")
+    # A byte cap alone cannot stop FIFO-open or EOF waits. Reject nonregular
+    # descriptors before reading; O_NONBLOCK avoids waiting for a FIFO writer.
+    # This is not a filesystem sandbox or a general IO deadline. Stdin remains
+    # the explicit stream boundary, with its existing caller-owned EOF contract.
+    flags = (os.O_RDONLY | getattr(os, "O_BINARY", 0)
+             | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOFOLLOW", 0))
+    descriptor = os.open(source, flags)
+    with os.fdopen(descriptor, "rb") as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode):
+            raise ValueError("request path must be a regular file")
+        if info.st_size > MAX_INPUT_BYTES:
+            raise ValueError("request file exceeds 1 MiB")
+        raw = stream.read(MAX_INPUT_BYTES + 1)
+    if len(raw) > MAX_INPUT_BYTES:
+        raise ValueError("request file exceeds 1 MiB")
+    return raw
 
 
 def main() -> int:

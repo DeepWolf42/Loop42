@@ -2,6 +2,15 @@
 
 Provider-specific harness adapters live behind Loop42's generic capability and authority contracts.
 
+## Existing local JSON client
+
+`local_client_provider.py` connects a consumer-owned, identity-checked local
+client to `WorkerProvider`. It binds the exact task/attempt/source/context to
+the input digest, validates the returned profile/mode/format and parses a
+strict ChangeSet. It grants no execution authority. See
+[contract and transport requirements](../../docs/LOCAL_CLIENT_PROVIDER.md)
+([Deutsch](../../docs/LOCAL_CLIENT_PROVIDER.de.md)).
+
 ## Local Ollama adapter
 
 `ollama_worker.py` is a deliberately narrow local adapter. It consumes the exact snapshot produced by the generic context tool and grants the model **proposal-only** authority.
@@ -129,6 +138,15 @@ a receipt fingerprint.
 A receipt fingerprint is not a signature or identity proof. It gives deterministic
 content identity so adapters can verify the full receipt before surfacing its hash
 to the generic reconciler.
+
+Saved receipts can be restored with bounded strict `parse_receipt(bytes)`.
+`python -m tools.harness.verification_receipt_cli --input request.json` checks
+one saved receipt against a consumer-supplied current task, subject digest,
+trusted verifier basis, evidence digests and observation time. It emits a
+terminal artifact only after validation. It does not obtain or authenticate
+evidence, post results or repeat a worker. See
+[recovery boundary](../../docs/VERIFICATION_RECEIPT_RECOVERY.md)
+([Deutsch](../../docs/VERIFICATION_RECEIPT_RECOVERY.de.md)).
 
 ## Action policy decision
 
