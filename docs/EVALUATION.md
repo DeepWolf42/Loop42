@@ -84,3 +84,8 @@ At least some scenarios should deliberately include:
 ## Rule
 
 Do not claim a model/harness/method is "better" without a defined scenario, baseline, and measurable result.
+
+
+## Opt-in refinement A/B review
+
+A proposed agent instruction/skill is not useful merely because a model calls it a lesson. The standalone `tools/checks/refinement_trial.py` classifies *supplied* paired baseline/candidate outcomes with exact prompt, scenario, source, verifier and harness/model identity, plus required passing holdouts. This checker does **not** run a model, authenticate evidence or grant installation/merge authority. A genuine real-harness A/B run and independent artifact review are required before claiming improvement. See [Refinement Trial](REFINEMENT_TRIAL.md). No consumer pin updates automatically.
