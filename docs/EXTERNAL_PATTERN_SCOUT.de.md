@@ -73,6 +73,54 @@ Suchrichtungen. Sie ist keine Brainstorming-Pflicht und MUSS entfallen, wenn sie
 keine eigene Entscheidung, kein neues Evidence-Ziel und keine neue
 Fehlerhypothese erzeugt.
 
+
+## Lückenerkennung und Wiederverwendungsprüfung
+
+Vor größerer neuer Infrastruktur, einer wichtigen Workflow-Änderung oder
+wiederholtem Scheitern **eine begrenzte Lücken- und Reuse-Probe in RECONCILE /
+TARGET** durchführen. Sie ist Teil des vorhandenen Matrixloop und der
+/truth-/gaps-Prüfungen, **keine zusätzliche Loop-Stufe**, kein Agent, Scheduler,
+Zustandsspeicher, Recht oder neuer Wahrheitsanspruch.
+
+1. **Zuerst abgleichen.** Vereinbartes Ziel, Abnahmekriterien, aktuelle Quelle
+   und Revision, vorhandene Implementierung, offene Issues/PRs/Branches,
+   frühere Recherche und Fähigkeiten bereits vorhandener Werkzeuge festhalten.
+   Designziele, Drafts und Tests auf alten Revisionen sind keine integrierten
+   aktuellen Funktionen.
+2. **Kleinen Umfang abstecken.** Den betroffenen durchgängigen Arbeitsweg und
+   Fehlermodi stichprobenartig prüfen statt nur die erstgenannte Bibliothek/API.
+   Bei Bedarf Bedienweg, Sicherheit, Recovery sowie Dependency-/License-Folgen
+   einbeziehen; nicht bei jedem Aufruf das gesamte Produkt auditieren.
+3. **Suchabdeckung ehrlich kennzeichnen.** Je relevantem Ausschnitt zwischen
+   `CHECKED_NO_DELTA` (auf benannter Grundlage geprüft, kein nützlicher Gewinn),
+   `USEFUL_CANDIDATE` (belegte prüfbare Alternative), `NOT_SEARCHED`
+   (Recherche-Lücke) und `BLOCKED_UNKNOWN` (Quelle, Fähigkeit oder Beleg
+   fehlt) unterscheiden. **NOT_SEARCHED ist nicht NO_USEFUL_DELTA.** Fehlende
+   Quellen sind kein Negativbefund; Grenze nennen und abhängige Behauptung stoppen.
+4. **Wiederverwenden vor Neuerfinden.** Vorhandene eigene Implementierung,
+   offene Arbeit, unterstützte Funktionen installierter Werkzeuge und neue
+   Plugin-/SDK-Möglichkeiten mit kleinen externen Mustern vergleichen. Auch
+   benachbarte Fachgebiete und reale Bedienerprobleme prüfen, wenn sie eine
+   Entscheidung verändern können. `REUSE_EXISTING` oder `SMALL_ADAPTER`
+   einem neuen Framework vorziehen.
+5. **Priorisieren und stoppen.** Wenige wesentliche blinde Flecken nach
+   Auswirkung, Safety/Korrektheit, gespartem Aufwand, Kosten und Unsicherheit
+   ordnen. Kleinsten reproduzierbaren Gegenfall oder Kompatibilitätstest
+   auswählen oder einen begrenzten `NEEDS_RESEARCH`-Folgeschritt nennen.
+   Kandidaten- und Zeit-/Run-Budget beachten; keine Aufgaben nur für eine
+   vollständige Matrix erzeugen.
+
+Ergebnis ist ein kleines **Abdeckungs-Delta**, kein Vollständigkeitsversprechen:
+geprüfter Umfang und Revision, wichtigste bislang übersehene Suchrichtung,
+Quellen/Aktualität, bereits vorhandene eigene Stärke, kleinste sinnvolle
+Fremdlösung, Einführungs-/Prüfaufwand, offene Unsicherheiten und nächster Test
+oder `NO_USEFUL_DELTA`. Gültige frühere Prüfergebnisse wiederverwenden, solange
+ihre Abhängigkeiten unverändert sind. Design, offene PR, Benchmark-Behauptung
+oder ungetestete Idee nie stillschweigend zu integrierter Funktion erklären.
+Produktbezogene Ergebnisse bleiben in der autoritativen Consumer-Quelle;
+der Scout schlägt nur Muster vor. Umsetzung und geschützte Entscheidungen
+behalten ihre bisherigen Freigabegrenzen.
+
 ## Scout-Contract
 
 Ein Scout braucht:
