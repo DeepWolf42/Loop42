@@ -81,6 +81,16 @@ Before inventing substantial new infrastructure or orchestration, Matrixloop may
 
 Scouting is an input to TARGET / PRE-MORTEM, not another loop stage. Discovery does not authorize adoption: relevance, project fit, expected value, provenance/license status and reproduction against the current source of truth still apply.
 
+Before substantial reinvention or when a prior search missed an important
+product area, TARGET can use the scout's bounded **gap detection and reuse gate**
+after RECONCILE has established live truth. Compare the current problem,
+already implemented/ongoing work and supported existing-tool capabilities
+before seeking alternatives. Mark areas that were not searched as
+`NOT_SEARCHED`, not as `NO_USEFUL_DELTA`; keep unavailable sources
+`BLOCKED_UNKNOWN`. Select one useful next test or stop under the existing
+budgets. This is **not an extra Matrixloop stage**, a new scheduler, or a
+second source of truth.
+
 See `docs/EXTERNAL_PATTERN_SCOUT.md`.
 
 
@@ -113,3 +123,5 @@ Loop42 owns only the generic mechanics. Candidate meaning, domain requirements,
 engineering/safety margins, objective definitions, recommendation semantics and
 all execution authority remain with the consumer. No consumer pin advances by
 adding this contract.
+
+The optional executable Gap & Reuse preflight is documented in [Gap & Reuse Preflight](GAP_REUSE_PREFLIGHT.md). It is a read-only RECONCILE/TARGET input, not a new required stage or automatic chat/runtime hook. For substantial dependency/capability decisions, the host can select `--github-repository owner/name` in the same call to collect bounded open PR/issue title leads. Routine work skips collection; incomplete or unavailable coverage remains `BLOCKED_UNKNOWN`. Existing tool inventories can still enter through supplied evidence. Recommendations require independent verification.

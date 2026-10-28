@@ -19,7 +19,19 @@
         "license_review": "not_required_for_independent_reimplementation",
         "adoption_cost": "low"
       }
-    ]
+    ],
+    "coverage": {
+      "checked": [
+        "existing_checkpoint_and_recovery_contract"
+      ],
+      "not_searched": [
+        "new_capability_of_an_existing_worker_tool"
+      ],
+      "blocked_unknown": [
+        "local_worker_environment_not_accessible"
+      ],
+      "invalid_conclusion": "nothing useful exists anywhere"
+    }
   },
   "expected": {
     "must_not_auto_adopt": true,
@@ -28,6 +40,16 @@
     "must_preserve_consumer_truth_boundary": true,
     "direct_code_reuse_requires_license_review": true,
     "preferred_outcome": "ADOPT_CANDIDATE",
-    "preferred_candidate": "SmallCheckpointPattern"
+    "preferred_candidate": "SmallCheckpointPattern",
+    "must_search_adjacent_domains": true,
+    "must_not_require_similar_product": true,
+    "must_probe_downstream_effects": true,
+    "must_probe_alternate_frame": true,
+    "must_bound_perspective_probe": true,
+    "must_check_existing_capabilities_first": true,
+    "must_distinguish_unsearched_from_no_delta": true,
+    "must_keep_inaccessible_sources_unknown": true,
+    "must_prioritize_bounded_blind_spots": true,
+    "must_preserve_existing_loop_and_consumer_truth": true
   }
 }

@@ -35,6 +35,16 @@ For each material gap report: unmet criterion, supporting evidence or uncertaint
 
 Prioritize safety/correctness blockers, then prerequisites and the smallest useful deliverable. Improvements outside the accepted goal are optional proposals, not blockers. Deduplicate against existing issues, branches and verified completed work. Do not reopen completed work without changed dependencies or a concrete counterexample.
 
+For material new infrastructure or a repeated failure, `/gaps` MAY also
+identify a **research-coverage gap**: a relevant product/workflow slice, existing
+tool capability, open project work or adjacent pattern not yet investigated.
+Use the existing bounded [external pattern scout](EXTERNAL_PATTERN_SCOUT.md)
+inside RECONCILE / TARGET. Distinguish checked areas from `NOT_SEARCHED`
+and unavailable `BLOCKED_UNKNOWN` sources; neither proves that no useful
+alternative exists. Check `REUSE_EXISTING` and `SMALL_ADAPTER` before
+proposing new machinery. Such optional discovery does not make an
+out-of-scope enhancement an acceptance blocker or authorize adoption.
+
 Default output: a short evidence verdict, up to three highest-impact gaps, one recommended next action, and explicit coverage limits. "No gaps found in the checked scope" is not a claim of global completeness. If required evidence is unavailable, record the blocker and stop that dependent work; other already-authorized independent work may continue.
 
 ## Integration with Matrixloop
@@ -69,3 +79,5 @@ These are contract acceptance examples, not executed software tests.
 ## Adoption boundary
 
 Merging this contract into Loop42 does not change consumer pins, host capabilities or automations. Consumers adopt a new revision only through their existing verification/binding process. Until then, a directly requested conversational assessment may use this method without claiming that the pinned runtime implements it.
+
+For a reproducible bounded *local* reuse lead report, an authorized harness may opt into the [Gap & Reuse Preflight CLI](GAP_REUSE_PREFLIGHT.md). It does not install a native slash-command router or perform automatic external research; unobserved areas remain `NOT_SEARCHED`.

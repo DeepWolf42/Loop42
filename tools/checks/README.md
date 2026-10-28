@@ -4,6 +4,10 @@ Home for generic Loop42 verification, provenance, freshness and policy checks.
 
 Product-specific safety/test logic remains in the consumer project.
 
+## Gap & Reuse preflight
+
+[`gap_reuse_preflight.py`](../../docs/GAP_REUSE_PREFLIGHT.md) supplies a bounded read-only RECONCILE / TARGET input. It reuses the repository map and can collect live open PR/issue title leads with explicit `--github-repository owner/name`. Routine work skips collection. Missing sources stay unknown; recommendations grant no adoption authority. No host hook or scheduler is installed.
+
 ## Consumer profile validation
 
 `consumer_profile.py` validates the project-agnostic `loop42.consumer-profile.v1` contract and can fail on a stale exact-revision pin.
