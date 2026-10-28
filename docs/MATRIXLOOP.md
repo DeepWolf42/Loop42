@@ -81,6 +81,16 @@ Before inventing substantial new infrastructure or orchestration, Matrixloop may
 
 Scouting is an input to TARGET / PRE-MORTEM, not another loop stage. Discovery does not authorize adoption: relevance, project fit, expected value, provenance/license status and reproduction against the current source of truth still apply.
 
+Before substantial reinvention or when a prior search missed an important
+product area, TARGET can use the scout's bounded **gap detection and reuse gate**
+after RECONCILE has established live truth. Compare the current problem,
+already implemented/ongoing work and supported existing-tool capabilities
+before seeking alternatives. Mark areas that were not searched as
+`NOT_SEARCHED`, not as `NO_USEFUL_DELTA`; keep unavailable sources
+`BLOCKED_UNKNOWN`. Select one useful next test or stop under the existing
+budgets. This is **not an extra Matrixloop stage**, a new scheduler, or a
+second source of truth.
+
 See `docs/EXTERNAL_PATTERN_SCOUT.md`.
 
 
