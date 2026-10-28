@@ -35,6 +35,18 @@ Je wesentlicher Lücke nennen: unerfülltes Kriterium, Beleg oder Unsicherheit, 
 
 Zuerst Sicherheits-/Korrektheitsblocker, dann Voraussetzungen und den kleinsten nützlichen Fortschritt priorisieren. Verbesserungen außerhalb des vereinbarten Ziels sind optionale Vorschläge. Mit vorhandenen Issues, Branches und nachweislich abgeschlossener Arbeit abgleichen. Erledigte Arbeit nur bei geänderten Abhängigkeiten oder konkretem Gegenbeispiel wieder öffnen.
 
+Bei wesentlicher neuer Infrastruktur oder wiederholtem Scheitern darf `/gaps`
+auch eine **Recherche-Abdeckungslücke** benennen: einen wichtigen Produkt-/
+Workflow-Teil, eine vorhandene Werkzeugfähigkeit, offene Projektarbeit oder ein
+benachbartes Muster, das bislang nicht untersucht wurde. Den bestehenden
+begrenzten [External Pattern Scout](EXTERNAL_PATTERN_SCOUT.de.md)
+innerhalb RECONCILE / TARGET verwenden. Geprüfte Bereiche von
+`NOT_SEARCHED` und nicht zugänglichen `BLOCKED_UNKNOWN`-Quellen
+unterscheiden; beides beweist nicht, dass keine sinnvolle Alternative existiert.
+Vor neuer Mechanik `REUSE_EXISTING` und `SMALL_ADAPTER` prüfen. Diese
+optionale Suche macht Verbesserungen außerhalb des vereinbarten Umfangs nicht
+zum Abnahmeblocker und erteilt keine Übernahmefreigabe.
+
 Standardausgabe: kurzes Belegurteil, höchstens drei wichtigste Lücken, eine empfohlene nächste Aktion und klare Prüfgrenzen. „Keine Lücke im geprüften Umfang gefunden“ bedeutet keine globale Vollständigkeit. Fehlt notwendige Evidenz, abhängige Arbeit mit benanntem Blocker stoppen; andere bereits erlaubte, unabhängige Arbeit kann weitergehen.
 
 ## Einbindung in den Matrixloop
