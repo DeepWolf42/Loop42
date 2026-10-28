@@ -6,6 +6,7 @@ import argparse
 from datetime import datetime
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -13,6 +14,7 @@ import sys
 from typing import Any
 
 from tools.context.repository_map import repository_map
+from tools.checks.gap_reuse_github import collect_open_work
 
 SCHEMA = "loop42.gap-reuse-preflight.v1"
 TRIGGERS = frozenset({"architecture", "new_infrastructure", "repeated_failure", "dependency_decision", "scheduled", "routine"})
@@ -106,7 +108,8 @@ def _evidence_area(name: str, raw: Any, head: str) -> tuple[dict[str, Any], list
 
 
 def preflight(repo: Path, *, target: str, trigger: str, expected_head: str,
-              evidence: dict[str, Any] | None = None) -> dict[str, Any]:
+              evidence: dict[str, Any] | None = None,
+              github_repository: str | None = None) -> dict[str, Any]:
     if not isinstance(target, str) or not target.strip() or len(target) > 240:
         raise ValueError("target must be 1-240 characters")
     if trigger not in TRIGGERS:
@@ -131,10 +134,17 @@ def preflight(repo: Path, *, target: str, trigger: str, expected_head: str,
             "limitations": ["Routine work is not blocked by a scout."],
         }
     else:
+        if github_repository is not None:
+            if "open_work" in evidence:
+                raise ValueError("choose supplied open_work evidence or GitHub collection, not both")
+            evidence = {**evidence, "open_work": collect_open_work(
+                github_repository, target=target, revision=head,
+                token=os.environ.get("GITHUB_TOKEN"))}
         result = {"schema": SCHEMA, "head": head, "target": target, "trigger": trigger,
                   "status": "INSPECTED", "coverage": [], "candidates": [], "adoption_authorized": False,
                   "limitations": ["Name/symbol matching is a lead, not proof of implementation or fit.",
-                                  "No network, issue API, tool inventory or external research is performed."]}
+                                  "GitHub is queried only when explicitly selected; title leads are not verified reuse.",
+                                  "No tool inventory or external pattern research is performed."]}
         mapped = repository_map(repo, query=target, budget_bytes=32768)
         terms = {term.lower() for term in _TERMS.findall(target)
                  if term.lower() not in {"with", "from", "this", "that", "eine", "einen", "und", "the", "for"}}
@@ -179,10 +189,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--trigger", choices=sorted(TRIGGERS), required=True)
     parser.add_argument("--expected-head", required=True)
     parser.add_argument("--evidence", type=Path)
+    parser.add_argument("--github-repository", help="opt-in one-page open PR/issue title probe for owner/name")
     args = parser.parse_args(argv)
     try:
         report = preflight(args.repo, target=args.target, trigger=args.trigger,
-                           expected_head=args.expected_head, evidence=_load_evidence(args.evidence))
+                           expected_head=args.expected_head, evidence=_load_evidence(args.evidence),
+                           github_repository=args.github_repository)
     except (ValueError, OSError, subprocess.SubprocessError) as exc:
         print(f"loop42 gap/reuse preflight: {exc}", file=sys.stderr)
         return 2

@@ -124,4 +124,4 @@ engineering/safety margins, objective definitions, recommendation semantics and
 all execution authority remain with the consumer. No consumer pin advances by
 adding this contract.
 
-The optional executable local Gap & Reuse preflight is documented in [Gap & Reuse Preflight](GAP_REUSE_PREFLIGHT.md). It is a read-only RECONCILE/TARGET input, not a new required stage or automatic chat/runtime hook. Missing external evidence remains explicit; recommendations still require verification.
+The optional executable Gap & Reuse preflight is documented in [Gap & Reuse Preflight](GAP_REUSE_PREFLIGHT.md). It is a read-only RECONCILE/TARGET input, not a new required stage or automatic chat/runtime hook. For substantial dependency/capability decisions, the host can select `--github-repository owner/name` in the same call to collect bounded open PR/issue title leads. Routine work skips collection; incomplete or unavailable coverage remains `BLOCKED_UNKNOWN`. Existing tool inventories can still enter through supplied evidence. Recommendations require independent verification.

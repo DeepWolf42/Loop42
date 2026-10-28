@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.checks.gap_reuse_preflight import preflight, _load_evidence
 
@@ -93,6 +94,63 @@ class GapReusePreflightTests(unittest.TestCase):
         evidence.write_text('{"open_work":{},"open_work":{}}', encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
             _load_evidence(evidence)
+
+    def test_github_cli_routine_skips_even_unavailable_repository(self):
+        run = subprocess.run([
+            sys.executable, "-m", "tools.checks.gap_reuse_preflight",
+            "--repo", str(self.repo), "--target", "checkpoint recovery",
+            "--trigger", "routine", "--expected-head", self.head,
+            "--github-repository", "example/project",
+        ], capture_output=True, text=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(json.loads(run.stdout)["status"], "SKIPPED")
+
+    def test_github_collection_is_revision_guarded_and_preserves_other_evidence(self):
+        with patch("tools.checks.gap_reuse_preflight.collect_open_work") as collect:
+            collect.return_value = {
+                "status": "USEFUL_CANDIDATE", "source": "GitHub title probe",
+                "checked_at": "2026-10-28T08:20:00Z", "revision": self.head,
+                "items": [{"name": "PR #12 checkpoint", "reference": "https://github.com/example/project/pull/12",
+                           "reason": "title match; inspect fit"}],
+            }
+            result = preflight(self.repo, target="unrelated target", trigger="architecture",
+                               expected_head=self.head, github_repository="example/project")
+            self.assertEqual(result["coverage"][1]["status"], "USEFUL_CANDIDATE")
+            self.assertEqual(result["candidates"][0]["name"], "PR #12 checkpoint")
+            self.assertEqual(result["coverage"][2]["status"], "NOT_SEARCHED")
+            self.assertFalse(result["adoption_authorized"])
+            collect.reset_mock()
+            with self.assertRaisesRegex(ValueError, "live HEAD differs"):
+                preflight(self.repo, target="checkpoint", trigger="architecture",
+                          expected_head="0" * 40, github_repository="example/project")
+            collect.assert_not_called()
+
+    def test_github_collection_does_not_silently_replace_supplied_open_work(self):
+        with self.assertRaisesRegex(ValueError, "open_work"):
+            preflight(self.repo, target="checkpoint", trigger="architecture",
+                      expected_head=self.head, github_repository="example/project",
+                      evidence={"open_work": {"status": "NOT_SEARCHED"}})
+
+    def test_github_unknown_does_not_block_owned_scan_and_routine_never_collects(self):
+        with patch("tools.checks.gap_reuse_preflight.collect_open_work") as collect:
+            collect.return_value = {"status": "BLOCKED_UNKNOWN", "reason": "access unavailable"}
+            result = preflight(self.repo, target="checkpoint", trigger="architecture",
+                               expected_head=self.head, github_repository="example/project")
+            self.assertEqual(result["coverage"][1]["status"], "BLOCKED_UNKNOWN")
+            self.assertEqual(result["candidates"][0]["name"], "checkpoint.py")
+            collect.reset_mock()
+            preflight(self.repo, target="checkpoint", trigger="routine",
+                      expected_head=self.head, github_repository="example/project")
+            collect.assert_not_called()
+
+    def test_head_move_during_github_collection_rejected(self):
+        def moved(*args, **kwargs):
+            git(self.repo, "commit", "--allow-empty", "-m", "concurrent change")
+            return {"status": "NOT_SEARCHED"}
+        with patch("tools.checks.gap_reuse_preflight.collect_open_work", side_effect=moved):
+            with self.assertRaisesRegex(ValueError, "HEAD changed"):
+                preflight(self.repo, target="checkpoint", trigger="architecture",
+                          expected_head=self.head, github_repository="example/project")
 
 
 if __name__ == "__main__":
