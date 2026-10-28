@@ -45,5 +45,40 @@ class ExternalPatternScoutTests(unittest.TestCase):
         self.assertEqual(expected["preferred_candidate"], "SmallCheckpointPattern")
 
 
+
+    def test_gap_detection_is_bounded_and_reuse_first(self):
+        text = (ROOT / "docs/EXTERNAL_PATTERN_SCOUT.md").read_text(encoding="utf-8")
+        german = (ROOT / "docs/EXTERNAL_PATTERN_SCOUT.de.md").read_text(encoding="utf-8")
+        self.assertIn("## Gap detection and reuse gate", text)
+        self.assertIn("RECONCILE / TARGET", text)
+        self.assertIn("not a new", text)
+        self.assertIn("CHECKED_NO_DELTA", text)
+        self.assertIn("USEFUL_CANDIDATE", text)
+        self.assertIn("NOT_SEARCHED", text)
+        self.assertIn("BLOCKED_UNKNOWN", text)
+        self.assertIn("NOT_SEARCHED is not NO_USEFUL_DELTA", text)
+        self.assertIn("REUSE_EXISTING", text)
+        self.assertIn("SMALL_ADAPTER", text)
+        self.assertIn("previous valid coverage", text)
+        self.assertIn("Consumer-specific findings", text)
+        self.assertIn("## Lückenerkennung und Wiederverwendungsprüfung", german)
+        for status in ("CHECKED_NO_DELTA", "USEFUL_CANDIDATE", "NOT_SEARCHED", "BLOCKED_UNKNOWN"):
+            self.assertIn(status, german)
+
+    def test_unsearched_and_inaccessible_areas_cannot_count_as_no_delta(self):
+        path = ROOT / "tests/frozen_scenarios/external_pattern_scout_v1.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertTrue(data["fixture"]["coverage"]["not_searched"])
+        self.assertTrue(data["fixture"]["coverage"]["blocked_unknown"])
+        expected = data["expected"]
+        for key in (
+            "must_check_existing_capabilities_first",
+            "must_distinguish_unsearched_from_no_delta",
+            "must_keep_inaccessible_sources_unknown",
+            "must_prioritize_bounded_blind_spots",
+            "must_preserve_existing_loop_and_consumer_truth",
+        ):
+            self.assertTrue(expected[key], key)
+
 if __name__ == "__main__":
     unittest.main()
