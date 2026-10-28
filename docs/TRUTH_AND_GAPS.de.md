@@ -81,3 +81,5 @@ Vertragsbeispiele für die Abnahme, keine ausgeführten Softwaretests.
 ## Übernahmegrenze
 
 Ein Merge dieses Vertrags in Loop42 verändert weder Consumer-Bindungen noch Host-Fähigkeiten oder Automatisierungen. Neue Revisionen werden über den bestehenden Prüf-/Bindungsprozess übernommen. Bis dahin kann eine direkt angeforderte Prüfung im Gespräch diese Methode verwenden, ohne Implementierung in der gebundenen Laufzeit zu behaupten.
+
+Für einen reproduzierbaren, begrenzten *lokalen* Wiederverwendungsbericht kann ein autorisierter Host die [Gap & Reuse Preflight CLI](GAP_REUSE_PREFLIGHT.de.md) aufrufen. Es entsteht kein nativer Slash-Dispatcher und keine automatische externe Recherche. Nicht geprüfte Bereiche bleiben `NOT_SEARCHED`.

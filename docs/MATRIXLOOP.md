@@ -123,3 +123,5 @@ Loop42 owns only the generic mechanics. Candidate meaning, domain requirements,
 engineering/safety margins, objective definitions, recommendation semantics and
 all execution authority remain with the consumer. No consumer pin advances by
 adding this contract.
+
+The optional executable local Gap & Reuse preflight is documented in [Gap & Reuse Preflight](GAP_REUSE_PREFLIGHT.md). It is a read-only RECONCILE/TARGET input, not a new required stage or automatic chat/runtime hook. Missing external evidence remains explicit; recommendations still require verification.

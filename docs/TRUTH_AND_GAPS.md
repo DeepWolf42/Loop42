@@ -79,3 +79,5 @@ These are contract acceptance examples, not executed software tests.
 ## Adoption boundary
 
 Merging this contract into Loop42 does not change consumer pins, host capabilities or automations. Consumers adopt a new revision only through their existing verification/binding process. Until then, a directly requested conversational assessment may use this method without claiming that the pinned runtime implements it.
+
+For a reproducible bounded *local* reuse lead report, an authorized harness may opt into the [Gap & Reuse Preflight CLI](GAP_REUSE_PREFLIGHT.md). It does not install a native slash-command router or perform automatic external research; unobserved areas remain `NOT_SEARCHED`.

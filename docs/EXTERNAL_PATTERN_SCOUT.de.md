@@ -181,3 +181,7 @@ Nicht:
 Loop42 besitzt die generische Scouting-Methode. Consumer-Projekte entscheiden selbst, ob ein gefundenes Muster für ihre Domäne relevant ist.
 
 CORA kann zum Beispiel ein generisches Checkpoint- oder Authority-Muster übernehmen, ohne Produktsemantik, Druckerannahmen oder Safety-Claims eines Fremdprojekts zu importieren.
+
+## Ausführbarer, optionaler Preflight
+
+Der lesende Check `python -m tools.checks.gap_reuse_preflight` ist in [Gap & Reuse Preflight](GAP_REUSE_PREFLIGHT.de.md) beschrieben. Ein Host muss ihn innerhalb von RECONCILE / TARGET ausdrücklich aufrufen; er führt keine eigene Websuche aus und läuft nicht bei jeder Codeänderung. Fehlende PR-, Tool- und externe Recherchedaten bleiben `NOT_SEARCHED`, bis ein autorisierter Adapter sie liefert. Die CLI ist noch kein autonomer vollständiger Scout und keine Freigabe.

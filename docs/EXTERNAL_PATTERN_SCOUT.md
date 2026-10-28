@@ -175,3 +175,7 @@ Do not:
 Loop42 owns the generic scouting method. Consumer projects decide whether a discovered pattern is relevant to their own domain.
 
 CORA, for example, may borrow a generic checkpoint or authority pattern without importing another project's product semantics, printer assumptions, or safety claims.
+
+## Executable opt-in preflight
+
+A bounded, read-only local check is now available as `python -m tools.checks.gap_reuse_preflight` (see [Gap & Reuse Preflight](GAP_REUSE_PREFLIGHT.md)). A host must explicitly invoke it inside RECONCILE / TARGET; it does not search the web or auto-run for every change. Unavailable GitHub/open-work, installed-tool and external-research evidence stays `NOT_SEARCHED` until an authorized adapter supplies it. This CLI is not a complete autonomous scout or an adoption approval.
