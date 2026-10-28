@@ -80,5 +80,20 @@ class ExternalPatternScoutTests(unittest.TestCase):
         ):
             self.assertTrue(expected[key], key)
 
+
+    def test_matrixloop_and_gaps_reuse_the_same_probe(self):
+        matrixloop = (ROOT / "docs/MATRIXLOOP.md").read_text(encoding="utf-8")
+        gaps = (ROOT / "docs/TRUTH_AND_GAPS.md").read_text(encoding="utf-8")
+        gaps_de = (ROOT / "docs/TRUTH_AND_GAPS.de.md").read_text(encoding="utf-8")
+        self.assertIn("gap detection and reuse gate", matrixloop)
+        self.assertIn("not an extra Matrixloop stage", matrixloop)
+        self.assertIn("NOT_SEARCHED", matrixloop)
+        self.assertIn("research-coverage gap", gaps)
+        self.assertIn("external pattern scout", gaps)
+        self.assertIn("REUSE_EXISTING", gaps)
+        self.assertIn("NOT_SEARCHED", gaps_de)
+        self.assertIn("BLOCKED_UNKNOWN", gaps_de)
+        self.assertIn("REUSE_EXISTING", gaps_de)
+
 if __name__ == "__main__":
     unittest.main()
