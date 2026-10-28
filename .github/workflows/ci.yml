@@ -4,7 +4,6 @@ on:
   push:
     branches: ["main"]
   pull_request:
-    branches: ["main"]
 
 permissions:
   contents: read
@@ -14,8 +13,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  repository-policy:
-    runs-on: ubuntu-latest
+  repository-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -26,5 +29,17 @@ jobs:
       - name: Run repository policy tests
         run: python -m unittest discover -s tests -p "test_*.py"
       - name: Verify opt-in completion gates on exact checked-out revision
+        shell: bash
         run: |
           python -m tools.checks.completion_gates tests/frozen_scenarios/loop42_completion_gates_v1.json --repo . --expected-revision "$(git rev-parse HEAD)" --run
+
+  repository-policy:
+    if: ${{ always() }}
+    needs: repository-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every platform test job to pass
+        shell: bash
+        env:
+          MATRIX_RESULT: ${{ needs.repository-tests.result }}
+        run: test "$MATRIX_RESULT" = success

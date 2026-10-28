@@ -117,15 +117,18 @@ Menschenlesbare Kern-Dokumentation folgt grundsätzlich **Englisch + Deutsch**. 
 
 Siehe [Dokumentations-Sprachregel](docs/DOCUMENTATION_LANGUAGE_POLICY.de.md).
 
-## Status
+## Status — 25.10.2026
 
-Loop42 ist ein öffentliches Entwicklungs-Repository.
+Integrierter Code-Checkpoint: `d55096114e4561df61fa2e6140c1ed83436dbd3a` (einschließlich #61/#62 nach den früheren Kernverträgen und dem Dokumentationsabgleich). Lokaler Vorschlagsadapter und gespeicherte Receipt-Recovery sind jetzt integriert; daraus folgt keine allgemeine autonome Projektbearbeitung.
 
-Die **v0.1 Extraction-/Consumer-Binding-Foundation ist verifiziert**. Wiederverwendbare Context-/Harness-Mechanik, Frozen-CORA-Equivalence und der Exact-Revision-Consumer-Profile-Contract sind vorhanden.
+- [#61](https://github.com/DeepWolf42/Loop42/pull/61) ist bei `0b6d1bb823167f8ed4e77c33cd99da7f96024e6d` integriert: exakt auftragsgebundener lokaler WorkerProvider. Ausgabe bleibt PROPOSAL; vertrauenswürdiger Transport, Identität, Zeit- und Erfassungsgrenzen bleiben Verbraucherpflicht.
+- [#62](https://github.com/DeepWolf42/Loop42/pull/62) ist bei `d55096114e4561df61fa2e6140c1ed83436dbd3a` integriert: gespeicherte VerificationReceipts für Recovery und begrenzte reguläre CLI-Eingaben. Der finale Tree entspricht dem unabhängig geprüften gemeinsamen Kandidaten; gespeicherte Belege benötigen weiterhin aktuelle Quellen-/Subject-/Prüfernachweise.
+- Draft [#72](https://github.com/DeepWolf42/Loop42/pull/72), `23a5ba3c87ff3fa4984433ec9f153de920cc73cf`, bleibt auf ungemergtem #49 (`de2d250a00ce141fcd00a35200ee012103ef6e61`). Seine aktualisierte [CI40232382948](https://github.com/DeepWolf42/Loop42/actions/runs/40232382948) bestand 235 Tests auf der exakten Parent-Basis. Gitleaks lief für diesen Zielbranch nicht. Vor Übernahme mit dem inzwischen neueren Main abgleichen und dann erforderliche Checks ausführen.
+- Draft #51 zur Werkzeug-/Plugin-/Skill-Auswahl und weitere optionale Drafts bleiben Vorschläge. Ältere Stacks sind keine Voraussetzung oder ausgelieferte Funktion. [Issue #40](https://github.com/DeepWolf42/Loop42/issues/40) führt die Agentenevaluator-Abnahme; enge Workerbeispiele sind kein allgemeiner Modellqualitätsnachweis.
+- Private Memory-/Reflection-Forschung bleibt außerhalb des öffentlichen Produkts. Kein allgemeines Lernen, authentifiziertes projektübergreifendes Memory oder automatische Skill-Übernahme behauptet.
+- CORA bleibt eigenständiger Consumer mit Pin `5470cd0b36774698a69c6ff61ff1a016dab036b8`. Übernahme richtet sich nach seinem eigenen Profil.
 
-Stand 2026-10-13 pinnt CORA die Loop42-Revision `5470cd0b36774698a69c6ff61ff1a016dab036b8` im Consumer-Profil auf `cora/development`. Der Pin ist exakt und verifiziert (Loop42 [Main-CI](https://github.com/DeepWolf42/Loop42/actions/runs/38123996570), CORA [Integrations-CI](https://github.com/DeepWolf42/C.O.R.A./actions/runs/38409208130)); er folgt Loop42 `main` nicht automatisch. Für spätere Pin-Änderungen ist das CORA-Consumer-Profil die verbindliche Quelle.
-
-Loop42 steht unter der MIT-Lizenz.
+[Main-CI40233824040](https://github.com/DeepWolf42/Loop42/actions/runs/40233824040) und [SecretScan40233824078](https://github.com/DeepWolf42/Loop42/actions/runs/40233824078) bestanden auf `d55096114e4561df61fa2e6140c1ed83436dbd3a`. Frühere Kandidatenläufe bleiben revisionsgebundene Historie. Optionale Drafts bleiben ungemergt; keine Release-/Deployment-/Berechtigungs- oder Hardwarefreigabe.
 
 <details>
 <summary>Warum 42?</summary>

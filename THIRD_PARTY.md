@@ -6,7 +6,7 @@ This file records provenance; listing a source does **not** mean its code is ven
 
 ## Factory / harness research
 
-The entries below were carried forward from CORA's verified 2026-09-26 Factory provenance audit when generic Factory ownership moved to Loop42. Their current use is **research / pattern reference only** unless a later file-level record says otherwise.
+Several entries below were carried forward from CORA's verified 2026-09-26 Factory provenance audit when generic Factory ownership moved to Loop42; newer entries come from bounded Loop42 pattern scouts. Their current use is **research / pattern reference only** unless a later file-level record says otherwise.
 
 | Project | Source | License observed in the CORA audit | Loop42 use |
 | --- | --- | --- | --- |
@@ -17,12 +17,18 @@ The entries below were carried forward from CORA's verified 2026-09-26 Factory p
 | Google Gemini CLI | https://github.com/google-gemini/gemini-cli | Apache-2.0 | bounded action-policy pattern: allow / deny / ask_user, priority matching and headless ask->deny; pinned research revision `38700b4b38bf387dafded6c97c3f190d084b49e9`, docs blob `95e65b33bd47e342c644b059e2e7a7c27d171d85`; no Gemini code/runtime imported |
 | Aider | https://github.com/Aider-AI/aider | Apache-2.0 | bounded repository-map/context-selection pattern; research revision `5dc9490bb35f9729ef2c95d00a19ccd30c26339c`; Loop42 implementation is independent standard-library code, no Aider code/runtime imported |
 | OpenAI Agents SDK Python | https://github.com/openai/openai-agents-python | MIT | pre-side-effect guardrail revalidation / approval-resume race pattern; pinned research revision `6862bdfa70a788626a0df5b9c69c8c0e1a2cc441`, no runtime/code imported |
+| OpenAI Symphony | https://github.com/openai/symphony | Apache-2.0 | bounded exponential-backoff retry/reconciliation pattern; pinned research revision `be10a1b79df723d6d7612b5651c8522704dafb2e`, `SPEC.md` blob `cd24131a1e2358cbfecc4f6efb028fc9fc6edefc`; Loop42 independently implements an evidence-gated retry classifier, no Symphony code/runtime imported |
 | Ollama | https://github.com/ollama/ollama | MIT | local `/api/chat` structured-output interoperability: documented JSON-schema `format`, non-streaming completion metadata and temperature guidance; docs checked 2026-09-30, upstream revision `1abe35e6e6e777e858bbfbba283667ee8d516801`; Loop42 validation is independently implemented, no Ollama code imported |
 | Leonxlnx/unlazy | https://github.com/Leonxlnx/unlazy | MIT; inspected revision `16671491f6679ad9378f52604d3bc2415b4120c7` | executable-completion-gate principles researched and independently implemented in `tools/checks/completion_gates.py`; no upstream source or runtime imported |
+| SLSA | https://github.com/slsa-framework/slsa | Community Specification License 1.0 for the referenced specification material | provenance/attestation research for content-bound verification receipts; pinned revision `82b296d49e4c8301e7db565f23620ffe89092a0c`, `spec/provenance.md` blob `769ed89d04dae9fa081eebf5af85777b9d522765`; Loop42 receipt code is independently implemented and no SLSA text/code is copied |
+| DSPy | https://github.com/stanfordnlp/dspy | MIT | prompt/evaluation research: compare prompt/program candidates against explicit metrics and validation scenarios; pinned research revision `98a4deebcf5dd30c02ea86a5abc46b8ae877111c`; no DSPy runtime/code imported |
+| Promptfoo | https://github.com/promptfoo/promptfoo | MIT | prompt regression/assertion and adversarial-evaluation research; pinned research revision `0e1e076298e1f2fd27fd80fd6a413047293c0eae`; no Promptfoo runtime/code imported |
+| Chaos Mesh | https://github.com/chaos-mesh/chaos-mesh | Apache-2.0 | fault-injection/chaos-testing research for deliberate recovery ambiguity scenarios; pinned research revision `c859a9c63164920478099947c8fa730ecb220477`; no Chaos Mesh runtime/code imported |
 | mini-SWE-agent | https://github.com/SWE-agent/mini-swe-agent | MIT | small bounded agent-loop/run-budget research |
 | Microsoft Agent Framework | https://github.com/microsoft/agent-framework | MIT | workflow/checkpoint/resume research |
 | LangGraph | https://github.com/langchain-ai/langgraph | MIT | durable execution/checkpoint/human-interrupt research |
 | Intrinsic Core | https://github.com/intrinsic-ai/intrinsic-core | Apache-2.0 | generic architecture/HAL/runtime-boundary research where applicable |
+| REA / Reverse Engineer Anything | https://github.com/morluto/rea | MIT | real-agent transcript evaluation pattern: scenario-bound tool routing, duplicate-call detection, evidence use, epistemic/authority honesty and token/tool overhead; pinned research revision `38b293329ca06c424a58bb59a28728f19015ce22`; Loop42 implementation is independent standard-library code, no REA runtime or implementation code imported |
 | Anthropic skills repository | https://github.com/anthropics/skills | file/repository-specific; no single root license relied upon | progressive-disclosure/skill-evaluation research only; check a specific file's license before reuse |
 
 No implementation code from these projects is intentionally imported by the current Loop42 v0.1 extraction. The extracted context and bounded Ollama-harness code is project-owned code derived from the already-proven CORA implementation path, with its exact CORA extraction basis recorded in the corresponding Loop42 documentation and frozen scenarios.
