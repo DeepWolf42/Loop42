@@ -70,6 +70,51 @@ The probe produces at most one or two concrete alternate hypotheses or search
 directions. It is not a brainstorming quota and MUST be skipped when it adds no
 distinct decision, evidence target, or failure hypothesis.
 
+
+## Gap detection and reuse gate
+
+Before substantial new infrastructure, an important workflow change, or a repeated
+failure, run **one bounded gap-and-reuse probe inside RECONCILE / TARGET**.
+This is part of the existing Matrixloop and /truth-/gaps workflow, **not a new
+loop stage**, agent, scheduler, database, permission or source of truth.
+
+1. **Reconcile first.** State the agreed target, acceptance criteria, live
+   source/revision, current implementation, existing work (issues, PRs, branches),
+   previous research and relevant capabilities already provided by installed tools.
+   Design intentions, drafts and passing tests on older revisions are not current
+   integrated behavior.
+2. **Map a small scope.** Sample the affected end-to-end workflow and failure
+   modes rather than searching only the first named library or API. Include the
+   operator-facing path, security, recovery and dependency/license impact where
+   relevant; do not audit every product area on every invocation.
+3. **Label search coverage honestly.** For each relevant slice distinguish
+   `CHECKED_NO_DELTA` (searched on the stated basis; no useful improvement),
+   `USEFUL_CANDIDATE` (grounded alternative worth evaluation),
+   `NOT_SEARCHED` (coverage gap), and `BLOCKED_UNKNOWN` (required source,
+   capability or evidence unavailable). **NOT_SEARCHED is not NO_USEFUL_DELTA.**
+   A missing source is not a negative finding; record the limit and stop that
+   dependent claim.
+4. **Check reuse before invention.** Compare the current owned implementation,
+   still-open work, supported existing-tool features and newly released plugin/
+   SDK capabilities with small external patterns. Also sample an adjacent
+   discipline or real user/operator failure if it may change the decision.
+   Prefer `REUSE_EXISTING` or `SMALL_ADAPTER` over a replacement framework.
+5. **Prioritize and stop.** Rank at most a few material blind spots by impact,
+   safety/correctness, likely saved effort, cost and uncertainty. Select the
+   smallest reproducible counterexample or compatibility test, or record a
+   bounded `NEEDS_RESEARCH` follow-up. Respect the scout's candidate and
+   time/run budgets; do not create backlog merely to fill a coverage matrix.
+
+The output is a small **coverage delta**, not a global completeness claim:
+checked scope and revision; highest-impact missed search angle; evidence/source
+and freshness; what already works internally; best reusable alternative;
+adoption/verification cost; explicit unknowns; recommended next test or
+`NO_USEFUL_DELTA`. Reuse previous valid coverage when its dependencies have
+not changed. Do not silently promote a design, open PR, benchmark claim or
+unverified idea to integrated capability. Consumer-specific findings stay in
+the consumer's authoritative records. The scout only proposes patterns;
+implementation and any operator-owned action retain their normal gates.
+
 ## Scout contract
 
 A scout must be bounded by:
