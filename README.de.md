@@ -2,6 +2,8 @@
 
 # Loop42
 
+[Ausführbare lokale Übergabe](docs/HANDOFF.de.md): Kandidat für Issue #77 mit begrenzter Worker-Ausführung, Verifikation und separat lesbarem Recovery-Status. Direkte oberflächenübergreifende Auslösung bleibt von tatsächlich verfügbaren Hostfähigkeiten abhängig.
+
 <p align="center">
   <img src="docs/assets/loop42-mark.webp" alt="Loop42 Retro-Emblem" width="300">
 </p>
