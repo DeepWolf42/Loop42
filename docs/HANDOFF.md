@@ -91,6 +91,13 @@ An incomplete local claim or an occupied remote claim blocks rather than
 creating another input. There is no new database, scheduler, service, credential
 or permission. Existing recovery stays consumer-owned.
 
+On Windows, choose a short recovery root outside the source checkout. Long task
+and worktree paths can make Git fail with `Filename too long` before any worker
+starts. A failed/interrupted claim remains UNKNOWN and is not replayed. Inspect
+the retained attempt, confirm process termination and effects, then use a newly
+approved submission ID and suitable consumer path. Do not delete claims, alter
+system privileges or weaken verification to make an attempt pass.
+
 Acceptance: real-Git submission/start/duplicate and failure tests, complete
 repository suite and gates, then an actual public synthetic one-command run and
 independent remote receipt retrieval. Test doubles are not live GitHub/model proof.

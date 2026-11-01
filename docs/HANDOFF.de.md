@@ -118,6 +118,14 @@ Belege erlauben keinen Retry. Unvollständige lokale oder belegte entfernte Clai
 blockieren, statt einen zweiten Eingang zu erzeugen. Keine neue Datenbank,
 Zeitsteuerung, Dienste, Zugangsdaten oder Rechte; Recovery bleibt beim Consumer.
 
+Unter Windows einen kurzen Recoverypfad außerhalb des Quellcheckouts wählen.
+Lange Task-/Worktreepfade können Git schon vor dem Workerstart mit `Filename too
+long` stoppen. Der fehlgeschlagene oder unterbrochene Claim bleibt UNKNOWN und
+wird nicht wiederholt. Alten Versuch prüfen, Prozessende und Nebenwirkungen
+abgleichen, danach eine neu freigegebene Submission-ID und einen geeigneten
+Consumerpfad verwenden. Keine Claims löschen, Systemrechte ändern oder Prüfungen
+abschwächen, um einen Versuch erfolgreich erscheinen zu lassen.
+
 Abnahme: echte Git-Tests für Einreichung, Start, Duplikate und Fehlerfälle;
 Gesamtsuite und Gates; anschließend ein tatsächlicher öffentlicher synthetischer
 Ein-Befehl-Lauf mit unabhängigem Abruf des Receipts. Testdoubles sind kein
