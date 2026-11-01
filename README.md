@@ -77,6 +77,8 @@ CORA is the first consumer project. CORA keeps its own product state and pins an
 
 ## Start here
 
+- [Executable local handoff](docs/HANDOFF.md) — issue #77 candidate: bounded worker execution, verification and independently readable recovery; direct cross-surface triggering remains capability-dependent.
+
 If you want to understand the system rather than read every file:
 
 - [Matrixloop](docs/MATRIXLOOP.md) — the lifecycle and stop rules
