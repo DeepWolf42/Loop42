@@ -33,13 +33,15 @@ class HandoffCLITests(unittest.TestCase):
             'requested_verification':['test:answer']}
         for tool in (False,True):
             def transport(workspace, identifiers, registry, **kw):
+                self.assertIs(kw.get('separate_stderr'),True)
                 argv=registry.specs[0].argv
                 self.assertEqual(argv[argv.index('--sandbox')+1],'read-only')
                 schema=json.loads(Path(argv[argv.index('--output-schema')+1]).read_bytes())
                 self.assertIn('anyOf',schema['properties']['changes']['items'])
                 Path(argv[argv.index('--output-last-message')+1]).write_text(json.dumps(proposal))
-                event={'type':'item.completed','item':{'type':'command_execution' if tool else 'agent_message'}}
-                return (VerificationResult('provider:codex',argv,0,False,json.dumps(event),False),)
+                event={'type':'item.completed','item':{'id':'final','type':'command_execution' if tool else 'agent_message','text':json.dumps(proposal)}}
+                events=[{'type':'thread.started','thread_id':'synthetic-thread'},{'type':'turn.started'},event,{'type':'turn.completed','usage':{}}]
+                return (VerificationResult('provider:codex',argv,0,False,'\n'.join(json.dumps(row) for row in events),False),)
             with patch('tools.harness.handoff_cli.shutil.which',return_value='codex'), patch('tools.harness.handoff_cli.run_verifications',side_effect=transport):
                 result=CodexProvider({'allow_codex':True})(self.request())
                 self.assertEqual(result.status,WorkerStatus.FAILED if tool else WorkerStatus.PROPOSAL)
