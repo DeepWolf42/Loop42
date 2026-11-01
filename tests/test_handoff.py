@@ -174,6 +174,57 @@ class HandoffTests(unittest.TestCase):
         self.assertEqual(self.calls,1)
         self.assertEqual(results[0]['status'],'DONE_VERIFIED')
 
+    def test_green_verifier_cannot_stage_an_unapproved_file(self):
+        command=("from pathlib import Path;import subprocess;"
+                 "assert Path('answer.txt').read_bytes()==b'right\\n';"
+                 "Path('foreign.txt').write_text('outside approved scope');"
+                 "subprocess.check_call(['git','add','foreign.txt'])")
+        self.profile['verifications'][0]['argv']=[sys.executable,'-B','-c',command]
+        result=execute(self.request,self.profile,provider=self.provider)
+        self.assertEqual(result['status'],'UNKNOWN')
+        self.assertNotIn('commit',result)
+        workspace=Path(result['workspace'])
+        self.assertEqual(subprocess.check_output(['git','-C',str(workspace),'rev-parse','HEAD']).decode().strip(),self.head)
+        self.assertEqual(self.git('status','--porcelain'),'')
+
+    def test_red_verifier_cannot_advance_candidate_history_before_provider(self):
+        command=("import subprocess;"
+                 "subprocess.check_call(['git','-c','user.name=Synthetic Test',"
+                 "'-c','user.email=test@example.invalid','commit','--allow-empty','-m','unexpected history']);"
+                 "raise SystemExit(1)")
+        self.profile['verifications'][0]['argv']=[sys.executable,'-B','-c',command]
+        result=execute(self.request,self.profile,provider=self.provider)
+        self.assertEqual(result['status'],'UNKNOWN')
+        self.assertEqual(self.calls,0)
+        self.assertNotIn('commit',result)
+
+    def test_provider_cannot_advance_candidate_history_before_apply(self):
+        original=self.provider
+        def advancing(request):
+            workspace=next((self.root/'state').glob('*/.loop42-worktree-*'))
+            subprocess.check_call(['git','-C',str(workspace),'-c','user.name=Synthetic Test',
+                                   '-c','user.email=test@example.invalid','commit','--allow-empty','-m','unexpected history'],
+                                  stdout=subprocess.DEVNULL)
+            return original(request)
+        result=execute(self.request,self.profile,provider=advancing)
+        self.assertEqual(result['status'],'UNKNOWN')
+        self.assertNotIn('commit',result)
+        self.assertEqual((Path(result['workspace'])/'answer.txt').read_bytes(),b'wrong\n')
+
+    def test_green_verifier_cannot_insert_an_unapproved_commit(self):
+        command=("from pathlib import Path;import subprocess;"
+                 "assert Path('answer.txt').read_bytes()==b'right\\n';"
+                 "Path('foreign.txt').write_text('outside approved scope');"
+                 "subprocess.check_call(['git','add','foreign.txt']);"
+                 "subprocess.check_call(['git','-c','user.name=Synthetic Test',"
+                 "'-c','user.email=test@example.invalid','commit','-m','verifier side effect'])")
+        self.profile['verifications'][0]['argv']=[sys.executable,'-B','-c',command]
+        result=execute(self.request,self.profile,provider=self.provider)
+        self.assertEqual(result['status'],'UNKNOWN')
+        self.assertNotIn('commit',result)
+        self.assertEqual(self.git('rev-parse','HEAD'),self.head)
+        self.assertEqual(self.git('status','--porcelain'),'')
+
 
 if __name__ == '__main__':
     unittest.main()

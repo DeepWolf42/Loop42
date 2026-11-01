@@ -195,7 +195,7 @@ def execute(request, profile, *, provider=None, before_provider=None):
     report['red']=red
     if request['require_red'] and not any(v['exit_code'] not in (0,None) and not v['timed_out'] and not v['output_truncated'] for v in red):
         return finish({'status':'RED_NOT_REPRODUCED'})
-    if git(workspace,'status','--porcelain'):
+    if git(workspace,'rev-parse','HEAD')!=task.source_revision or git(workspace,'status','--porcelain'):
         return finish({'status':'UNKNOWN','reason':'verifier_changed_source'})
     files={}
     for p in request['paths']:
@@ -225,7 +225,8 @@ def execute(request, profile, *, provider=None, before_provider=None):
         return finish({'status':'BLOCKED_SCOPE'})
     normalized=normalize_changeset(changeset,files)
     # Re-read source, candidate and policy immediately before side effects.
-    if git(repo,'rev-parse','HEAD')!=task.source_revision or git(repo,'status','--porcelain') or git(workspace,'status','--porcelain'):
+    if (git(repo,'rev-parse','HEAD')!=task.source_revision or git(repo,'status','--porcelain')
+            or git(workspace,'rev-parse','HEAD')!=task.source_revision or git(workspace,'status','--porcelain')):
         return finish({'status':'UNKNOWN','reason':'source_changed_before_apply'})
     rules=tuple(PolicyRule('authorized-path-'+str(i),PolicyDecision.ALLOW,action='changeset.modify',
         target_prefix='repo:'+p,effect=ActionEffect.REVERSIBLE_WRITE) for i,p in enumerate(request['paths']))
@@ -242,6 +243,9 @@ def execute(request, profile, *, provider=None, before_provider=None):
     dirty=git(workspace,'diff','--name-only').splitlines()
     if git(repo,'rev-parse','HEAD')!=task.source_revision or git(repo,'status','--porcelain'):
         return finish({'status':'UNKNOWN','reason':'source_changed_before_commit'})
+    if (git(workspace,'rev-parse','HEAD')!=task.source_revision
+            or git(workspace,'diff','--cached','--name-only')):
+        return finish({'status':'UNKNOWN','reason':'unexpected_candidate_history_or_index'})
     if set(dirty)!=set(c.path for c in normalized.files) or git(workspace,'ls-files','--others','--exclude-standard'):
         return finish({'status':'UNKNOWN','reason':'unexpected_candidate_delta'})
     git(workspace,'add','--',*(c.path for c in normalized.files))

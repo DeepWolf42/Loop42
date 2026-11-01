@@ -2,6 +2,13 @@
 
 # Executable local handoff (issue #77 candidate)
 
+Candidate history must remain at the bound source revision after RED, before
+apply and before commit. GREEN must leave the Git index unchanged; staged foreign
+files or verifier-created commits block completion as UNKNOWN. Existing recovery
+data is preserved. This detects verifier side effects; registered commands remain
+trusted programs, not a security sandbox. A changed verifier fingerprint requires
+fresh qualification; historical receipts are not silently upgraded.
+
 One authorized host invocation reads a task, checks repository identity, exact
 source and cleanliness, calls one available proposal provider, applies a bounded
 ChangeSet in a detached worktree, runs registered tests, commits the verified

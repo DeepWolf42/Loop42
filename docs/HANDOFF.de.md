@@ -2,6 +2,14 @@
 
 # Ausführbare lokale Übergabe (Kandidat für Issue #77)
 
+Die Kandidatenhistorie muss nach RED, vor Apply und vor dem Commit auf der
+gebundenen Quellrevision bleiben. GREEN muss den Git-Index unverändert lassen;
+gestagte fremde Dateien oder von Prüfkommandos erzeugte Commits blockieren den
+Abschluss mit UNKNOWN. Bestehende Recoverydaten bleiben erhalten. Diese Kontrolle
+erkennt Prüfernebenwirkungen; registrierte Kommandos bleiben vertrauenswürdige
+Programme ohne Sicherheitssandbox. Ein geänderter Prüferfingerprint erfordert
+eine neue Qualifikation; historische Receipts werden nicht stillschweigend aufgewertet.
+
 ## GitHub-Eingang und automatischer Rückkanal — 01.11.2026
 
 Die zusätzliche CLI liest genau einen vom konfigurierten Operator verfassten
