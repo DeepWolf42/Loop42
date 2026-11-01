@@ -149,7 +149,7 @@ def status(request, profile):
         return {'status':'UNKNOWN','reason':'saved_receipt_not_current_or_complete'}
 
 
-def execute(request, profile, *, provider=None):
+def execute(request, profile, *, provider=None, before_provider=None):
     repo, folder, registry=_validate(request,profile)
     if folder.exists():
         return status(request,profile)  # never rerun an ambiguous attempt
@@ -181,6 +181,11 @@ def execute(request, profile, *, provider=None):
         return report
     if provider is None:
         return finish({'status':'BLOCKED_CAPABILITY','reason':'no_callable_authorized_provider'})
+    if before_provider is not None:
+        try:
+            before_provider(folder,task)
+        except (ValueError,OSError,RuntimeError):
+            return finish({'status':'UNKNOWN','reason':'preflight_claim_not_confirmed_no_execution'})
     lease=create_detached_worktree(repo,request['source_revision'],parent=folder)
     workspace=lease.root
     report['workspace']=str(workspace)

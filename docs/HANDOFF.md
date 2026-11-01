@@ -102,16 +102,100 @@ receipt fingerprint, verifier code/Python fingerprint, verifier identity/time an
 all stored evidence hashes. These are trusted local records, not signatures or
 proof against an attacker controlling the machine. Changed verifier/runtime or
 source requires requalification. Failed verifier retains candidate and FAILED;
-missing/corrupt proof is UNKNOWN. No automatic push, PR, merge or background work.
+missing/corrupt proof is UNKNOWN. No automatic candidate push, PR, merge or
+background work. The GitHub adapter below may reserve explicitly approved claim
+refs; it does not push the candidate.
 
 A connected host may publish a **reviewed, nonprivate summary** with task ID,
 source/candidate SHAs, receipt fingerprint and checks to the existing GitHub issue
 or PR through its authorized connector. Another authorized session can retrieve
 that report. Local paths/raw records stay private. Remote summary is reported
 evidence, not an independent local verification; CLI status needs the retained
-local recovery directory. This is deliberately not automatic GitHub publication.
+local recovery directory. The original `handoff_cli` leaves publication to its
+host; the `github_handoff` adapter below automates only the bounded summary.
 
 ## Product boundaries
+
+### GitHub transport continuation — 2026-11-01 plan
+
+Use the existing runner with one explicit issue-comment input. A trusted private
+profile fixes repository, issue, authenticated operator and comment-write scope.
+Only that operator's strict `loop42.handoff.v1` JSON code block is accepted; no
+remote command/profile definitions become authority. Re-read the exact comment
+before execution and publication. A deterministic task ID and captured comment
+fingerprint bind recovery. Publish only allowlisted summary fields, never raw
+logs, local paths, task text or credentials. Record a SideEffectIntent before a
+single POST, then independently GET the result. An ambiguous POST is reconciled
+through the existing side-effect classifier; no automatic replay.
+
+Implementation/acceptance: failing transport/identity/publication tests; bounded
+official REST client using only existing noninteractive Git credentials; runner
+adapter/CLI; positive live synthetic GitHub-to-local-to-GitHub run plus duplicate,
+edited-input and lost-response counterchecks; full regression, independent review
+and fresh CI. No new daemon, cloud environment, credentials or permissions. The
+confirmed cloud-environment setup blocker on PR #78 stays separate.
+
+### Direct GitHub input and return channel
+
+`github_handoff` reads exactly one operator-authored fenced `loop42-handoff` JSON
+request from an explicitly selected issue comment. The block uses the same v1
+task schema above. The runtime derives the stable task ID from repository ID and
+comment ID; comment text, author, update timestamp and live source branch SHA
+are bound to recovery. Local trusted profile, paths and commands remain local.
+
+Add this operator-owned section to the private project profile:
+
+```json
+"github": {
+  "issue_number": 77,
+  "source_branch": "approved-development-branch",
+  "operator_login": "example-operator",
+  "auth": "git-credential",
+  "allow_comments": true,
+  "allow_execution_refs": true
+}
+```
+
+```text
+python -B -m tools.harness.github_handoff run --profile project.local.json --comment-id APPROVED_COMMENT_ID
+python -B -m tools.harness.github_handoff status --profile project.local.json --comment-id APPROVED_COMMENT_ID
+```
+
+Only existing, noninteractive Git credential-helper authentication to github.com
+is used; no token is printed, acquired or persisted by Loop42. Missing auth or
+write rights is BLOCKED_CAPABILITY. Only public open issues and matching operator
+identity are supported by this adapter. The current configured remote branch
+must equal the request's exact source commit; the local checkout must also match.
+No profile/commands from the issue are accepted. No redirects, pagination,
+unbounded responses, automatic HTTP retries or user prompting.
+
+Before a worker starts, a nonce-bearing commit with the unchanged source tree is
+used to reserve `refs/heads/loop42-claims/TASK_ID` by an ordinary Git push. Sibling
+claims cannot fast-forward one another; concurrent claims have one winner. Its
+exact remote SHA is re-read before execution. This needs explicitly approved
+HTTPS origin write access and `allow_execution_refs`; it does not change GitHub
+permissions. No force update, claim deletion or product-branch write. Lost local
+recovery or an already owned claim blocks execution even on a different host.
+Retain claim branches until deliberate reconciliation; deleting one is not retry
+authorization. The result still commits locally only; candidate push/PR is not
+performed by this adapter.
+
+The public claim also publishes the profile's configured Git author name/email.
+Choose an intentionally public noreply or synthetic identity; this is part of
+the explicit `allow_execution_refs` authorization, not a private-only operation.
+
+Publication contains only task/source/receipt identities, status and bounded
+verification exit facts. No paths, raw logs, prompts, credentials or model prose
+are published. An atomic publication claim and persisted SideEffectIntent precede
+one result POST. The result is independently GET-read afterwards. A lost response
+can be confirmed by the exact owned marker; absent/conflicting evidence remains
+UNKNOWN, never an automatic second POST. Edited task/source prevents apply or
+publication. Remote status explicitly labels `github_report_not_local_reverification`:
+it authenticates/rechecks the reported identities and shape, not local execution.
+Private-repository support and an unattended host trigger are not implied.
+
+Transport reference: [GitHub issue comments REST API](https://docs.github.com/en/rest/issues/comments)
+and [existing Git credential helpers](https://git-scm.com/docs/gitcredentials).
 
 Official interfaces checked on 2026-10-29:
 [Codex non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode)

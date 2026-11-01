@@ -2,6 +2,58 @@
 
 # Ausführbare lokale Übergabe (Kandidat für Issue #77)
 
+## GitHub-Eingang und automatischer Rückkanal — 01.11.2026
+
+Die zusätzliche CLI liest genau einen vom konfigurierten Operator verfassten
+GitHub-Kommentar mit einem `loop42-handoff`-JSON-Codeblock. Er verwendet das
+vorhandene v1-Auftragsschema; lokale Pfad-/Prüf-/Freigabeprofile bleiben lokal.
+Task-ID aus Repository-ID und Kommentar-ID, Kommentartext, Autor, Bearbeitungszeit
+und aktueller Quellbranch-SHA werden gebunden. Der lokale Checkout muss ebenfalls
+exakt passen. Fremde Autoren, fremde Issues, geänderte Eingaben und zusätzliche
+Profil-/Kommandofelder werden abgewiesen.
+
+Im privaten Profil ergänzt `github` die Felder `issue_number`, `source_branch`,
+`operator_login`, `auth: "git-credential"`, `allow_comments: true` und
+`allow_execution_refs: true`. Vollständige Beispiele stehen im englischen
+Vertragsdokument. Nur bestehende, nichtinteraktive Git-Anmeldung für github.com
+wird verwendet; keine neuen Tokens, Rechte oder Installationen. Fehlende
+Fähigkeiten bleiben BLOCKED_CAPABILITY. Diese Variante unterstützt ausschließlich
+ausdrücklich ausgewählte öffentliche, offene Issues mit passender Operator-ID.
+
+```text
+python -B -m tools.harness.github_handoff run --profile project.local.json --comment-id FREIGEGEBENE_KOMMENTAR_ID
+python -B -m tools.harness.github_handoff status --profile project.local.json --comment-id FREIGEGEBENE_KOMMENTAR_ID
+```
+
+Vor dem Workerstart reserviert ein Nonce-Commit mit unverändertem Quellbaum den
+Branch `loop42-claims/TASK_ID` per normalem Git-Push. Konkurrierende Geschwister-
+Claims können einander nicht vorspulen; nur ein Versuch erhält den Claim. Dessen
+Remote-SHA wird vor Ausführung erneut gelesen. Erforderlich sind explizite
+Profilfreigabe und vorhandene HTTPS-Schreibrechte. Keine Force-Updates, Löschungen
+oder Produktbranch-Änderungen. Fehlendes lokales Recovery und ein bereits belegter
+Claim blockieren auch auf einem zweiten Host. Claim-Branches bleiben bis zur
+bewussten Reconciliation erhalten; Löschen erteilt keine Retryfreigabe. Der
+eigentliche Ergebniskandidat bleibt lokal; kein automatischer Kandidatenpush/PR.
+Der öffentliche Claim enthält auch Git-Autorname und -E-Mail aus dem Profil.
+Dafür eine bewusst öffentliche Noreply- oder synthetische Identität verwenden;
+dies gehört zur ausdrücklichen Freigabe `allow_execution_refs`.
+
+Der Rückkanal veröffentlicht nur Aufgaben-/Quell-/Receiptidentität, Status und
+begrenzte Prüf-Exitdaten. Keine lokalen Pfade, Rohlogs, Prompts, Zugangsdaten oder
+Modelltexte. Atomarer Publikationsclaim und persistierter SideEffectIntent gehen
+einem einzigen POST voraus; anschließend erfolgt ein unabhängiges GET. Verlorene
+Antworten werden nur durch den exakten eigenen Ergebnismarker bestätigt. Fehlende
+oder widersprüchliche Belege bleiben UNKNOWN; kein automatischer erneuter POST.
+Geänderte GitHub-Aufträge/Quellen verhindern Apply beziehungsweise Veröffentlichung.
+Redirects, Pagination, übergroße Antworten und automatische HTTP-Retries werden
+abgewiesen. Remote-Status trägt ausdrücklich
+`github_report_not_local_reverification`: authentifizierter Berichtabruf, keine
+eigene erneute lokale Ausführung. Unbeaufsichtigter Hosttrigger und Privat-Repo-
+Unterstützung werden dadurch nicht behauptet.
+
+Quellen: [GitHub-Kommentar-API](https://docs.github.com/en/rest/issues/comments),
+[bestehende Git-Credential-Helper](https://git-scm.com/docs/gitcredentials).
+
 Ein freigegebener Host-Aufruf prüft Auftrag, Repository, exakte Quellrevision und
 sauberen Checkout. Ein vorhandener Provider liefert genau einen Vorschlag. Der
 bestehende ChangeSet-/Policy-/Dispatch-/Verification-Kern wendet ihn in einem
@@ -76,14 +128,16 @@ Prüfercode-/Pythonfingerprint, Prüferkennung/Zeit und Evidenzhashes erneut.
 Diese lokalen Daten sind keine Signaturen gegen einen Angreifer mit Hostzugriff.
 Andere Quellen oder Prüfer benötigen neue Qualifikation. Rote Tests bleiben
 FAILED, fehlende/beschädigte Belege UNKNOWN. Arbeitsordner bleiben für Recovery
-erhalten. Kein automatischer Push, PR, Merge oder Hintergrundlauf.
+erhalten. Kein automatischer Ergebniskandidatenpush, PR, Merge oder Hintergrundlauf.
+Der GitHub-Adapter darf nur ausdrücklich freigegebene Claim-Refs reservieren.
 
 Ein berechtigter Host kann einen geprüften, nichtprivaten Kurzbeleg im vorhandenen
 GitHub-Issue/PR hinterlegen: Task-ID, Quell-/Kandidaten-SHAs, Receiptfingerprint und
 Prüfergebnisse. Andere berechtigte Sitzungen können ihn dort abrufen. Rohdaten
 und lokale Pfade bleiben privat. Das ist ein übernommener Bericht, keine eigene
 lokale Nachprüfung; dafür benötigt der Statusaufruf den erhaltenen Recoverypfad.
-Die CLI selbst veröffentlicht nicht automatisch auf GitHub.
+Die ursprüngliche `handoff_cli` überlässt das dem Host; `github_handoff`
+automatisiert ausschließlich den begrenzten Ergebnisbeleg.
 
 ## Produktgrenzen und Aufwand
 
