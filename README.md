@@ -12,6 +12,19 @@ Instead of letting chats, tools, branches and workers slowly drift into differen
 
 **What is actually true now? What is the next useful thing to do? Are we allowed and able to do it? Did it really work? Is another round still worth it?**
 
+## Current integrated status — 2026-11-01
+
+PR [#78](https://github.com/DeepWolf42/Loop42/pull/78), including [#79](https://github.com/DeepWolf42/Loop42/pull/79), is integrated into `main` at `91e4cf99a5d9cbaece517dbe9a1b209e6abc1dc5`.
+
+- Approved public task text can enter the existing GitHub/local Codex handoff in one command, with RED/GREEN verification, isolated candidate commit and automatically published receipt. See [operation and setup](docs/HANDOFF.md).
+- Codex proposals require a complete, consistent event stream and matching final proposal. Verifier-created history/index changes, symlinks and permission changes block completion. Duplicate or ambiguous starts never silently rerun.
+- Combined candidate `39c8df3`: 334 local tests run, 333 passed / 1 platform skip. [Linux/Windows CI](https://github.com/DeepWolf42/Loop42/actions/runs/41333958302) and [secret scan](https://github.com/DeepWolf42/Loop42/actions/runs/41333958306) succeeded; both completion gates passed on the exact candidate. Those are pre-merge receipts, not a claim about a later commit's CI.
+- Real synthetic Codex/GitHub runs are documented in #78 at their original revisions. No new live model call was performed for the combined correction.
+- Arbitrary Chat/Work kickoff and unattended triggering remain unqualified. A capable local host and explicit project profile are required. This is no general model-quality or production-autonomy approval.
+- Other optional drafts remain separate. Consumers retain their existing pins. Private memory/reflection remains research; `NO_GO_PRODUCT_INTEGRATION` remains in force.
+
+Earlier dated checkpoints below are historical; they do not override this integration or current GitHub checks.
+
 ## In plain language
 
 Loop42 is **not** an AI model, a project-management app or a second database for your project.
@@ -77,7 +90,7 @@ CORA is the first consumer project. CORA keeps its own product state and pins an
 
 ## Start here
 
-- [Executable local handoff](docs/HANDOFF.md) — issue #77 candidate: bounded worker execution, verification and independently readable recovery; direct cross-surface triggering remains capability-dependent.
+- [Executable local handoff](docs/HANDOFF.md) — integrated issue #77 flow: bounded worker execution, verification and independently readable recovery; direct cross-surface triggering remains capability-dependent.
 
 If you want to understand the system rather than read every file:
 
