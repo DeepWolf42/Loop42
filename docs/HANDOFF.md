@@ -58,6 +58,43 @@ run with operator permissions; review scripts and dependencies beforehand.
 
 ## One task, one start
 
+### Start from approved public text
+
+`github_submit` composes the existing request schema from a UTF-8 task and a
+trusted project profile, submits the input to the selected issue, then delegates
+to `github_handoff`. The profile supplies all allowed paths and all registered
+verification IDs; RED is mandatory. Use a narrowly scoped profile. Add
+`github.allow_task_comments: true` explicitly: this separately authorizes the
+public task text, in addition to existing result-comment and claim-ref scopes.
+Do not send private tasks, conversations, paths, credentials or patient data.
+
+```text
+python -B -m tools.harness.github_submit start --profile project.local.json --submission-id approved-task-1 --expected-revision EXACT_40_HEX_SHA --task-file approved-public-task.txt
+```
+
+The task file can be `-` for caller-owned stdin. Task text is bounded to 2048 UTF-8
+bytes and cannot contain Markdown code fences. No JSON construction, manual
+comment-ID transfer or intermediate user handoff is required. `submit` instead
+of `start` only publishes the input and returns SUBMITTED, never worker success.
+The returned `input_comment_id` works with the existing remote `status` command.
+The host must still reconcile open work and approve intent before this call;
+arbitrary issue prose does not become authority.
+
+A stable caller-selected submission key binds the numeric repository/operator
+IDs and selected issue. Reusing it with changed text, source or scope blocks.
+An exact owned input marker can be rediscovered on another host. A separate
+existing Git-claim mechanism reserves this submission before its single POST;
+the normal execution claim still protects the worker. Both claims are retained.
+Lost responses are reconciled through exact owned comments and the existing
+SideEffectIntent contract; absent/conflicting evidence never authorizes a retry.
+An incomplete local claim or an occupied remote claim blocks rather than
+creating another input. There is no new database, scheduler, service, credential
+or permission. Existing recovery stays consumer-owned.
+
+Acceptance: real-Git submission/start/duplicate and failure tests, complete
+repository suite and gates, then an actual public synthetic one-command run and
+independent remote receipt retrieval. Test doubles are not live GitHub/model proof.
+
 A capable Chat/Work/Codex host can read an approved GitHub issue through its
 connected GitHub tools, reconcile open work and prepare this small local task
 without asking the user to copy messages. The host owns intent/acceptance review;

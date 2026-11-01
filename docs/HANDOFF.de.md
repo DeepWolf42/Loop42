@@ -84,6 +84,45 @@ separater Statusaufruf; Gesamttests und revisionsgebundene CI.
 
 ## Einrichtung und nächster Auftrag
 
+### Start mit freigegebenem öffentlichem Text
+
+`github_submit` erzeugt das bestehende Auftragsschema aus UTF-8-Auftragstext und
+vertrauenswürdigem Projektprofil, veröffentlicht den Eingang im ausgewählten
+Issue und nutzt danach `github_handoff`. Das Profil liefert sämtliche erlaubten
+Pfade und registrierten Prüfkennungen; RED ist Pflicht. Das Profil entsprechend
+eng begrenzen. `github.allow_task_comments: true` muss zusätzlich ausdrücklich
+die Veröffentlichung des Auftragstextes erlauben. Die bisherigen Freigaben für
+Ergebnisbelege und Claim-Refs reichen dafür nicht aus. Keine privaten Aufträge,
+Chats, Pfade, Zugangsdaten oder Patientendaten übermitteln.
+
+```text
+python -B -m tools.harness.github_submit start --profile project.local.json --submission-id freigegebener-auftrag-1 --expected-revision EXAKTER_40_HEX_SHA --task-file oeffentlicher-auftrag.txt
+```
+
+`--task-file -` liest vom durch den Aufrufer kontrollierten stdin. Maximal 2048
+UTF-8-Bytes, keine Markdown-Codezäune. JSON-Erstellung, manuelle Kommentar-ID-
+Übertragung und Zwischenübergaben entfallen. `submit` statt `start` veröffentlicht
+nur den Eingang und liefert SUBMITTED, keinen Workererfolg. Die zurückgegebene
+`input_comment_id` eignet sich für den vorhandenen Remote-Statusaufruf. Der Host
+muss offene Arbeit und Auftragsabsicht vorher abgleichen; beliebiger Issue-Text
+erteilt keine Ausführungsfreigabe.
+
+Der stabile Einreichungsschlüssel bindet numerische Repository-/Operator-IDs und
+das ausgewählte Issue. Wiederverwendung mit anderem Text, Quellstand oder Umfang
+blockiert. Ein exakter eigener Eingangsmarker ist auf einem zweiten Host wieder
+auffindbar. Der vorhandene Git-Claim reserviert auch die Einreichung vor ihrem
+einzigen POST; der normale Ausführungsclaim schützt weiterhin den Worker. Beide
+bleiben erhalten. Verlorene Antworten werden über exakte eigene Kommentare und
+den vorhandenen SideEffectIntent-Vertrag abgeglichen. Fehlende oder widersprüchliche
+Belege erlauben keinen Retry. Unvollständige lokale oder belegte entfernte Claims
+blockieren, statt einen zweiten Eingang zu erzeugen. Keine neue Datenbank,
+Zeitsteuerung, Dienste, Zugangsdaten oder Rechte; Recovery bleibt beim Consumer.
+
+Abnahme: echte Git-Tests für Einreichung, Start, Duplikate und Fehlerfälle;
+Gesamtsuite und Gates; anschließend ein tatsächlicher öffentlicher synthetischer
+Ein-Befehl-Lauf mit unabhängigem Abruf des Receipts. Testdoubles sind kein
+Live-GitHub-/Modellnachweis.
+
 Die vollständigen JSON-Beispiele stehen im [englischen Vertragsdokument](HANDOFF.md).
 Einmal pro Projekt eine private, vertrauenswürdige `project.local.json` außerhalb
 der Versionsverwaltung einrichten: Repository-ID, absoluter Checkoutpfad,

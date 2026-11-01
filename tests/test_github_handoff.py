@@ -36,7 +36,8 @@ class FakeGitHub:
     def post(self,path,body):
         assert path=='/repos/example/synthetic/issues/7/comments'
         self.posts+=1
-        result={'id':124,'body':body['body'],'user':{'id':9,'login':'operator'},
+        result={'id':123+self.posts,'body':body['body'],'user':{'id':9,'login':'operator'},
+                'updated_at':'2026-11-01T10:01:00Z',
                 'issue_url':'https://api.github.com/repos/example/synthetic/issues/7',
                 'html_url':'https://github.com/example/synthetic/issues/7#issuecomment-124'}
         self.comments.append(result)
