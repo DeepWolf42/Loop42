@@ -2,6 +2,9 @@
 
 # Ausführbare lokale Übergabe (Kandidat für Issue #77)
 
+GREEN muss zusätzlich Typ, Berechtigungen und freigegebene Bytes jeder geänderten regulären Datei erhalten. Symlinks/Junctions oder geänderte Dateimodi blockieren den Abschluss vor dem Staging mit UNKNOWN. Zwei reale Git-Gegenfälle reproduzieren vor dieser Korrektur einen falschen Erfolg.
+
+
 Die Kandidatenhistorie muss nach RED, vor Apply und vor dem Commit auf der
 gebundenen Quellrevision bleiben. GREEN muss den Git-Index unverändert lassen;
 gestagte fremde Dateien oder von Prüfkommandos erzeugte Commits blockieren den

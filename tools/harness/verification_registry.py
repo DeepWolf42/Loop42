@@ -96,12 +96,15 @@ def run_verifications(
     *,
     stop_on_failure: bool = True,
     output_limit: int = _DEFAULT_OUTPUT_LIMIT,
+    separate_stderr: bool = False,
 ) -> Tuple[VerificationResult, ...]:
     """Run only pre-registered argv commands; never evaluate a model command string."""
     if not isinstance(registry, VerificationRegistry):
         raise TypeError("registry must be VerificationRegistry")
     if type(stop_on_failure) is not bool:
         raise TypeError("stop_on_failure must be boolean")
+    if type(separate_stderr) is not bool:
+        raise TypeError('separate_stderr must be boolean')
     if isinstance(output_limit, bool) or not isinstance(output_limit, int) or not 1 <= output_limit <= 16 * 1024 * 1024:
         raise ValueError("output_limit must be between 1 byte and 16 MiB")
     root = _workspace_root(workspace)
@@ -109,30 +112,36 @@ def run_verifications(
     results: list[VerificationResult] = []
 
     for spec in specs:
-        scope = VerificationProcess(spec.argv, root)
+        scope = VerificationProcess(spec.argv, root, separate_stderr=True) if separate_stderr else VerificationProcess(spec.argv, root)
         process = scope.process
         captured = bytearray()
+        diagnostics = bytearray()
+        output_lock = threading.Lock()
         overflow = threading.Event()
         reader_errors = []
-        def read_output():
+        def read_output(stream, destination):
             try:
                 while True:
-                    chunk = process.stdout.read1(min(65536, output_limit + 1))
+                    chunk = stream.read1(min(65536, output_limit + 1))
                     if not chunk:
                         break
-                    remaining = output_limit - len(captured)
-                    captured.extend(chunk[:remaining])
-                    if len(chunk) > remaining:
-                        overflow.set()
-                        break
+                    with output_lock:
+                        remaining = output_limit - len(captured) - len(diagnostics)
+                        destination.extend(chunk[:remaining])
+                        if len(chunk) > remaining:
+                            overflow.set()
+                            break
             except BaseException as error:
                 reader_errors.append(error)
-        reader = threading.Thread(target=read_output, daemon=True)
+        readers = [threading.Thread(target=read_output, args=(process.stdout,captured), daemon=True)]
+        if separate_stderr:
+            readers.append(threading.Thread(target=read_output, args=(process.stderr,diagnostics), daemon=True))
         timed_out = False
         import time
         deadline = time.monotonic() + spec.timeout_seconds
         try:
-            reader.start()
+            for reader in readers:
+                reader.start()
             while process.poll() is None and not overflow.is_set():
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
@@ -144,10 +153,13 @@ def run_verifications(
             try:
                 # Also quiesce descendants after an otherwise successful parent.
                 scope.terminate()
-                reader.join(timeout=3)
-                if reader.is_alive():
+                for reader in readers:
+                    reader.join(timeout=3)
+                if any(reader.is_alive() for reader in readers):
                     raise RuntimeError('verification output reader did not become quiescent')
                 process.stdout.close()
+                if separate_stderr:
+                    process.stderr.close()
             finally:
                 scope.close()
         if reader_errors:

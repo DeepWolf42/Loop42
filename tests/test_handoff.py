@@ -69,6 +69,31 @@ class HandoffTests(unittest.TestCase):
         self.assertEqual(execute(self.request, self.profile, provider=self.provider)['commit'], result['commit'])
         self.assertEqual(self.calls, 1)
 
+    @unittest.skipIf(os.name == 'nt', 'POSIX symlink qualification')
+    def test_green_verifier_cannot_replace_candidate_with_symlink(self):
+        external = self.root / 'approved-bytes.txt'
+        external.write_bytes(b'right\n')
+        command=("from pathlib import Path;"
+                 "assert Path('answer.txt').read_bytes()==b'right\\n';"
+                 "Path('answer.txt').unlink();"
+                 "Path('answer.txt').symlink_to("+repr(str(external))+")")
+        self.profile['verifications'][0]['argv']=[sys.executable,'-B','-c',command]
+        result=execute(self.request,self.profile,provider=self.provider)
+        self.assertEqual(result['status'],'UNKNOWN')
+        self.assertNotIn('commit',result)
+        self.assertEqual(self.git('status','--porcelain'),'')
+
+    @unittest.skipIf(os.name == 'nt', 'POSIX executable mode qualification')
+    def test_green_verifier_cannot_change_candidate_executable_mode(self):
+        self.git('config','core.filemode','true')
+        command=("from pathlib import Path;"
+                 "assert Path('answer.txt').read_bytes()==b'right\\n';"
+                 "Path('answer.txt').chmod(0o755)")
+        self.profile['verifications'][0]['argv']=[sys.executable,'-B','-c',command]
+        result=execute(self.request,self.profile,provider=self.provider)
+        self.assertEqual(result['status'],'UNKNOWN')
+        self.assertNotIn('commit',result)
+
     def test_stale_revision_blocks_before_provider(self):
         self.request['source_revision'] = '0'*40
         with self.assertRaises(ValueError): execute(self.request, self.profile, provider=self.provider)

@@ -45,7 +45,9 @@ def _checked(value):
 
 
 class VerificationProcess:
-    def __init__(self, argv: tuple[str, ...], workspace: Path):
+    def __init__(self, argv: tuple[str, ...], workspace: Path, *, separate_stderr: bool = False):
+        if type(separate_stderr) is not bool:
+            raise TypeError('separate_stderr must be boolean')
         self.job = None
         self.process = None
         if os.name == 'nt':
@@ -62,7 +64,7 @@ class VerificationProcess:
                 self.process = subprocess.Popen(
                     [sys.executable, str(Path(__file__).resolve()), name, json.dumps(argv)],
                     cwd=workspace, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT, shell=False,
+                    stderr=subprocess.PIPE if separate_stderr else subprocess.STDOUT, shell=False,
                 )
             except BaseException:
                 self.api.CloseHandle(self.job)
@@ -70,7 +72,8 @@ class VerificationProcess:
                 raise
         else:
             self.process = subprocess.Popen(argv, cwd=workspace, stdin=subprocess.DEVNULL,
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False, start_new_session=True)
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE if separate_stderr else subprocess.STDOUT,
+                shell=False, start_new_session=True)
 
     def terminate(self):
         if self.job is not None:

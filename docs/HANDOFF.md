@@ -2,6 +2,9 @@
 
 # Executable local handoff (issue #77 candidate)
 
+GREEN must also preserve each modified regular file's type, permissions and approved bytes. Replacing it with a symlink/junction or changing its mode blocks completion as UNKNOWN before staging. Two real-Git regression cases reproduce false completion before this correction.
+
+
 Candidate history must remain at the bound source revision after RED, before
 apply and before commit. GREEN must leave the Git index unchanged; staged foreign
 files or verifier-created commits block completion as UNKNOWN. Existing recovery

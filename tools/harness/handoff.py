@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import stat
 import sys
 
 from tools.harness.action_policy import ActionEffect, PolicyDecision, PolicyRule
@@ -232,13 +233,18 @@ def execute(request, profile, *, provider=None, before_provider=None):
         target_prefix='repo:'+p,effect=ActionEffect.REVERSIBLE_WRITE) for i,p in enumerate(request['paths']))
     change_permit=issue_changeset_permit(workspace,normalized,interactive=False,rules=rules)
     apply_changeset(workspace,normalized,change_permit,interactive=False,rules=rules)
+    candidate_modes={c.path:stat.S_IMODE((workspace/c.path).stat().st_mode) for c in normalized.files}
     green=tuple(asdict(v) for v in run_verifications(workspace,request['verification_ids'],registry,stop_on_failure=False))
     report['green']=green
     if any(v['exit_code']!=0 or v['timed_out'] or v['output_truncated'] for v in green):
         return finish({'status':'FAILED_VERIFICATION'})
     # A verifier cannot silently edit the candidate or include foreign files.
     for c in normalized.files:
-        if hashlib.sha256((workspace/c.path).read_bytes()).hexdigest()!=c.after_sha256:
+        target=workspace/c.path
+        if (any(q.is_symlink() or q.is_junction() for q in (target,*target.parents))
+                or not target.is_file()
+                or stat.S_IMODE(target.stat().st_mode)!=candidate_modes[c.path]
+                or hashlib.sha256(target.read_bytes()).hexdigest()!=c.after_sha256):
             return finish({'status':'UNKNOWN','reason':'verified_candidate_changed'})
     dirty=git(workspace,'diff','--name-only').splitlines()
     if git(repo,'rev-parse','HEAD')!=task.source_revision or git(repo,'status','--porcelain'):
