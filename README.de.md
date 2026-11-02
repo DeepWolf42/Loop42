@@ -23,6 +23,7 @@ PR [#78](https://github.com/DeepWolf42/Loop42/pull/78) einschließlich [#79](htt
 - Gemeinsamer Kandidat `39c8df3`: lokal 334 Tests ausgeführt, 333 bestanden / 1 Plattformskip. [Linux-/Windows-CI](https://github.com/DeepWolf42/Loop42/actions/runs/41333958302), [Secret-Scan](https://github.com/DeepWolf42/Loop42/actions/runs/41333958306) und beide exakt gebundenen Abschlussprüfungen bestanden. Das sind Kandidatennachweise vor dem Merge, keine CI-Zusage für spätere Commits.
 - Echte synthetische Codex-/GitHub-Läufe sind in #78 an ihren ursprünglichen Revisionen dokumentiert. Für die gemeinsame Korrektur gab es keinen neuen Modellaufruf.
 - Beliebiger Chat-/Work-Start und unbeaufsichtigte Auslösung bleiben unqualifiziert. Erforderlich sind ein geeigneter lokaler Host und ein ausdrücklich freigegebenes Projektprofil. Keine allgemeine Modellqualitäts- oder Produktivautonomiefreigabe.
+- Der optionale [A/B-Prüfer](docs/REFINEMENT_TRIAL.md) bewertet gelieferte Ziel-/Holdout-Ergebnisse und weist widersprüchliche Prüferrevisionen zurück. Er startet keine Modelle, authentifiziert keine Belege und erteilt keine Übernahme- oder Ausführungsfreigabe. Keine gemessene Modellverbesserung behauptet.
 - Andere optionale Drafts bleiben getrennt; Consumer-Pins unverändert. Privates Memory/Reflection bleibt Forschung mit `NO_GO_PRODUCT_INTEGRATION`.
 
 Ältere datierte Abschnitte darunter sind historische Nachweise und ersetzen weder diesen Integrationsstand noch aktuelle GitHub-Prüfungen.

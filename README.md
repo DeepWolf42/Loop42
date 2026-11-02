@@ -21,6 +21,7 @@ PR [#78](https://github.com/DeepWolf42/Loop42/pull/78), including [#79](https://
 - Combined candidate `39c8df3`: 334 local tests run, 333 passed / 1 platform skip. [Linux/Windows CI](https://github.com/DeepWolf42/Loop42/actions/runs/41333958302) and [secret scan](https://github.com/DeepWolf42/Loop42/actions/runs/41333958306) succeeded; both completion gates passed on the exact candidate. Those are pre-merge receipts, not a claim about a later commit's CI.
 - Real synthetic Codex/GitHub runs are documented in #78 at their original revisions. No new live model call was performed for the combined correction.
 - Arbitrary Chat/Work kickoff and unattended triggering remain unqualified. A capable local host and explicit project profile are required. This is no general model-quality or production-autonomy approval.
+- The optional [paired A/B classifier](docs/REFINEMENT_TRIAL.md) reviews supplied target/holdout outcomes, including verifier-revision mismatches. It runs no models, authenticates no evidence and grants no instruction adoption or execution authority. No measured model improvement is claimed.
 - Other optional drafts remain separate. Consumers retain their existing pins. Private memory/reflection remains research; `NO_GO_PRODUCT_INTEGRATION` remains in force.
 
 Earlier dated checkpoints below are historical; they do not override this integration or current GitHub checks.
