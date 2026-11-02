@@ -2,6 +2,8 @@
 
 # Loop42
 
+[Ausführbare lokale Übergabe](docs/HANDOFF.de.md): Integrierter Ablauf für Issue #77 mit begrenzter Worker-Ausführung, Verifikation und separat lesbarem Recovery-Status. Direkte oberflächenübergreifende Auslösung bleibt von tatsächlich verfügbaren Hostfähigkeiten abhängig.
+
 <p align="center">
   <img src="docs/assets/loop42-mark.webp" alt="Loop42 Retro-Emblem" width="300">
 </p>
@@ -11,6 +13,20 @@ Loop42 hilft dabei, lange KI-gestützte Entwicklungsarbeit **verständlich, übe
 Statt dass Chats, Werkzeuge, Branches und verschiedene Worker mit der Zeit ihre eigenen Versionen der Realität entwickeln, kehrt Loop42 immer wieder zu ein paar einfachen Fragen zurück:
 
 **Was stimmt gerade wirklich? Was ist als Nächstes sinnvoll? Dürfen und können wir das tun? Hat es tatsächlich funktioniert? Bringt eine weitere Runde noch etwas?**
+
+## Aktuell integrierter Stand — 01.11.2026
+
+PR [#78](https://github.com/DeepWolf42/Loop42/pull/78) einschließlich [#79](https://github.com/DeepWolf42/Loop42/pull/79) ist in `main` unter `91e4cf99a5d9cbaece517dbe9a1b209e6abc1dc5` integriert.
+
+- Freigegebener öffentlicher Auftragstext startet den vorhandenen GitHub-/lokalen Codex-Ablauf mit einem Befehl: RED/GREEN-Prüfung, isolierter Kandidatencommit und automatisch veröffentlichter Ergebnisbeleg. [Bedienung und Einrichtung](docs/HANDOFF.de.md).
+- Codex-Vorschläge benötigen einen vollständigen, widerspruchsfreien Ereignisstrom und passenden Abschluss. Vom Prüfer geänderte Historie, Git-Index, Symlinks oder Dateiberechtigungen blockieren den Abschluss. Doppelte oder unklare Starts werden nicht stillschweigend wiederholt.
+- Gemeinsamer Kandidat `39c8df3`: lokal 334 Tests ausgeführt, 333 bestanden / 1 Plattformskip. [Linux-/Windows-CI](https://github.com/DeepWolf42/Loop42/actions/runs/41333958302), [Secret-Scan](https://github.com/DeepWolf42/Loop42/actions/runs/41333958306) und beide exakt gebundenen Abschlussprüfungen bestanden. Das sind Kandidatennachweise vor dem Merge, keine CI-Zusage für spätere Commits.
+- Echte synthetische Codex-/GitHub-Läufe sind in #78 an ihren ursprünglichen Revisionen dokumentiert. Für die gemeinsame Korrektur gab es keinen neuen Modellaufruf.
+- Beliebiger Chat-/Work-Start und unbeaufsichtigte Auslösung bleiben unqualifiziert. Erforderlich sind ein geeigneter lokaler Host und ein ausdrücklich freigegebenes Projektprofil. Keine allgemeine Modellqualitäts- oder Produktivautonomiefreigabe.
+- Der optionale [A/B-Prüfer](docs/REFINEMENT_TRIAL.md) bewertet gelieferte Ziel-/Holdout-Ergebnisse und weist widersprüchliche Prüferrevisionen zurück. Er startet keine Modelle, authentifiziert keine Belege und erteilt keine Übernahme- oder Ausführungsfreigabe. Keine gemessene Modellverbesserung behauptet.
+- Andere optionale Drafts bleiben getrennt; Consumer-Pins unverändert. Privates Memory/Reflection bleibt Forschung mit `NO_GO_PRODUCT_INTEGRATION`.
+
+Ältere datierte Abschnitte darunter sind historische Nachweise und ersetzen weder diesen Integrationsstand noch aktuelle GitHub-Prüfungen.
 
 ## Einfach gesagt
 
