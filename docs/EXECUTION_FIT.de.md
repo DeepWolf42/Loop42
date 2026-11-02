@@ -99,6 +99,21 @@ Behandle tarifabhängige Kontingente, Rate Limits, Modell-/Agenten-Nutzung, Task
 
 Prüfe auch den aktiven Client oder Host. Browser, Desktop, Mobilgerät und automatisierte Laufzeit können selbst im selben Konto unterschiedliche Fähigkeiten anbieten. Fehlt die gewählte Aktion im aktuellen Client, wiederhole gescheiterte Versuche nicht endlos und gib keine langen unbrauchbaren Klickpfade vor. Bereite die begrenzte Arbeit vor, wechsle oder verschiebe sie auf einen geeigneten Client, wenn praktikabel, oder wähle einen einfacheren Ausweichweg, der das Ziel erhält.
 
+## Wiederverwendung vor neuer Tool-, Plugin- und Skill-Auswahl
+
+Dies ist eine begrenzte **Execution-Fit-Prüfung** in TARGET / PRE-MORTEM, keine zusätzliche Matrixloop-Phase, kein Pflichtstopp vor jedem Code-Schritt und keine ChatGPT-spezifische Voraussetzung. Sie ist sinnvoll, wenn eine größere neue Fähigkeit, Abhängigkeit, Integration oder Ausführungsroute ausgewählt wird, wiederholte Reibung auf ein fehlendes Werkzeug hindeutet oder die verfügbaren Fähigkeiten wesentlich unklar sind. Bei einer kleinen, bereits klar begrenzten Änderung oder einem aktuell nachgewiesenen geeigneten Weg die Prüfung auslassen oder stark verkürzen. Unveränderte Kataloge nicht immer neu durchsuchen.
+
+1. **Zuerst das Ergebnis klären.** Aufgabe, Grenzen, Akzeptanzevidenz und maßgebliche aktuelle Revision festhalten, ohne ein bestimmtes Werkzeug als Lösung vorauszusetzen.
+2. **Eigene Lösungen vor externer Suche prüfen.** Bestehende Projektfähigkeiten, freigegebene Tools, Bibliotheken, Workflows, Adapter, Entscheidungen und relevante offene Arbeiten berücksichtigen. Keine aktive Implementierung duplizieren und keine geprüfte Fähigkeit nur wegen eines neuen Tools ersetzen.
+3. **Die echte Werkzeugumgebung des aktiven Hosts prüfen.** Bei Bedarf installierte und verbindbare Tools, Apps, Plugins, Skills, Repository-/Coding-Agenten und Spezialdienste prüfen. Zwischen *gelistet*, *installiert*, *in diesem Client verfügbar*, *autorisiert* und *funktionsgeprüft* unterscheiden. Ein Katalogeintrag belegt weder Zugriff noch Berechtigung. Host-spezifische Suche und Aktivierung gehören hinter schlanke Adapter.
+4. **Nur plausible Kandidaten vergleichen.** Eine kleine Auswahl nach Aufgaben-Fit, Evidenz/Aktualität, Kosten/Kontingenten, Sicherheit, Lizenzen, Abhängigkeiten, Wartung, Portabilität, Integrationsaufwand und Operator-Reibung bewerten. Erst außerhalb des Projekts suchen oder neu entwickeln, wenn eigene Optionen nicht genügen. Für fremden Code oder Muster gilt das normale Adoption-Gate des [External Pattern Scout](EXTERNAL_PATTERN_SCOUT.md).
+5. **Innerhalb der Berechtigungen handeln.** Ein verfügbares, freigegebenes Werkzeug direkt verwenden, wenn es der beste Weg ist. Neue Verbindungen, Installationen oder kostenpflichtige Dienste nur bei klarem *Netto-Vorteil* empfehlen; dazu Name, konkreter Nutzen, geprüfte Voraussetzungen und kürzester verifizierter Aktivierungsweg. Nichts stillschweigend installieren oder autorisieren. Eine optionale Empfehlung darf brauchbare Arbeit mit vorhandenem Ausweichweg nicht blockieren.
+6. **Verifizieren und aufhören.** Den gewählten Weg an der echten Aufgabe und aktuellen Revision testen. Ungeprüfte Aussagen als `UNKNOWN` behandeln, doppelte Tool-Aufrufe vermeiden und alte Entscheidungen nur bei wesentlichen Änderungen erneut bewerten.
+
+Den Operator nur unterbrechen, wenn tatsächlich neue Zustimmung, Ausgaben, Zugangsdaten, geschützte Aktionen oder eine wesentliche Richtungsentscheidung nötig sind. Sonst ohne ritualisierte Freigabefrage weiterarbeiten. Werkzeugentdeckung verleiht **keine neue Ausführungsbefugnis** und ändert nicht die Produktwahrheit des Consumer-Projekts.
+
+Beispiel: Eine kleine Python-Korrektur mit geprüftem Repository-Connector wird damit direkt umgesetzt, ohne jedes Mal Plugin-Kataloge durchzugehen. Eine neue Spezialintegration kann einen kurzen, belegten Werkzeugvergleich rechtfertigen; eine nicht notwendige Plugin-Empfehlung darf die brauchbare Umsetzung nicht verzögern.
+
 ## Tool-Routing und Client-Übergabe
 
 Wähle Tools nach Aufgabenform und gesamten Ausführungskosten statt nach einer festen Eskalationsleiter. Stufen dürfen übersprungen werden, wenn ein Spezialistenweg klar günstiger oder zuverlässiger ist.
@@ -144,3 +159,5 @@ Eine plausible Annahme reicht nicht, wenn sie Operator-Arbeit, Kosten oder eine 
 - der erwartete Weg prüft zuerst die Voraussetzung, bewertet den Mehrwert eines Upgrades, verwirft unnötige Komplexität, bietet die einfachste brauchbare Alternative an und gibt erst dann ausführbare Schritte.
 
 Das Szenario ist generisch. GitHub dient nur als konkrete Fixture, damit der Operator-Friction-Fehler reproduzierbar bleibt.
+
+`tests/frozen_scenarios/tool_skill_selection_v1.json` erfasst einen weiteren Werkzeugauswahl-Regressionsfall: Einen vorhandenen Repository-Connector ohne Installations-Pflichtfrage wiederverwenden und ein optionales externes Plugin nur bei geprüftem Nutzen und Zustimmung ergänzen.
