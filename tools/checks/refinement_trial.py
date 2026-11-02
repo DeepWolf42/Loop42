@@ -80,6 +80,7 @@ def evaluate_refinement_trial(raw: Any) -> TrialDecision:
         raise ValueError("trial requires 2-40 paired cases")
 
     seen: set[str] = set()
+    scenario_roles: dict[str, str] = {}
     harness: tuple[str, str] | None = None
     improved = regressed = preserved = 0
     target_improved = 0
@@ -94,6 +95,9 @@ def evaluate_refinement_trial(raw: Any) -> TrialDecision:
         scenario_sha = _hex(item["scenario_sha256"], _SHA, f"case[{i}].scenario_sha256")
         if item["kind"] not in ("target", "holdout"):
             raise ValueError("invalid case kind")
+        if scenario_sha in scenario_roles and scenario_roles[scenario_sha] != item["kind"]:
+            raise ValueError("scenario content reused across target and holdout")
+        scenario_roles[scenario_sha] = item["kind"]
         before = _run(item["baseline"], f"case[{i}].baseline", source, baseline, scenario_sha)
         after = _run(item["candidate"], f"case[{i}].candidate", source, candidate, scenario_sha)
         # The *same* verifier must score both arms of a case. Different frozen

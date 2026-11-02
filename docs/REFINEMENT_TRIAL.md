@@ -20,7 +20,7 @@ A coding agent may encounter a recurring error and suggest a reusable instructio
 - REJECT: any PASS -> FAIL paired regression.
 - INCONCLUSIVE: any UNKNOWN, a holdout failing to preserve PASS -> PASS, or no FAIL -> PASS target improvement.
 - PROMISING: at least one target FAIL -> PASS, every holdout PASS -> PASS, no regression or UNKNOWN. **Not** permission to adopt.
-- Malformed input or a source, prompt, scenario, verifier, model or harness identity mismatch raises ValueError.
+- Malformed input or a source, prompt, scenario, verifier, model or harness identity mismatch raises ValueError. A scenario content digest cannot serve as both target and holdout, even under different IDs or list order. Repeated content within one role remains allowed; independent artifact review still owns the actual experiment design.
 
 **Trust warning:** hashes here assert content identity only; they are not proof of execution or authentication. A caller could fabricate structurally valid PASS metadata. Do not treat checker output as a verification receipt, model-quality result, or independent oracle. The existing completion gates check actual engineering behavior and are not a replacement for semantic agent evaluation.
 

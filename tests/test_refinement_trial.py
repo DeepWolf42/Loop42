@@ -110,6 +110,26 @@ class RefinementTrialTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate"):
             evaluate_refinement_trial(self._changed(lambda d: d["cases"][1].update(scenario_id=d["cases"][0]["scenario_id"])))
 
+    def test_target_content_cannot_also_count_as_holdout(self):
+        for reverse in (False, True):
+            d = fixture()
+            digest = d["cases"][0]["scenario_sha256"]
+            holdout = d["cases"][1]
+            holdout["scenario_sha256"] = digest
+            for arm in ("baseline", "candidate"):
+                holdout[arm]["scenario_sha256"] = digest
+            if reverse:
+                d["cases"].reverse()
+            with self.subTest(reverse=reverse), self.assertRaisesRegex(ValueError, "target.*holdout"):
+                evaluate_refinement_trial(d)
+
+    def test_repeated_content_within_one_role_remains_comparable(self):
+        d = fixture()
+        repeat = copy.deepcopy(d["cases"][0])
+        repeat["scenario_id"] = "target-repeat"
+        d["cases"].append(repeat)
+        self.assertEqual(evaluate_refinement_trial(d).status, "PROMISING")
+
     def test_same_verifier_id_with_different_revision_per_arm_rejected(self):
         for index in (0, 1):
             d = fixture()
