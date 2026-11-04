@@ -98,6 +98,21 @@ Treat plan-bounded quotas, rate limits, model/agent usage, task slots and contex
 
 Also verify the active client or host. Browser, desktop, mobile and automated runtimes can expose different capabilities even under the same account. If the selected action is unavailable on the current client, do not loop on failed attempts or provide long unusable click-paths. Prepare the bounded work, switch/defer to a capable client when practical, or choose a lower-friction fallback that preserves the goal.
 
+## Reuse-aware tool, plugin and skill selection
+
+This is a bounded **Execution Fit** check in TARGET / PRE-MORTEM, not a new Matrixloop stage, mandatory pre-code pause or ChatGPT-specific requirement. Apply it when a substantial new capability, dependency, integration or execution path is being chosen; when repeated friction suggests a missing tool; or when available capabilities are materially uncertain. Skip or compress it for a trivial, already-bounded edit or when fresh evidence already identifies a suitable route. Do not repeatedly scan unchanged catalogs.
+
+1. **Define the outcome first.** State the task, constraints, acceptance evidence and current authoritative revision without assuming that a named tool is the answer.
+2. **Check owned reuse before external discovery.** Look at current project capabilities, approved tools, libraries, workflows, adapters, existing decisions and relevant open work. Do not duplicate an active implementation or replace a verified capability merely because another tool exists.
+3. **Inspect the active host's real capability surface.** Where useful, check installed and connectable tools, apps, plugins, skills, repository/coding agents and specialist services. Distinguish *listed*, *installed*, *available in this client*, *authorized* and *verified to work*. A catalog listing is not evidence of access or permission. Host-specific discovery and activation belong behind thin adapters.
+4. **Compare only plausible candidates.** Prefer a small shortlist judged by task fit, evidence and freshness, cost/quotas, safety, licensing, dependencies, maintenance, portability, integration effort and operator friction. Search outside the project or design a new solution only when owned options are insufficient. Follow the normal [External Pattern Scout](EXTERNAL_PATTERN_SCOUT.md) adoption gate for third-party code or patterns.
+5. **Choose and act within authority.** Use an already available, authorized tool directly if it is the best fit. Suggest a new connection, installation or paid service only when the *net* benefit is clear, including its name, specific advantage, confirmed prerequisites and the shortest verified activation path. Do not install or authorize it silently. An optional recommendation must not block useful work with an existing fallback.
+6. **Verify, then stop.** Test the selected path against the actual task and current revision. Preserve `UNKNOWN` for unverified claims, avoid duplicate tool calls, and revisit a prior choice only when material facts change.
+
+Pause for the operator only if execution genuinely requires new consent, spending, credentials, a protected action or a consequential change in direction. Otherwise continue without a ritual approval question. Tool discovery gives **no new execution authority** and must not change consumer project truth.
+
+For example, a small Python fix with a verified repository connector should proceed using that connector; it does not need a general plugin catalog tour. A new specialist integration may justify a short, evidence-based tool comparison, but a nonessential plugin recommendation must not delay a viable implementation.
+
 ## Tool routing and client handoff
 
 Choose tools by task shape and total execution cost, not by a fixed escalation ladder. Tiers may be skipped when a specialist path is clearly cheaper or more reliable.
@@ -143,3 +158,5 @@ A plausible assumption is not enough when it would cause operator work, cost or 
 - the expected path verifies the prerequisite first, evaluates upgrade value, rejects unnecessary complexity, offers the simplest viable fallback and only then gives actionable steps.
 
 The scenario is generic. GitHub is only the concrete fixture used to keep the operator-friction failure reproducible.
+
+`tests/frozen_scenarios/tool_skill_selection_v1.json` captures a separate tool-discovery regression: reuse an available repository tool without a forced installation prompt, and require a verified benefit and consent before adding an optional external plugin.
